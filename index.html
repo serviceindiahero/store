@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>India Motors — Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f1f5f9;--w:#fff;--bd:#e2e8f0;--pr:#2563eb;--prl:#eff6ff;--gr:#059669;--grl:#ecfdf5;--re:#dc2626;--rel:#fef2f2;--ye:#d97706;--yel:#fffbeb;--t1:#0f172a;--t2:#475569;--t3:#94a3b8;--r:12px;--rs:8px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased}
+input,button,select,textarea{font-family:'Inter',sans-serif;font-size:inherit}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+
+/* LOGIN */
+#LP{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#dbeafe,#f1f5f9 50%,#ede9fe);padding:16px}
+.lc{width:100%;max-width:400px;background:#fff;border-radius:20px;padding:36px 28px;box-shadow:0 20px 60px rgba(37,99,235,.15),0 4px 16px rgba(0,0,0,.06);border:1px solid #e0e7ff}
+.lb{text-align:center;margin-bottom:28px}
+.ll{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;box-shadow:0 8px 24px rgba(37,99,235,.3)}
+.lb h1{font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-.5px}
+.lb p{font-size:12px;color:#64748b;margin-top:4px}
+.lf{margin-bottom:14px}
+.lf label{display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.lf input{width:100%;padding:12px 14px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;color:#0f172a;font-size:14px;outline:none;transition:.2s}
+.lf input:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.pww{position:relative}.pww input{padding-right:44px}
+.pwe{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;line-height:1}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.35);transition:.2s}
+.lbtn:hover:not(:disabled){transform:translateY(-1px)}
+.lbtn:disabled{opacity:.6;cursor:not-allowed}
+.lerr{display:none;margin-top:12px;padding:12px 14px;border-radius:9px;font-size:13px;font-weight:500;line-height:1.5;text-align:center}
+.lerr.show{display:block}
+.lerr.e{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+.lerr.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#059669}
+.lerr.inf{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+.ltb{width:100%;padding:10px;margin-top:10px;background:transparent;border:1.5px solid #e2e8f0;border-radius:9px;color:#64748b;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+.ltb:hover{border-color:#2563eb;color:#2563eb;background:#eff6ff}
+.lft{text-align:center;margin-top:14px;font-size:11px;color:#94a3b8}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.shake{animation:shake .35s ease}
+
+/* APP */
+#APP{display:none;height:100vh;overflow:hidden;flex-direction:column}
+#APP.on{display:flex}
+
+/* TOPBAR */
+.tb{height:56px;min-height:56px;background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:sticky;top:0;z-index:50}
+.tb-m{background:none;border:none;cursor:pointer;color:#64748b;font-size:20px;padding:5px;border-radius:7px;display:none;line-height:1}
+.tb-lo{font-size:15px;font-weight:800;color:#0f172a}
+.tb-s{padding:3px 10px;background:#eff6ff;color:#2563eb;border-radius:20px;font-size:11px;font-weight:700;border:1px solid #bfdbfe}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sp{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#64748b;background:#f8fafc;border:1px solid var(--bd);border-radius:20px;padding:3px 10px}
+.sd{width:7px;height:7px;border-radius:50%;background:#059669}.sd.off{background:#dc2626}.sd.sy{background:#d97706}
+.av{width:33px;height:33px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff}
+.tb-srch{background:none;border:none;cursor:pointer;color:#64748b;font-size:18px;padding:6px;border-radius:7px}
+.tb-srch:hover{background:#eff6ff;color:#2563eb}
+
+/* LAYOUT */
+.lay{flex:1;display:flex;overflow:hidden}
+.sb{width:244px;min-width:244px;background:#fff;border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.sbu{padding:14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sbav{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.sbnm{font-size:13px;font-weight:700}.sbrl{font-size:11px;color:#64748b}
+.nv{flex:1;overflow-y:auto;padding:8px}
+.ns{padding:10px 10px 3px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;color:#475569;font-size:13px;font-weight:500;border-radius:var(--rs);margin:1px 0;transition:.15s}
+.ni:hover{background:#f1f5f9;color:#0f172a}.ni.on{background:#eff6ff;color:#2563eb;font-weight:700}
+.ni .ic{font-size:15px;width:20px;text-align:center}
+.sbf{padding:12px;border-top:1px solid var(--bd)}
+.blo{width:100%;padding:9px;background:transparent;border:1.5px solid var(--bd);border-radius:var(--rs);color:#64748b;cursor:pointer;font-size:12px;font-weight:600;transition:.15s}
+.blo:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2}
+.ov{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:199;backdrop-filter:blur(2px)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.pg{flex:1;overflow-y:auto;padding:20px}
+
+/* BOTTOM NAV */
+.bn{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);padding:5px 0 max(5px,env(safe-area-inset-bottom));z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.06)}
+.bnr{display:flex;justify-content:space-around}
+.bni{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 10px;cursor:pointer;color:#94a3b8;background:none;border:none;transition:.1s}
+.bni.on{color:#2563eb}.bni .bic{font-size:20px}.bni .bit{font-size:9px;font-weight:700;text-transform:uppercase}
+.fab{position:fixed;bottom:74px;right:16px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;cursor:pointer;font-size:22px;display:none;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,99,235,.4);z-index:101}
+
+/* SEARCH OVERLAY */
+.gs-ov{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:50px 16px 16px;backdrop-filter:blur(4px)}
+.gs-ov.on{display:flex}
+.gs-box{width:100%;max-width:680px;background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.2);overflow:hidden;max-height:82vh;display:flex;flex-direction:column}
+.gs-hd{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd)}
+.gs-in{flex:1;padding:10px 14px;background:#f8fafc;border:1.5px solid var(--bd);border-radius:9px;font-size:15px;outline:none;color:#0f172a}
+.gs-in:focus{border-color:#2563eb;background:#fff}
+.gs-cl{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:22px;line-height:1;padding:4px}
+.gs-rs{overflow-y:auto;flex:1}
+.gs-sec{padding:10px 16px 6px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;background:#f8fafc;border-bottom:1px solid var(--bd)}
+.gs-it{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:.1s}
+.gs-it:hover{background:#eff6ff}
+.gs-pn{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#2563eb;min-width:150px}
+.gs-em{padding:40px;text-align:center;color:#94a3b8}
+
+/* CARDS */
+.cd{background:#fff;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.cdh{padding:13px 17px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.cdt{font-size:13px;font-weight:700;color:#0f172a}.cdb{padding:16px}
+
+/* STATS */
+.sg{display:grid;gap:12px;margin-bottom:18px}
+.s2{grid-template-columns:1fr 1fr}.s3{grid-template-columns:repeat(3,1fr)}.s4{grid-template-columns:1fr 1fr}
+.st{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:15px;cursor:pointer;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.st:hover{border-color:#2563eb;transform:translateY(-2px)}
+.stl{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.stv{font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-1px;color:#0f172a}
+.sts{font-size:11px;color:#94a3b8;margin-top:4px}
+.stb{height:4px;background:#f1f5f9;border-radius:4px;margin-top:10px;overflow:hidden}
+.stbf{height:100%;border-radius:4px;transition:width .6s}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:.15s;white-space:nowrap}
+.bpr{background:#2563eb;color:#fff}.bpr:hover{background:#1d4ed8}
+.bsu{background:#059669;color:#fff}.bsu:hover{background:#047857}
+.bda{background:#dc2626;color:#fff}.bda:hover{background:#b91c1c}
+.bwa{background:#d97706;color:#fff}
+.bgh{background:transparent;border:1.5px solid var(--bd);color:#475569}.bgh:hover{border-color:#2563eb;color:#2563eb;background:#eff6ff}
+.bsm{padding:5px 11px;font-size:11px}.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* BADGES */
+.bg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.bgs{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
+.bgd{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.bgw{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+.bgp{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+.bgg{background:#f8fafc;color:#64748b;border:1px solid var(--bd)}
+
+/* PAGE */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.pt{font-size:20px;font-weight:800;color:#0f172a;letter-spacing:-.4px}
+.ps{font-size:12px;color:#64748b;margin-top:3px}
+
+/* TABS */
+.tbr{display:flex;border-bottom:2px solid var(--bd);margin-bottom:18px;overflow-x:auto}
+.tb2{padding:9px 16px;font-size:13px;font-weight:600;color:#64748b;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s}
+.tb2.on{color:#2563eb;border-bottom-color:#2563eb}
+.tp{display:none}.tp.on{display:block}
+
+/* ALERTS */
+.al{padding:10px 13px;border-radius:var(--rs);font-size:12px;margin-bottom:12px;font-weight:500;display:flex;gap:8px}
+.ali{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.alw{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+
+/* TOASTS */
+#TS{position:fixed;top:66px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.t{background:#fff;border:1px solid var(--bd);border-radius:9px;padding:11px 15px;display:flex;align-items:center;gap:9px;min-width:250px;max-width:330px;font-size:12px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,.1);animation:ti .22s ease}
+.t.ts{border-left:3px solid #059669}.t.td{border-left:3px solid #dc2626}.t.tw{border-left:3px solid #d97706}.t.ti{border-left:3px solid #2563eb}
+@keyframes ti{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+@keyframes to2{from{opacity:1}to{opacity:0;transform:translateX(110%)}}
+
+/* MODALS */
+.mbd{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.md{background:#fff;border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:mdi .18s ease;border:1px solid var(--bd)}
+.mdlg{max-width:660px}.mdxl{max-width:900px}
+@keyframes mdi{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.mdh{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2}
+.mdt{font-size:15px;font-weight:800}
+.mdc{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:20px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;line-height:1}
+.mdc:hover{background:#f1f5f9;color:#0f172a}
+.mdb{padding:20px}.mdf{padding:13px 20px;border-top:1px solid var(--bd);display:flex;gap:9px;justify-content:flex-end}
+
+/* FORMS */
+.fg{display:grid;gap:12px;margin-bottom:14px}.f2{grid-template-columns:1fr 1fr}
+.fl{display:flex;flex-direction:column;gap:5px}
+.fll{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px}
+.fi{padding:10px 12px;background:#f8fafc;border:1.5px solid var(--bd);border-radius:var(--rs);color:#0f172a;font-size:13px;outline:none;transition:.15s}
+.fi:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.fi.mn{font-family:'JetBrains Mono',monospace;text-transform:uppercase}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Cpath fill='%2364748b' d='M5.5 7L1 2h9z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;cursor:pointer}
+textarea.fi{resize:vertical;min-height:70px}
+
+/* TABLES */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{background:#f8fafc;padding:9px 13px;text-align:left;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--bd);white-space:nowrap;position:sticky;top:0;z-index:2}
+tbody tr{border-bottom:1px solid #f1f5f9;transition:.1s}
+tbody tr:hover{background:#fafbfc}
+tbody td{padding:10px 13px;font-size:12px;color:#475569}
+.tpn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#0f172a}
+.tq{font-family:'JetBrains Mono',monospace;font-weight:700;text-align:right}
+
+/* AUTOCOMPLETE */
+.acw{position:relative}
+.acl{position:absolute;top:calc(100% + 2px);left:0;right:0;background:#fff;border:1.5px solid #2563eb;border-radius:var(--rs);max-height:200px;overflow-y:auto;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,.12);display:none}
+.aci{padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid #f1f5f9}
+.aci:hover{background:#eff6ff}
+.acp{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb}
+.acd{font-size:11px;color:#64748b;margin-top:1px}
+
+/* PAGINATION */
+.pag{display:flex;align-items:center;gap:5px;padding:13px 17px;border-top:1px solid var(--bd);flex-wrap:wrap}
+.pb{padding:5px 10px;border:1.5px solid var(--bd);border-radius:6px;background:#fff;cursor:pointer;font-size:11px;font-weight:700;color:#64748b}
+.pb.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.pb:hover:not(.on):not(:disabled){border-color:#2563eb;color:#2563eb}
+.pb:disabled{opacity:.35;cursor:not-allowed}
+.pi{font-size:11px;color:#94a3b8;margin-right:4px}
+
+/* FILTERS */
+.fb{display:flex;gap:8px;flex-wrap:wrap;padding:11px 16px;border-bottom:1px solid var(--bd);background:#f8fafc}
+.fin{padding:7px 11px;background:#fff;border:1.5px solid var(--bd);border-radius:7px;font-size:12px;color:#0f172a;flex:1;min-width:120px;max-width:210px;outline:none}
+.fin:focus{border-color:#2563eb}
+select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2364748b' d='M5 7L1 2h8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:27px;cursor:pointer}
+
+/* DIFFS */
+.ds{color:#dc2626;font-weight:700}.de{color:#d97706;font-weight:700}.dm{color:#059669;font-weight:700}
+
+/* MISC */
+.prg{height:5px;background:#f1f5f9;border-radius:5px;overflow:hidden}
+.prgf{height:100%;border-radius:5px;transition:width .6s}
+.emp{text-align:center;padding:48px 20px;color:#94a3b8}
+.emp-i{font-size:44px;margin-bottom:10px}.emp-t{font-size:15px;font-weight:700;color:#64748b}
+.ib{background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--rs);padding:10px 13px;font-size:12px;color:#1e40af;font-weight:500}
+.smb{display:flex;gap:12px;flex-wrap:wrap;padding:9px 16px;background:#f8fafc;border-top:1px solid var(--bd);font-size:11px;font-weight:700}
+.smi{display:flex;align-items:center;gap:4px}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.snpc{background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:1px solid #bfdbfe;border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+.dz{border:2px dashed var(--bd);border-radius:var(--r);padding:32px;text-align:center;cursor:pointer;transition:.2s}
+.dz:hover{border-color:#2563eb;background:#eff6ff}
+
+/* SCANNER */
+.scw{width:100%;max-width:500px;margin:0 auto}
+.svw{position:relative;width:100%;border-radius:var(--r);overflow:hidden;background:#0f172a;aspect-ratio:4/3;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+#QRV{width:100%;height:100%;object-fit:cover;display:block}
+.sou{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.sfr{width:60%;aspect-ratio:1;position:relative}
+.sfr::before,.sfr::after{content:'';position:absolute;width:24px;height:24px;border-color:#3b82f6;border-style:solid}
+.sfr::before{top:0;left:0;border-width:4px 0 0 4px;border-radius:4px 0 0 0}
+.sfr::after{top:0;right:0;border-width:4px 4px 0 0;border-radius:0 4px 0 0}
+.sfb{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between}
+.sfb::before,.sfb::after{content:'';width:24px;height:24px;border-color:#3b82f6;border-style:solid}
+.sfb::before{border-width:0 0 4px 4px;border-radius:0 0 0 4px}
+.sfb::after{border-width:0 4px 4px 0;border-radius:0 0 4px 0}
+.sln{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#3b82f6,#93c5fd,#3b82f6,transparent);animation:sla 1.8s ease-in-out infinite;box-shadow:0 0 8px #3b82f6}
+@keyframes sla{0%{top:2%}50%{top:98%}100%{top:2%}}
+.sst{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
+.spl{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(15,23,42,.8);color:#fff;border:1px solid rgba(255,255,255,.15)}
+.spl.sc{color:#4ade80}.spl.de{color:#60a5fa}.spl.pa{color:#fbbf24}
+.sbt{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:10px}
+.s-btn{background:rgba(15,23,42,.75);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer}
+.sct{text-align:center;padding:8px 0 0;font-size:11px;color:#64748b}
+
+/* SCAN CARDS */
+.scc{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);padding:13px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.scc.fo{border-color:#a7f3d0;background:#f0fdf4}.scc.un{border-color:#fde68a;background:#fffbeb}
+.sch{display:flex;align-items:center;gap:7px;margin-bottom:9px;font-weight:700;font-size:13px}
+.scr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.scr:last-of-type{border:none}
+.scrl{color:#94a3b8;font-size:11px}.scrv{font-weight:600;color:#0f172a}
+.qc{display:flex;align-items:center;gap:6px}
+.qc input{width:70px;text-align:center;padding:5px;background:#f8fafc;border:1.5px solid #bfdbfe;border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#0f172a;outline:none}
+.qc input:focus{border-color:#2563eb}
+.qb{width:29px;height:29px;border-radius:50%;background:#eff6ff;color:#2563eb;border:none;cursor:pointer;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.qb:hover{background:#2563eb;color:#fff}
+
+/* BINS */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
+.bcrd{background:#fff;border:2px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.bcrd:hover{border-color:#2563eb;transform:translateY(-2px)}
+.bcrd.co{border-color:#a7f3d0;background:#f0fdf4}.bcrd.pa{border-color:#fde68a;background:#fffbeb}
+.bnn{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:#0f172a}
+.bnd{font-size:11px;color:#64748b;margin-top:2px}
+.bnp{font-size:20px;font-weight:800;color:#2563eb;margin-top:9px;font-family:'JetBrains Mono',monospace}
+
+/* WEDGE SCANNER */
+.wedge-box{background:#1e293b;border-radius:var(--r);padding:16px;margin-bottom:14px;cursor:pointer}
+.wedge-inp{width:100%;background:transparent;border:none;outline:none;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:15px;caret-color:#4ade80}
+.wedge-inp::placeholder{color:#475569}
+.wedge-st{font-size:11px;font-weight:600;margin-top:8px;padding:5px 12px;border-radius:20px;display:inline-block}
+.ws-wait{background:rgba(248,250,252,.1);color:#94a3b8}
+.ws-ok{background:rgba(74,222,128,.15);color:#4ade80}
+
+@media(max-width:768px){
+  .sb{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);z-index:200;transition:transform .25s cubic-bezier(.4,0,.2,1)}
+  .sb.on{transform:translateX(0)}.ov.on{display:block}.tb-m{display:flex}
+  .pg{padding:14px;padding-bottom:80px}.bn{display:block}.fab{display:flex}
+  .s4,.s3{grid-template-columns:1fr 1fr}.cg{grid-template-columns:1fr}.f2{grid-template-columns:1fr}
+  .gs-ov{padding:8px}
+}
+@media(min-width:769px){.bn,.fab{display:none!important}}
+@media print{.sb,.tb,.bn,.fab{display:none!important}.pg{padding:0;overflow:visible}.main{overflow:visible}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="LP">
+  <div style="width:100%;max-width:400px">
+    <div class="lc" id="LCRD">
+      <div class="lb">
+        <div class="ll">🏍️</div>
+        <h1>India Motors</h1>
+        <p>Inventory Audit &nbsp;·&nbsp; Alwar, Rajasthan</p>
+      </div>
+      <div class="lf">
+        <label>Username</label>
+        <input type="text" id="LU" placeholder="naveen or admin" autocomplete="off" autocapitalize="none" spellcheck="false">
+      </div>
+      <div class="lf">
+        <label>Password</label>
+        <div class="pww">
+          <input type="password" id="LPW" placeholder="Your password">
+          <button class="pwe" onclick="togglePw()" type="button">👁</button>
+        </div>
+      </div>
+      <button class="lbtn" id="LBTN" onclick="doLogin()">SIGN IN</button>
+      <div class="lerr" id="LERR"></div>
+      <button class="ltb" onclick="testAPI()">🔌 Test Connection</button>
+      <div class="lft">Hero MotoCorp Authorized Dealer · Alwar</div>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL SEARCH -->
+<div class="gs-ov" id="GSO">
+  <div class="gs-box">
+    <div class="gs-hd">
+      <span style="font-size:18px">🔍</span>
+      <input class="gs-in" id="GSI" placeholder="Search part number, description, category, bin…" autocomplete="off" oninput="doGS()" autocapitalize="none">
+      <button class="gs-cl" onclick="closeGS()">✕</button>
+    </div>
+    <div class="gs-rs" id="GSR">
+      <div class="gs-em"><div style="font-size:36px;margin-bottom:10px">🔍</div><div style="font-weight:600;color:#64748b">Type to search 4,249 parts</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="APP">
+  <div style="background:#dc2626;color:#fff;padding:5px 16px;font-size:11px;font-weight:700;text-align:center;display:none" id="OFB">📡 Offline — scans queued</div>
+  <div class="tb">
+    <button class="tb-m" onclick="toggleSB()">☰</button>
+    <span class="tb-lo">🏍️ India Motors</span>
+    <span class="tb-s" id="TBS">March 2026 Audit</span>
+    <div class="tb-r">
+      <button class="tb-srch" onclick="openGS()" title="Search Inventory (Ctrl+K)">🔍</button>
+      <div class="sp"><div class="sd" id="SDI"></div><span id="STX">Online</span></div>
+      <div class="av" id="TAV">N</div>
+    </div>
+  </div>
+  <div class="lay">
+    <div class="sb" id="SB">
+      <div class="sbu">
+        <div class="sbav" id="SAV">N</div>
+        <div><div class="sbnm" id="SNM">User</div><div class="sbrl" id="SRL">Role</div></div>
+      </div>
+      <nav class="nv" id="NAV"></nav>
+      <div class="sbf"><button class="blo" onclick="doLogout()">🚪 Sign Out</button></div>
+    </div>
+    <div class="ov" id="OV" onclick="closeSB()"></div>
+    <div class="main"><div class="pg" id="PG"></div></div>
+  </div>
+  <nav class="bn">
+    <div class="bnr">
+      <button class="bni on" id="BN0" onclick="go('dashboard')"><span class="bic">🏠</span><span class="bit">Home</span></button>
+      <button class="bni" id="BN1" onclick="go('scan')"><span class="bic">📷</span><span class="bit">Scan</span></button>
+      <button class="bni" onclick="openGS()"><span class="bic">🔍</span><span class="bit">Search</span></button>
+      <button class="bni" id="BN2" onclick="go('bins')"><span class="bic">📦</span><span class="bit">Bins</span></button>
+      <button class="bni" id="BN3" onclick="go('scanlog')"><span class="bic">📋</span><span class="bit">Log</span></button>
+    </div>
+  </nav>
+  <button class="fab" onclick="go('scan')">📷</button>
+</div>
+<div id="TS"></div>
+<div id="MR"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG — Your exact API URL
+// ═══════════════════════════════════════════════════════════
+const API = 'https://script.google.com/macros/s/AKfycbw5ELKal2HM85kw5Bz8SKonAZMp_EcX_dUQgoVc_Xgv7X6P06hv7slnJcIRLCTJQW65Yg/exec';
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const SK='imAudit3',IK='imItems3',BK='imBins3',QK='imQueue3',PGSZ=50;
+const S={user:null,online:navigator.onLine,items:[],bins:[],counts:[],sessions:[],auditS:null,charts:{},pd:{},pg:{},stream:null,raf:null,scanQ:[],lqr:'',lqrt:0,torch:false,track:null};
+
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().split('T')[0];
+const nowt=()=>new Date().toTimeString().slice(0,8);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5).toUpperCase();
+const fmt=n=>(parseFloat(n)||0).toLocaleString('en-IN');
+const fmtM=n=>'₹'+(parseFloat(n)||0).toFixed(2);
+const tr2=(s,n=24)=>s&&s.length>n?s.slice(0,n)+'…':(s||'');
+const esc=s=>{const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;};
+const fmtD=d=>{if(!d)return'—';try{return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch{return d;}};
+const greet=()=>{const h=new Date().getHours();return h<12?'Good Morning':h<17?'Good Afternoon':'Good Evening';};
+
+// ═══════════════════════════════════════════════════════════
+// API  — redirect:follow is CRITICAL for Google Apps Script
+// ═══════════════════════════════════════════════════════════
+async function callAPI(data) {
+  try {
+    // Method 1: Standard POST with redirect follow (works on local file + most hosts)
+    const r = await fetch(API, {
+      method: 'POST',
+      redirect: 'follow',
+      body: JSON.stringify(data)
+    });
+    const txt = await r.text();
+    try { return JSON.parse(txt); }
+    catch(e) { return { success:false, error:'Bad response: '+txt.slice(0,150) }; }
+  } catch(e) {
+    try {
+      // Method 2: URL-encoded form POST (bypasses CORS preflight on GitHub Pages)
+      const params = new URLSearchParams();
+      params.append('payload', JSON.stringify(data));
+      const r2 = await fetch(API, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+      const txt2 = await r2.text();
+      try { return JSON.parse(txt2); }
+      catch(e2) { return { success:false, error:'Bad response M2: '+txt2.slice(0,150) }; }
+    } catch(e2) {
+      try {
+        // Method 3: GET request with data as URL param (last resort)
+        const url = API + '?data=' + encodeURIComponent(JSON.stringify(data));
+        const r3 = await fetch(url, { method:'GET', redirect:'follow' });
+        const txt3 = await r3.text();
+        try { return JSON.parse(txt3); }
+        catch(e3) { return { success:false, error:'Failed to fetch — CORS blocked. Open index.html directly in Chrome instead of GitHub Pages.' }; }
+      } catch(e3) {
+        return { success:false, error:'Failed to fetch — '+e3.message };
+      }
+    }
+  }
+}
+
+async function api(data) {
+  if (!S.online) {
+    if (['saveCount','deleteCount'].includes(data.action)) { enQ(data); return {success:true,queued:true}; }
+    return { success:false, error:'No internet connection' };
+  }
+  if (S.user) data._u = S.user.username;
+  return await callAPI(data);
+}
+
+function enQ(d){const q=JSON.parse(localStorage.getItem(QK)||'[]');q.push({id:uid(),d,ts:Date.now()});localStorage.setItem(QK,JSON.stringify(q));syncUI();}
+
+async function flushQ(){
+  const q=JSON.parse(localStorage.getItem(QK)||'[]');if(!q.length||!S.online)return;
+  let ok=0;const rem=[];
+  for(const item of q){const r=await callAPI(item.d);if(r.success)ok++;else rem.push(item);}
+  localStorage.setItem(QK,JSON.stringify(rem));if(ok)toast(`${ok} records synced`,'s');syncUI();
+}
+
+function syncUI(){
+  const d=$('SDI'),t=$('STX');if(!d||!t)return;
+  const q=JSON.parse(localStorage.getItem(QK)||'[]');
+  if(!S.online){d.className='sd off';t.textContent='Offline';$('OFB').style.display='block';}
+  else if(q.length){d.className='sd sy';t.textContent=`${q.length} pending`;}
+  else{d.className='sd';t.textContent='Online';$('OFB').style.display='none';}
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function toast(msg,type='s',dur=3200){
+  const el=document.createElement('div');el.className=`t t${type}`;
+  const ic={s:'✅',d:'❌',w:'⚠️',i:'ℹ️'};
+  el.innerHTML=`<span>${ic[type]||'✅'}</span><span>${msg}</span>`;
+  $('TS').appendChild(el);
+  setTimeout(()=>{el.style.animation='to2 .25s ease forwards';setTimeout(()=>el.remove(),260);},dur);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════
+function modal(h){const el=document.createElement('div');el.className='mbd';el.innerHTML=h;el.onclick=e=>{if(e.target===el)el.remove();};$('MR').appendChild(el);}
+function closeMd(){$('MR').lastElementChild?.remove();}
+
+// ═══════════════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════════════
+function togglePw(){const f=$('LPW');f.type=f.type==='password'?'text':'password';}
+function setErr(msg,cls='e'){const el=$('LERR');if(!el)return;el.textContent=msg;el.className='lerr show '+cls;}
+
+async function doLogin(){
+  const u=($('LU')?.value||'').trim();
+  const p=($('LPW')?.value||'').trim();
+  const btn=$('LBTN');
+  if(!u||!p){setErr('Enter username and password');return;}
+  btn.disabled=true;btn.textContent='Signing in…';
+  setErr('Connecting to server…','inf');
+  const r=await callAPI({action:'login',username:u,password:p});
+  if(r.success&&r.user){
+    const s={...r.user,_lt:Date.now()};
+    localStorage.setItem(SK,JSON.stringify(s));
+    S.user=s;
+    bootApp();
+  } else {
+    // Show EXACT server error so we know what went wrong
+    const msg=r.error||'Login failed';
+    setErr('❌ '+msg);
+    $('LCRD').classList.remove('shake');void $('LCRD').offsetWidth;$('LCRD').classList.add('shake');
+    btn.disabled=false;btn.textContent='SIGN IN';
+  }
+}
+
+async function testAPI(){
+  setErr('Testing connection…','inf');
+  const r=await callAPI({action:'login',username:'_test_',password:'_test_'});
+  if(r.success!==undefined||r.error){
+    setErr('✅ API reachable! Login with: admin / admin  OR check your users sheet','ok');
+  } else {
+    setErr('❌ Cannot reach API. Set "Who has access" = Anyone in Apps Script Deploy settings');
+  }
+}
+
+function doLogout(){
+  if(!confirm('Sign out?'))return;
+  stopCam();localStorage.removeItem(SK);S.user=null;S.items=[];S.bins=[];
+  $('LP').style.display='flex';$('APP').classList.remove('on');
+  $('LU').value='';$('LPW').value='';$('LERR').className='lerr';
+}
+
+function loadSess(){
+  try{
+    const r=localStorage.getItem(SK);if(!r)return null;
+    const s=JSON.parse(r);
+    if((Date.now()-s._lt)/3600000>10){localStorage.removeItem(SK);return null;}
+    return s;
+  }catch{return null;}
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+async function bootApp(){
+  $('LP').style.display='none';
+  $('APP').classList.add('on');
+  setUserUI();buildNav();syncUI();
+  await Promise.all([syncItems(),syncBins(),loadAuditSess()]);
+  go('dashboard');
+  if(window.innerWidth<=768){
+    document.querySelector('.bn').style.display='block';
+    document.querySelector('.fab').style.display='flex';
+  }
+  flushQ();
+}
+
+function setUserUI(){
+  const u=S.user;if(!u)return;
+  const init=(u.name||u.username).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  ['TAV','SAV'].forEach(id=>{const el=$(id);if(el)el.textContent=init;});
+  if($('SNM'))$('SNM').textContent=u.name||u.username;
+  if($('SRL'))$('SRL').textContent=u.role==='master_auditor'?'Master Auditor':'Executive';
+}
+
+function buildNav(){
+  const nav=$('NAV');if(!nav)return;
+  const m=S.user?.role==='master_auditor';
+  const ls=[
+    {l:'Dashboard',i:'🏠',p:'dashboard'},{l:'Scan & Count',i:'📷',p:'scan'},
+    {l:'Manual Entry',i:'✏️',p:'manual'},{l:'Bin Locations',i:'📦',p:'bins'},
+    {l:'My Scan Log',i:'📋',p:'scanlog'},
+    ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},
+            {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
+          :[{l:'Item Master',i:'🗃️',p:'itemmaster'}])
+  ];
+  nav.innerHTML=ls.map(l=>l.sec?`<div class="ns">${l.sec}</div>`
+    :`<div class="ni" data-p="${l.p}" onclick="go('${l.p}')"><span class="ic">${l.i}</span>${l.l}</div>`).join('');
+}
+
+function setNav(p){
+  document.querySelectorAll('.ni').forEach(e=>e.classList.toggle('on',e.dataset.p===p));
+  ['BN0','BN1','BN2','BN3'].forEach(id=>$(id)?.classList.remove('on'));
+  ({dashboard:'BN0',scan:'BN1',bins:'BN2',scanlog:'BN3'}[p]&&$(({dashboard:'BN0',scan:'BN1',bins:'BN2',scanlog:'BN3'}[p]))?.classList.add('on'));
+}
+
+function toggleSB(){$('SB').classList.toggle('on');$('OV').classList.toggle('on');}
+function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on');}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function go(p){
+  if(!S.user)return;
+  if(['variance','daywise','fullsummary','dms','settings'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
+  stopCam();closeSB();setNav(p);
+  $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
+    variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,
+    itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF)();
+}
+function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
+
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+async function syncItems(){
+  // Always fetch fresh from server
+  if(S.online){
+    const r=await api({action:'getItems'});
+    if(r.success&&r.items&&r.items.length>0){
+      S.items=r.items;
+      localStorage.setItem(IK,JSON.stringify(r.items));
+      return;
+    }
+  }
+  const c=localStorage.getItem(IK);
+  if(c)try{S.items=JSON.parse(c);}catch{}
+}
+async function syncBins(){
+  // Always fetch fresh from server — never use stale cache for bins
+  if(S.online){
+    const r=await api({action:'getBins'});
+    if(r.success&&r.bins&&r.bins.length>0){
+      S.bins=r.bins;
+      localStorage.setItem(BK,JSON.stringify(r.bins));
+      return;
+    }
+  }
+  // Fallback to cache only if offline
+  const c=localStorage.getItem(BK);
+  if(c)try{S.bins=JSON.parse(c);}catch{}
+}
+async function loadAuditSess(){
+  if(!S.online)return;
+  const r=await api({action:'getSessions'});
+  if(r.success&&r.sessions){
+    S.sessions=r.sessions;
+    S.auditS=r.sessions.find(s=>s.status==='active');
+    if(S.auditS&&$('TBS'))$('TBS').textContent=S.auditS.sessionName||'Active Audit';
+  }
+}
+async function fetchCounts(date,auditor){
+  if(!S.online){
+    let c=S.allCounts||S.counts;
+    if(date)c=c.filter(x=>x.date===date);
+    if(auditor)c=c.filter(x=>x.auditor===auditor);
+    return c;
+  }
+  // Always fetch ALL counts and store in S.allCounts
+  const r=await api({action:'getCounts'});
+  if(r.success&&r.counts){
+    S.allCounts=r.counts; // full unfiltered — for variance/full summary
+    // S.counts = today only — for dashboard and scan log
+    S.counts=r.counts.filter(c=>c.date===today());
+  }
+  // Return filtered result
+  let result=S.allCounts||[];
+  if(date)result=result.filter(c=>c.date===date);
+  if(auditor)result=result.filter(c=>c.auditor===auditor);
+  return result;
+}
+const findItem=pn=>S.items.find(i=>(i.partNo||'').trim().toUpperCase()===(pn||'').trim().toUpperCase());
+const srch=q=>{const u=(q||'').toUpperCase().trim();if(!u)return[];return S.items.filter(i=>(i.partNo||'').toUpperCase().includes(u)||(i.desc||'').toUpperCase().includes(u)||(i.category||'').toUpperCase().includes(u)||(i.bin||'').toUpperCase().includes(u)).slice(0,30);};
+
+// ═══════════════════════════════════════════════════════════
+// GLOBAL SEARCH
+// ═══════════════════════════════════════════════════════════
+function openGS(){$('GSO').classList.add('on');setTimeout(()=>$('GSI')?.focus(),80);}
+function closeGS(){$('GSO').classList.remove('on');$('GSI').value='';$('GSR').innerHTML='<div class="gs-em"><div style="font-size:36px;margin-bottom:10px">🔍</div><div style="font-weight:600;color:#64748b">Type to search 4,249 parts</div></div>';}
+
+let gsT=null;
+function doGS(){
+  clearTimeout(gsT);
+  gsT=setTimeout(()=>{
+    const q=($('GSI')?.value||'').trim(),res=$('GSR');if(!res)return;
+    if(!q){res.innerHTML='<div class="gs-em"><div style="font-size:36px;margin-bottom:8px">🔍</div><div style="font-weight:600;color:#64748b">Type to search</div></div>';return;}
+    const items=srch(q);
+    if(!items.length){res.innerHTML=`<div class="gs-em"><div style="font-size:36px;margin-bottom:8px">😕</div><div style="font-weight:600;color:#64748b">No results for "${esc(q)}"</div></div>`;return;}
+    const cMap={};S.counts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
+    let h=`<div class="gs-sec">📦 ${items.length} item(s) found</div>`;
+    h+=items.map(item=>{
+      const dms=parseFloat(item.systemQty)||0,cnt=cMap[item.partNo]??null;
+      const diff=cnt!==null?cnt-dms:null;
+      const sb=diff===null?'bgg':diff===0?'bgs':diff<0?'bgd':'bgw';
+      const sl=diff===null?'Not Counted':diff===0?'✅ Match':diff<0?`🔻 Short ${Math.abs(diff)}`:`🔺 Excess +${diff}`;
+      const hi=t=>esc(t).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<mark style="background:#fef08a;border-radius:2px">${m}</mark>`);
+      return`<div class="gs-it" onclick="showDetail('${esc(item.partNo)}')">
+        <div class="gs-pn">${hi(item.partNo)}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500;color:#0f172a">${hi(tr2(item.desc||'—',34))}</div>
+          <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap">
+            ${item.bin?`<span class="bg bgp" style="font-size:9px">${esc(item.bin)}</span>`:''}
+            ${item.category?`<span class="bg bgg" style="font-size:9px">${esc(item.category)}</span>`:''}
+            <span class="bg ${sb}" style="font-size:9px">${sl}</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px">${fmt(dms)}</div>
+          <div style="font-size:9px;color:#94a3b8">DMS Qty</div>
+          ${cnt!==null?`<div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:#059669">${fmt(cnt)}</div><div style="font-size:9px;color:#94a3b8">Counted</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+    res.innerHTML=h;
+  },100);
+}
+
+function showDetail(pn){
+  const item=findItem(pn);if(!item)return;
+  const dms=parseFloat(item.systemQty)||0;
+  const cMap={};S.counts.filter(c=>c.partNo===pn).forEach(c=>{if(!cMap[c.date])cMap[c.date]={qty:0,auditor:c.auditorName||c.auditor};cMap[c.date].qty+=parseFloat(c.qty)||0;});
+  const totalCounted=Object.values(cMap).reduce((s,v)=>s+v.qty,0);
+  const counted=Object.keys(cMap).length?totalCounted:null;
+  const diff=counted!==null?counted-dms:null;
+  const isMaster=S.user?.role==='master_auditor';
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}" ${b.bin===item.bin?'selected':''}>${esc(b.bin)}</option>`).join('');
+  modal(`<div class="md">
+    <div class="mdh"><div class="mdt" style="font-family:'JetBrains Mono',monospace;font-size:13px">${esc(pn)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
+    <div class="mdb">
+      <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(item.desc||'—')}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        ${item.bin?`<span class="bg bgp">${esc(item.bin)}</span>`:''}
+        ${item.category?`<span class="bg bgg">${esc(item.category)}</span>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="text-align:center;background:#f8fafc;border-radius:var(--rs);padding:10px">
+          <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace">${fmt(dms)}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:2px">DMS Stock</div>
+        </div>
+        <div style="text-align:center;background:${diff===null?'#f8fafc':diff===0?'#ecfdf5':diff<0?'#fef2f2':'#fffbeb'};border-radius:var(--rs);padding:10px">
+          <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${diff===null?'#94a3b8':diff===0?'#059669':diff<0?'#dc2626':'#d97706'}">${counted!==null?fmt(counted):'—'}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:2px">Counted</div>
+        </div>
+        <div style="text-align:center;background:#f8fafc;border-radius:var(--rs);padding:10px">
+          <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace">${fmtM(item.mrp)}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:2px">MRP</div>
+        </div>
+      </div>
+      ${Object.keys(cMap).length?`<div style="margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Count History</div>
+        ${Object.entries(cMap).map(([date,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 10px;background:#f8fafc;border-radius:6px;margin-bottom:4px;font-size:12px">
+          <span style="font-family:'JetBrains Mono',monospace;color:#64748b">${fmtD(date)}</span>
+          <span style="font-weight:700">${v.qty} units</span>
+          <span style="color:#94a3b8">${v.auditor||''}</span>
+        </div>`).join('')}
+      </div>`:''}
+      ${isMaster?`<div style="border-top:1px solid var(--bd);padding-top:14px">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Quick Edit</div>
+        <div class="fg f2">
+          <div class="fl"><label class="fll">Bin</label><select class="fi" id="DSB" style="font-size:12px"><option value="">No Bin</option>${bo}</select></div>
+          <div class="fl"><label class="fll">System Qty</label><input class="fi" id="DSQ" type="number" value="${dms}" style="font-size:12px"></div>
+        </div>
+        <button class="btn bpr bsm" onclick="quickEdit('${esc(pn)}')">💾 Save</button>
+      </div>`:''}
+    </div>
+    <div class="mdf"><button class="btn bgh" onclick="closeMd()">Close</button><button class="btn bpr bsm" onclick="closeMd();go('scan')">📷 Scan This</button></div>
+  </div>`);
+}
+
+async function quickEdit(pn){
+  const item=S.items.find(i=>i.partNo===pn);if(!item)return;
+  item.bin=$('DSB')?.value||'';item.systemQty=$('DSQ')?.value||0;
+  const r=await api({action:'saveItem',item});
+  if(r.success){toast(`${pn} updated`,'s');localStorage.setItem(IK,JSON.stringify(S.items));closeMd();}
+  else toast(r.error||'Failed','d');
+}
+
+// ═══════════════════════════════════════════════════════════
+// HERO QR DECODE
+// ═══════════════════════════════════════════════════════════
+function decodeHQR(raw){
+  const map={};
+  (raw||'').trim().split(/(?=D\/)/).forEach(pt=>{
+    pt=pt.trim();if(!pt.startsWith('D/'))return;
+    const f=pt.split('/');if(f.length<5)return;
+    const pn=(f[3]||'').trim();const qty=parseInt(f[4])||1;const mrp=parseFloat(f[5])||0;
+    if(!pn||pn.length<3)return;
+    if(!map[pn])map[pn]={partNo:pn,qty:0,mrp};
+    map[pn].qty+=qty;
+  });
+  return Object.values(map);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CAMERA — High quality, multi-pass for faded QR codes
+// ═══════════════════════════════════════════════════════════
+function loadJsQR(cb){if(window.jsQR){cb();return;}const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js';s.onload=cb;s.onerror=()=>toast('jsQR failed to load','d');document.head.appendChild(s);}
+
+function startCam(){
+  loadJsQR(()=>{
+    const vid=$('QRV');if(!vid){toast('Video element not found','d');return;}
+    setSt('','⏳ Requesting camera…');
+    const hd={video:{facingMode:{ideal:'environment'},width:{ideal:1920,min:1280},height:{ideal:1080,min:720},frameRate:{ideal:30}}};
+    navigator.mediaDevices.getUserMedia(hd)
+      .catch(()=>navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}}))
+      .then(stream=>{
+        S.stream=stream;
+        S.track=stream.getVideoTracks()[0];
+        vid.srcObject=stream;
+        vid.setAttribute('playsinline','true');
+        vid.muted=true;
+        vid.onloadedmetadata=()=>{
+          vid.play()
+            .then(()=>{setSt('sc','🟢 Scanning — hold QR steady…');startLoop(vid);})
+            .catch(()=>{setSt('sc','🟢 Active');startLoop(vid);});
+        };
+        setTimeout(()=>{try{vid.play().catch(()=>{});}catch(e){}},300);
+      })
+      .catch(e=>{setSt('','❌ Camera error: '+e.message);toast('Camera: '+e.message+' — Allow camera in browser settings','d',6000);});
+  });
+}
+
+function startLoop(vid){
+  const cvs=document.createElement('canvas');
+  const ctx=cvs.getContext('2d',{willReadFrequently:true});
+  scanLoop(vid,cvs,ctx);
+}
+
+function stopCam(){
+  if(S.raf){cancelAnimationFrame(S.raf);S.raf=null;}
+  if(S.stream){S.stream.getTracks().forEach(t=>t.stop());S.stream=null;}
+  S.track=null;S.torch=false;
+}
+
+function setSt(cls,msg){const el=$('SST');if(el)el.innerHTML=`<span class="spl ${cls}">${msg}</span>`;}
+
+async function toggleTorch(){
+  if(!S.track){toast('Camera not active','w');return;}
+  try{S.torch=!S.torch;await S.track.applyConstraints({advanced:[{torch:S.torch}]});const b=$('TORCHBTN');if(b)b.textContent=S.torch?'💡 ON':'🔦 Torch';}
+  catch{toast('Torch not supported','w');}
+}
+
+// 3-pass decode: normal → inverted → contrast-enhanced (for faded codes)
+function tryDecode(ctx,w,h){
+  if(!window.jsQR)return null;
+  const img=ctx.getImageData(0,0,w,h);
+  let c=jsQR(img.data,w,h,{inversionAttempts:'dontInvert'});if(c)return c.data;
+  c=jsQR(img.data,w,h,{inversionAttempts:'onlyInvert'});if(c)return c.data;
+  // Contrast boost for faded labels
+  const en=new Uint8ClampedArray(img.data);
+  for(let i=0;i<en.length;i+=4){
+    const avg=(en[i]+en[i+1]+en[i+2])/3;
+    const v=avg>128?Math.min(255,avg*1.5+20):Math.max(0,avg*0.5-10);
+    en[i]=en[i+1]=en[i+2]=v;en[i+3]=255;
+  }
+  c=jsQR(new ImageData(en,w,h),w,h,{inversionAttempts:'attemptBoth'});if(c)return c.data;
+  return null;
+}
+
+function scanLoop(vid,cvs,ctx){
+  if(!S.stream)return;
+  if(vid.readyState>=vid.HAVE_ENOUGH_DATA&&vid.videoWidth>0){
+    cvs.width=vid.videoWidth;cvs.height=vid.videoHeight;ctx.drawImage(vid,0,0);
+    const result=tryDecode(ctx,cvs.width,cvs.height);
+    if(result){
+      const now=Date.now();
+      if(result!==S.lqr||now-S.lqrt>4000){S.lqr=result;S.lqrt=now;onQR(result);return;}
+    }
+  }
+  S.raf=requestAnimationFrame(()=>scanLoop(vid,cvs,ctx));
+}
+
+function resumeScan(){S.lqr='';const vid=$('QRV');if(!vid||!S.stream)return;setSt('sc','🟢 Scanning…');startLoop(vid);}
+
+function onQR(raw){
+  setSt("de","✅ Decoded!");
+  const res=decodeHQR(raw);
+  if(!res||!res.length){toast("QR format not recognized","w");setTimeout(resumeScan,1500);return;}
+  // ADD to queue instead of replacing — same as keyboard scanner
+  res.forEach(function(newItem){
+    const existing=S.scanQ.find(function(q){return q.partNo===newItem.partNo;});
+    if(existing){existing.qty+=newItem.qty;toast("➕ "+newItem.partNo+" qty: "+existing.qty,"i",1500);}
+    else if(S.scanQ.length<20){S.scanQ.push(newItem);toast("📷 Added: "+newItem.partNo,"s",1500);}
+    else{toast("Queue full (20). Tap Save All.","w");}
+  });
+  renderCards();
+  setTimeout(resumeScan,1500);
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+async function rDash(){
+  const[sr,counts]=await Promise.all([api({action:'getStats'}),fetchCounts(today(),S.user.role==='master_auditor'?null:S.user.username)]);
+  const st=sr.stats||{};
+  if(S.user.role==='master_auditor')mDash(st,counts);else eDash(st,counts);
+}
+
+function mDash(st,counts){
+  const total=parseInt(st.totalItems)||S.items.length;
+  // counts is already filtered to today — use it directly for accurate "Counted Today"
+  const todC=counts.length;
+  const pct=total?Math.round(todC/total*100):0,nm=(S.user?.name||'').split(' ')[0];
+  $('PG').innerHTML=`
+  <div class="ph">
+    <div><div class="pt">${greet()}, ${esc(nm)} 👋</div>
+    <div class="ps">${fmtD(new Date())} &nbsp;·&nbsp; <span class="bg bgs"><span style="width:5px;height:5px;border-radius:50%;background:#059669;display:inline-block;margin-right:3px"></span>${esc(S.auditS?.sessionName||'March 2026 Full Audit')}</span></div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bgh bsm" onclick="openGS()">🔍 Search</button>
+      <button class="btn bpr bsm" onclick="go('scan')">📷 Scan</button>
+    </div>
+  </div>
+  <div class="sg s4">
+    <div class="st"><div class="stl">Total SKUs</div><div class="stv">${fmt(total)}</div><div class="sts">items sheet</div></div>
+    <div class="st" onclick="go('fullsummary')"><div class="stl">Counted Today</div><div class="stv" style="color:#2563eb">${fmt(todC)}</div><div class="sts">${pct}% done</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div></div>
+    <div class="st" onclick="go('variance')"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626">${fmt(st.shortCount||0)}</div></div>
+    <div class="st" onclick="go('variance')"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706">${fmt(st.excessCount||0)}</div></div>
+  </div>
+  <!-- Quick search -->
+  <div class="cd" style="margin-bottom:16px">
+    <div class="cdh"><div class="cdt">🔍 Quick Search</div><button class="btn bgh bsm" onclick="openGS()">Full Search</button></div>
+    <div style="padding:14px">
+      <input class="fi" id="DQI" placeholder="Type part number or description…" oninput="dqSearch()" autocapitalize="none" autocomplete="off" style="width:100%">
+      <div id="DQR" style="margin-top:10px"></div>
+    </div>
+  </div>
+  <div class="cg">
+    <div class="cd"><div class="cdh"><div class="cdt">Today's Progress</div></div><div style="padding:12px;display:flex;justify-content:center;max-height:190px"><canvas id="C1" style="max-height:175px;max-width:175px"></canvas></div></div>
+    <div class="cd"><div class="cdh"><div class="cdt">Variance</div></div><div style="padding:12px;display:flex;justify-content:center;max-height:190px"><canvas id="C2" style="max-height:175px;max-width:175px"></canvas></div></div>
+  </div>`;
+  setTimeout(()=>{
+    const notC=Math.max(0,total-todC);
+    const c1=$('C1');if(c1){if(S.charts.c1)S.charts.c1.destroy();S.charts.c1=new Chart(c1,{type:'doughnut',data:{labels:['Counted','Remaining'],datasets:[{data:[todC,notC],backgroundColor:['#2563eb','#e2e8f0'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'72%',responsive:true,maintainAspectRatio:true}});}
+    const c2=$('C2');const m=parseInt(st.matchCount||0),sh=parseInt(st.shortCount||0),ex=parseInt(st.excessCount||0);
+    if(c2){if(S.charts.c2)S.charts.c2.destroy();S.charts.c2=new Chart(c2,{type:'doughnut',data:{labels:['Match','Short','Excess'],datasets:[{data:[m,sh,ex],backgroundColor:['#059669','#dc2626','#d97706'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'72%',responsive:true,maintainAspectRatio:true}});}
+  },100);
+}
+
+function dqSearch(){
+  const q=($('DQI')?.value||'').trim(),res=$('DQR');if(!res)return;
+  if(!q){res.innerHTML='';return;}
+  const items=srch(q).slice(0,6);
+  if(!items.length){res.innerHTML='<div style="font-size:12px;color:#94a3b8">No results</div>';return;}
+  res.innerHTML=items.map(item=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#f8fafc;border-radius:var(--rs);margin-bottom:6px;cursor:pointer;border:1px solid var(--bd)" onclick="closeGS();showDetail('${esc(item.partNo)}')">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb;min-width:140px">${esc(item.partNo)}</span>
+    <span style="font-size:12px;flex:1">${esc(tr2(item.desc,28))}</span>
+    ${item.bin?`<span class="bg bgp" style="font-size:9px">${esc(item.bin)}</span>`:''}
+    <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800">${fmt(item.systemQty)}</span>
+  </div>`).join('');
+}
+
+function eDash(st,counts){
+  const nm=(S.user?.name||'').split(' ')[0];
+  $('PG').innerHTML=`<div class="ph"><div><div class="pt">Hello, ${esc(nm)} 👋</div><div class="ps">${fmtD(new Date())}</div></div>
+    <button class="btn bgh bsm" onclick="openGS()">🔍 Search</button>
+  </div>
+  <div style="text-align:center;padding:14px 0 20px">
+    <button class="btn bpr" style="padding:14px 34px;font-size:15px;border-radius:12px" onclick="go('scan')">📷 START SCANNING</button>
+  </div>
+  <div class="cd" style="margin-bottom:14px"><div class="cdh"><div class="cdt">🔍 Search Inventory</div></div>
+    <div style="padding:14px"><input class="fi" id="DQI" placeholder="Search part number or description…" oninput="dqSearch()" autocapitalize="none" autocomplete="off" style="width:100%"><div id="DQR" style="margin-top:10px"></div></div>
+  </div>
+  <div class="sg s2">
+    <div class="st"><div class="stl">My Counts Today</div><div class="stv" style="color:#2563eb">${counts.length}</div></div>
+    <div class="st"><div class="stl">Bins Covered</div><div class="stv">${new Set(counts.map(c=>c.bin).filter(Boolean)).size}</div></div>
+  </div>
+  <div class="cd"><div class="cdh"><div class="cdt">Recent Scans</div><button class="btn bda bsm" onclick="go('scanlog')">View & Delete All</button></div>
+  <div class="tw"><table><thead><tr><th>Time</th><th>Part No</th><th>Description</th><th>Qty</th><th></th></tr></thead>
+  <tbody>${[...counts].reverse().slice(0,8).map(c=>`<tr id="R_${c.id}">
+    <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(c.time||'').slice(0,5)}</td>
+    <td class="tpn">${esc(c.partNo)}</td><td>${esc(tr2(c.desc,26))}</td><td class="tq">${c.qty}</td>
+    <td><button class="btn bda bsm" style="padding:3px 8px" onclick="delRow('${c.id}','R_${c.id}')">🗑</button></td>
+  </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8">No scans today</td></tr>'}</tbody>
+  </table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCAN PAGE
+// ═══════════════════════════════════════════════════════════
+function rScan(){
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  $('PG').innerHTML=`<div class="ph"><div class="pt">📷 Scan & Count</div></div>
+  <div class="tbr">
+    <button class="tb2 on" onclick="swTab('TKB','STABS',this)">⌨️ Keyboard Scanner</button>
+    <button class="tb2" onclick="swTab('TCAM','STABS',this)">📷 Camera</button>
+    <button class="tb2" onclick="swTab('TMAN','STABS',this)">✏️ Manual</button>
+    <button class="tb2" onclick="swTab('TPKT','STABS',this)">📦 Packet</button>
+  </div>
+  <div id="STABS">
+    <!-- TAB 1: KEYBOARD SCANNER (Scan to Keyboard app) -->
+    <div class="tp on" id="TKB">
+      <div class="al ali">📱 <strong>Use your Scan-to-Keyboard app:</strong> Tap the green box below, then scan any QR code with your app. Parts appear automatically.</div>
+      <div class="wedge-box" onclick="focusWedge()">
+        <div style="font-size:11px;color:#64748b;margin-bottom:6px;font-weight:600">⌨️ KEYBOARD SCANNER INPUT — Tap here then scan</div>
+        <input class="wedge-inp" id="WEDGE" placeholder="👆 Tap here, then scan with your Scan-to-Keyboard app…" autocomplete="off" autocapitalize="none" autocorrect="off">
+        <div class="ws-wait" id="WST" style="font-size:11px;font-weight:600;margin-top:8px;padding:5px 12px;border-radius:20px;display:inline-block">⏳ Waiting for scan…</div>
+      </div>
+      <div id="SCK" style="margin-top:14px"></div>
+    </div>
+    <!-- TAB 2: CAMERA -->
+    <div class="tp" id="TCAM">
+      <div class="scw">
+        <div class="svw">
+          <video id="QRV" playsinline muted autoplay></video>
+          <div class="sou"><div class="sfr"><div class="sln"></div><div class="sfb"></div></div></div>
+          <div class="sst" id="SST"><span class="spl">Tap Start</span></div>
+          <div class="sbt">
+            <button class="s-btn" id="TORCHBTN" onclick="toggleTorch()">🔦 Torch</button>
+            <button class="s-btn" onclick="resumeScan()">🔄 Next QR</button>
+          </div>
+        </div>
+        <div class="sct">High-quality scanner · 3-pass decode · Works on faded codes</div>
+        <div style="display:flex;gap:9px;margin-top:11px">
+          <button class="btn bpr" id="BST" onclick="bstartCam()">▶ Start Scanner</button>
+          <button class="btn bgh" id="BSP" style="display:none" onclick="bstopCam()">⏹ Stop</button>
+        </div>
+      </div>
+      <div id="SCAM" style="margin-top:14px"></div>
+    </div>
+    <!-- TAB 3: MANUAL -->
+    <div class="tp" id="TMAN">${manForm('MS')}</div>
+    <!-- TAB 4: PACKET -->
+    <div class="tp" id="TPKT">${pktForm()}</div>
+  </div>
+  <!-- LOG -->
+  <div class="cd" style="margin-top:18px">
+    <div class="cdh"><div class="cdt">📋 Today's Scan Log</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="bg bgp" id="LC">0</span>
+        <button class="btn bda bsm" onclick="delAll()">🗑 Delete All</button>
+      </div>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>Time</th><th>Part No</th><th>Desc</th><th>Bin</th><th>Qty</th><th>Type</th><th>Delete</th></tr></thead>
+      <tbody id="LTBL"><tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">Loading…</td></tr></tbody>
+    </table></div>
+  </div>`;
+  initWedge();
+  reloadLog();
+}
+
+function bstartCam(){$('BST').style.display='none';$('BSP').style.display='inline-flex';startCam();}
+function bstopCam(){stopCam();$('BST').style.display='inline-flex';$('BSP').style.display='none';setSt('','Stopped');}
+
+// ── WEDGE (Scan-to-Keyboard) ──
+let wedgeBuf='',wedgeT=null;
+function initWedge(){
+  const inp=$('WEDGE');if(!inp)return;
+  inp.value='';setWSt('wait');
+  // Auto-focus: keep focus always on wedge input
+  inp.focus();
+  inp.addEventListener('blur',()=>{
+    // Only auto-refocus if nothing else has focus (body is active)
+    // This way qty inputs, selects, and buttons all work normally
+    setTimeout(()=>{
+      const ae=document.activeElement;
+      const isBody=(ae===document.body||ae===document.documentElement||!ae);
+      const still=$('WEDGE');
+      if(still&&isBody&&S.page==='scan')still.focus();
+    },400);
+  });
+  inp.addEventListener('input',()=>{
+    clearTimeout(wedgeT);setWSt('ok');
+    wedgeT=setTimeout(()=>{
+      const v=(inp.value||'').trim();
+      if(v.length>2){processWedge(v);inp.value='';setWSt('wait');}
+    },200);
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      clearTimeout(wedgeT);
+      const v=(inp.value||'').trim();
+      if(v.length>2){processWedge(v);inp.value='';setWSt('wait');}
+      e.preventDefault();
+    }
+  });
+}
+
+function setWSt(s){
+  const el=$('WST');if(!el)return;
+  const n=$('WCOUNT');
+  const cnt=S.scanQ.length;
+  if(s==='wait'){
+    el.style.cssText='font-size:11px;font-weight:600;margin-top:8px;padding:5px 12px;border-radius:20px;display:inline-block;background:rgba(248,250,252,.1);color:#94a3b8';
+    el.textContent=cnt>0?`⏳ Ready — ${cnt} in queue, scan next…`:'⏳ Ready — scan a part…';
+  }else{
+    el.style.cssText='font-size:11px;font-weight:600;margin-top:8px;padding:5px 12px;border-radius:20px;display:inline-block;background:rgba(74,222,128,.15);color:#4ade80';
+    el.textContent='✅ Got it! Keep scanning…';
+  }
+}
+
+function focusWedge(){const inp=$('WEDGE');if(inp){inp.focus();inp.select();}}
+
+function processWedge(v){
+  v=v.trim();
+  const area=$('SCK');
+  // Decode Hero QR format
+  const res=decodeHQR(v);
+  if(res&&res.length){
+    // ADD to queue (don't replace) — accumulate up to 20
+    res.forEach(newItem=>{
+      const existing=S.scanQ.find(q=>q.partNo===newItem.partNo);
+      if(existing){
+        existing.qty+=newItem.qty; // sum quantities if same part scanned again
+        toast(`➕ ${newItem.partNo} qty updated: ${existing.qty}`,'i',2000);
+      } else if(S.scanQ.length<20){
+        S.scanQ.push(newItem);
+        toast(`📷 Added: ${newItem.partNo}`,'s',1500);
+      } else {
+        toast('Queue full (20). Save All first.','w');
+      }
+    });
+    if(area)renderCardsInto(area);
+    setWSt('ok');
+    setTimeout(()=>setWSt('wait'),800);
+    return;
+  }
+  // Plain part number from barcode gun
+  const pn=v.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(pn.length>2){
+    const existing=S.scanQ.find(q=>q.partNo===pn);
+    if(existing){
+      existing.qty+=1;
+      toast(`➕ ${pn} qty: ${existing.qty}`,'i',2000);
+    } else if(S.scanQ.length<20){
+      const item=findItem(pn);
+      S.scanQ.push({partNo:pn,qty:1,mrp:parseFloat(item?.mrp)||0});
+      toast(`📷 Added: ${pn}`,'s',1500);
+    } else {
+      toast('Queue full (20). Tap Save All first.','w');
+    }
+    if(area)renderCardsInto(area);
+    setWSt('ok');
+    setTimeout(()=>setWSt('wait'),800);
+  }
+}
+
+// ── SCAN CARDS ──
+function renderCards(){renderCardsInto($('SCAM'));}
+function renderCardsInto(area){
+  if(!area)return;
+  const items=S.scanQ;
+  if(!items?.length){area.innerHTML='';return;}
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  const pending=items.filter((_,i)=>$('SC'+i)?.style.pointerEvents!=='none').length;
+  let h=`<div style="background:#0f172a;border-radius:var(--r);padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="color:#fff;font-weight:800;font-size:15px">📋 Queue: ${items.length} / 20 parts</div>
+      <div style="color:#94a3b8;font-size:11px;margin-top:2px">Keep scanning — tap Save All when done</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bda bsm" onclick="clearQueue()">✕ Clear</button>
+      <button class="btn bsu" onclick="saveAllQR()" style="padding:9px 18px;font-size:13px">✓ Save All (${items.length})</button>
+    </div>
+  </div>`;
+  items.forEach((item,i)=>{
+    const m=findItem(item.partNo);
+    h+=`<div class="scc ${m?'fo':'un'}" id="SC${i}" style="margin-bottom:8px">
+      <div class="sch" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:7px">
+          ${m?'✅':'⚠️'}
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#2563eb;font-weight:800">${esc(item.partNo)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="bg ${m?'bgs':'bgw'}" style="font-size:9px">${m?'In Master':'Not Found'}</span>
+          <button style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:14px;line-height:1;padding:2px" onclick="removeFromQueue(${i})" title="Remove">✕</button>
+        </div>
+      </div>
+      ${m?`<div class="scr"><span class="scrl">Description</span><span class="scrv" style="font-size:11px">${esc(tr2(m.desc,36))}</span></div>
+      <div class="scr"><span class="scrl">DMS Stock</span><span class="scrv" style="font-family:'JetBrains Mono',monospace;color:#2563eb">${m.systemQty||0}</span></div>`:''}
+      <div class="scr"><span class="scrl">Physical Qty</span><span class="scrv">
+        <div class="qc">
+          <button class="qb" onclick="aq(${i},-1)">−</button>
+          <input type="number" id="SQ${i}" value="${item.qty}" min="0" style="width:65px">
+          <button class="qb" onclick="aq(${i},1)">+</button>
+        </div>
+      </span></div>
+      <div class="scr"><span class="scrl">Bin</span><span class="scrv">
+        <select class="fi" id="SBN${i}" style="padding:4px 26px 4px 8px;font-size:11px">
+          <option value="${esc(m?.bin||'')}">${m?.bin?`Default: ${esc(m.bin)}`:'No bin'}</option>${bo}
+        </select>
+      </span></div>
+      ${!m?`<div style="margin-top:8px"><button class="btn bwa bsm" onclick="addSave(${i})">+ Add to Master & Save</button></div>`:''}
+    </div>`;
+  });
+  area.innerHTML=h;
+  // Do NOT call focusWedge here — it fights the blur listener and breaks qty inputs
+}
+
+function removeFromQueue(i){
+  S.scanQ.splice(i,1);
+  const area=$('SCK')||$('SCAM');
+  if(area)renderCardsInto(area);
+  setWSt('wait');
+}
+
+function clearQueue(){
+  if(S.scanQ.length&&!confirm(`Clear all ${S.scanQ.length} parts from queue?`))return;
+  S.scanQ=[];
+  const area=$('SCK')||$('SCAM');
+  if(area)area.innerHTML='';
+  setWSt('wait');
+  toast('Queue cleared','i');
+  focusWedge();
+}
+
+function aq(i,d){
+  const e=$('SQ'+i);if(e)e.value=Math.max(0,(parseInt(e.value)||0)+d);
+  // Update scanQ qty too
+  if(S.scanQ[i])S.scanQ[i].qty=parseInt(e?.value)||1;
+}
+function skip(i){const c=$('SC'+i);if(c){c.style.opacity='.3';c.style.pointerEvents='none';}}
+
+async function saveOne(i){
+  const item=S.scanQ[i];if(!item)return;
+  const m=findItem(item.partNo);
+  const qty=parseInt($('SQ'+i)?.value)||item.qty;
+  const bin=$('SBN'+i)?.value||m?.bin||'';
+  const r=await api({action:'saveCount',count:{id:uid(),partNo:item.partNo,desc:m?.desc||'',bin,date:today(),qty,time:nowt(),type:'QR',remarks:'',auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
+  if(r.success){
+    toast(`✅ Saved: ${item.partNo} × ${qty}`,'s');
+    // Remove from queue
+    S.scanQ.splice(i,1);
+    const area=$('SCK')||$('SCAM');if(area)renderCardsInto(area);
+    reloadLog();
+  } else toast(r.error||'Failed','d');
+  focusWedge();
+}
+
+async function saveAllQR(){
+  if(!S.scanQ.length){toast('Queue is empty','w');return;}
+  const btn=document.querySelector('[onclick="saveAllQR()"]');
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  let n=0,failed=0;
+  for(let i=0;i<S.scanQ.length;i++){
+    const item=S.scanQ[i];
+    if(!item)continue;
+    const m=findItem(item.partNo);
+    const qty=parseInt($('SQ'+i)?.value)||item.qty;
+    const bin=$('SBN'+i)?.value||m?.bin||'';
+    const r=await api({action:'saveCount',count:{id:uid(),partNo:item.partNo,desc:m?.desc||'',bin,date:today(),qty,time:nowt(),type:'QR',remarks:'',auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
+    if(r.success)n++;else failed++;
+  }
+  // Clear queue after saving
+  S.scanQ=[];
+  const area=$('SCK')||$('SCAM');if(area)area.innerHTML='';
+  setWSt('wait');
+  toast(`✅ ${n} parts saved${failed?` (${failed} failed)`:''}. Queue cleared — keep scanning!`,'s',4000);
+  reloadLog();
+  focusWedge();
+}
+
+async function addSave(i){
+  const item=S.scanQ[i];const bin=$('SBN'+i)?.value||'';
+  const ni={partNo:item.partNo,desc:'Unknown Part',category:'Others',bin,systemQty:0,unit:'Nos',hsn:'',mrp:item.mrp||0,dlc:0,moq:1};
+  await api({action:'saveItem',item:ni});S.items.push(ni);localStorage.setItem(IK,JSON.stringify(S.items));
+  const r=await api({action:'saveCount',count:{id:uid(),partNo:item.partNo,desc:'Unknown Part',bin,date:today(),qty:item.qty,time:nowt(),type:'QR',remarks:'Added via QR',auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
+  if(r.success){toast(`Added & saved: ${item.partNo}`,'s');skip(i);reloadLog();}
+  else toast(r.error||'Failed','d');
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOG & DELETE
+// ═══════════════════════════════════════════════════════════
+async function reloadLog(){
+  const tb=$('LTBL'),lc=$('LC');if(!tb)return;
+  const isMaster=S.user?.role==='master_auditor';
+  const counts=await fetchCounts(today(),isMaster?null:S.user.username);
+  if(lc)lc.textContent=counts.length;
+  if(!counts.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">No scans today</td></tr>';return;}
+  tb.innerHTML=[...counts].reverse().map(c=>`<tr id="R_${c.id}">
+    <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(c.time||'').slice(0,5)}</td>
+    <td class="tpn">${esc(c.partNo)}</td>
+    <td>${esc(tr2(c.desc,20))}</td>
+    <td><span class="bg bgp" style="font-size:9px">${esc(c.bin||'—')}</span></td>
+    <td class="tq">${c.qty}</td>
+    <td><span class="bg bgg" style="font-size:9px">${c.type||'QR'}</span></td>
+    <td><button class="btn bda bsm" style="padding:3px 8px" onclick="delRow('${c.id}','R_${c.id}')">🗑</button></td>
+  </tr>`).join('');
+}
+
+async function delRow(id,rowId){
+  const row=$(rowId);if(row){row.style.opacity='.4';row.style.background='#fef2f2';}
+  const r=await api({action:'deleteCount',id});
+  if(r.success){toast('Deleted','s');row?.remove();const lc=$('LC');if(lc)lc.textContent=Math.max(0,parseInt(lc.textContent||'0')-1);}
+  else{toast(r.error||'Failed','d');if(row){row.style.opacity='1';row.style.background='';}}
+}
+
+async function delAll(){
+  if(!confirm('Delete ALL of today\'s scan records?\nThis cannot be undone.'))return;
+  const counts=await fetchCounts(today(),S.user.role==='master_auditor'?null:S.user.username);
+  let d=0;for(const c of counts){const r=await api({action:'deleteCount',id:c.id});if(r.success)d++;}
+  toast(`${d} records deleted`,'s');reloadLog();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MANUAL FORM
+// ═══════════════════════════════════════════════════════════
+function manForm(sfx){
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  return`<div class="cd"><div class="cdh"><div class="cdt">✏️ Manual Entry</div></div><div class="cdb">
+    <div class="fg f2">
+      <div class="fl"><label class="fll">Part Number *</label>
+        <div class="acw"><input class="fi mn" id="MP${sfx}" placeholder="e.g. K06431KTCF981S" oninput="acFn('MP${sfx}','AL${sfx}','mfl_${sfx}')" autocapitalize="none">
+        <div class="acl" id="AL${sfx}"></div></div></div>
+      <div class="fl"><label class="fll">Bin (optional)</label><select class="fi" id="MB${sfx}"><option value="">No Bin</option>${bo}</select></div>
+    </div>
+    <div class="fl" style="margin-bottom:12px"><label class="fll">Description</label><input class="fi" id="MD${sfx}" readonly placeholder="Auto-filled"></div>
+    <div class="fg f2">
+      <div class="fl"><label class="fll">DMS Qty (System Qty)</label><input class="fi" id="MQ${sfx}" readonly placeholder="—"></div>
+      <div class="fl"><label class="fll">Physical Qty *</label><input class="fi mn" id="MPQ${sfx}" type="number" min="0" value="1"></div>
+    </div>
+    <div class="fl" style="margin-bottom:14px"><label class="fll">Remarks</label><input class="fi" id="MR${sfx}" placeholder="Optional"></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn bpr" onclick="subMan('${sfx}')">💾 Save Count</button>
+      <button class="btn bgh" onclick="clrMan('${sfx}')">✕ Clear</button>
+    </div>
+  </div></div>`;
+}
+
+function acFn(inp,lst,fn){
+  const v=$(inp)?.value||'',l=$(lst);if(!l)return;
+  if(v.length<1){l.style.display='none';return;}
+  const res=srch(v);
+  if(!res.length){l.style.display='none';return;}
+  l.innerHTML=res.map(i=>`<div class="aci" onclick="${fn}('${esc(i.partNo)}','${(i.desc||'').replace(/'/g,"\\'")}','${esc(i.bin||'')}','${i.systemQty||0}');document.getElementById('${lst}').style.display='none'">
+    <div class="acp">${esc(i.partNo)}</div>
+    <div class="acd">${esc(tr2(i.desc,40))} &nbsp;·&nbsp; <strong>DMS: ${i.systemQty||0}</strong></div>
+  </div>`).join('');
+  l.style.display='block';
+}
+
+function mfl_MS(pn,d,b,q){$('MPMS')&&($('MPMS').value=pn);$('MDMS')&&($('MDMS').value=d);$('MBMS')&&($('MBMS').value=b||'');$('MQMS')&&($('MQMS').value=q||0);}
+function mfl_M(pn,d,b,q){$('MPM')&&($('MPM').value=pn);$('MDM')&&($('MDM').value=d);$('MBM')&&($('MBM').value=b||'');$('MQM')&&($('MQM').value=q||0);}
+
+async function subMan(sfx){
+  const pn=($(`MP${sfx}`)?.value||'').trim().toUpperCase();
+  if(!pn){toast('Enter Part Number','w');return;}
+  const qty=parseInt($(`MPQ${sfx}`)?.value)||0;
+  const r=await api({action:'saveCount',count:{id:uid(),partNo:pn,desc:$(`MD${sfx}`)?.value||'',bin:$(`MB${sfx}`)?.value||'',date:today(),qty,time:nowt(),type:'Manual',remarks:$(`MR${sfx}`)?.value||'',auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
+  if(r.success){toast(`✅ Saved: ${pn} × ${qty}`,'s');clrMan(sfx);reloadLog();if($('MRECENT'))await loadManRecent();}
+  else toast(r.error||'Failed','d');
+}
+function clrMan(sfx){['MP','MD','MR'].forEach(p=>{const e=$(p+sfx);if(e)e.value='';});const q=$('MPQ'+sfx);if(q)q.value='1';const b=$('MB'+sfx);if(b)b.value='';}
+
+// ═══════════════════════════════════════════════════════════
+// PACKET FORM
+// ═══════════════════════════════════════════════════════════
+function pktForm(){
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  return`<div class="cd"><div class="cdh"><div class="cdt">📦 Packet / Bundle</div></div><div class="cdb">
+    <div class="fg f2">
+      <div class="fl"><label class="fll">Part Number *</label>
+        <div class="acw"><input class="fi mn" id="PKPN" placeholder="Part number" oninput="acFn('PKPN','PKAL','pkfl')" autocapitalize="none">
+        <div class="acl" id="PKAL"></div></div></div>
+      <div class="fl"><label class="fll">Bin (optional)</label><select class="fi" id="PKBN"><option value="">No Bin</option>${bo}</select></div>
+    </div>
+    <div class="fl" style="margin-bottom:11px"><label class="fll">Description</label><input class="fi" id="PKDSC" readonly></div>
+    <div class="fg f2">
+      <div class="fl"><label class="fll">Units / Packet</label><input class="fi mn" id="PKU" type="number" min="1" placeholder="12" oninput="cpkt()"></div>
+      <div class="fl"><label class="fll">No. of Packets</label><input class="fi mn" id="PKN" type="number" min="1" placeholder="5" oninput="cpkt()"></div>
+    </div>
+    <div id="PKTOT" style="display:none;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:var(--rs);padding:11px 14px;margin-bottom:12px">
+      <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase">Total Quantity</div>
+      <div id="PKTV" style="font-size:26px;font-weight:800;color:#059669;font-family:'JetBrains Mono',monospace"></div>
+      <div id="PKTC" style="font-size:11px;color:#64748b;margin-top:2px"></div>
+    </div>
+    <button class="btn bpr" onclick="subPkt()">💾 Save Count</button>
+  </div></div>`;
+}
+function pkfl(pn,d,b){$('PKPN').value=pn;$('PKDSC').value=d;$('PKBN').value=b||'';$('PKAL').style.display='none';}
+function cpkt(){const u=parseInt($('PKU')?.value)||0,n=parseInt($('PKN')?.value)||0,b=$('PKTOT'),v=$('PKTV'),c=$('PKTC');if(!b)return;if(u>0&&n>0){b.style.display='block';v.textContent=fmt(u*n)+' units';c.textContent=`${n} pkts × ${u} = ${u*n}`;}else b.style.display='none';}
+async function subPkt(){
+  const pn=($('PKPN')?.value||'').trim().toUpperCase();if(!pn){toast('Enter Part Number','w');return;}
+  const u=parseInt($('PKU')?.value)||0,n=parseInt($('PKN')?.value)||0;if(!u||!n){toast('Enter units & packet count','w');return;}
+  const r=await api({action:'saveCount',count:{id:uid(),partNo:pn,desc:$('PKDSC')?.value||'',bin:$('PKBN')?.value||'',date:today(),qty:u*n,time:nowt(),type:'Packet',remarks:`${n}pkts×${u}`,auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
+  if(r.success){toast(`✅ Packet: ${pn} × ${u*n}`,'s');['PKPN','PKDSC','PKU','PKN'].forEach(id=>{const e=$(id);if(e)e.value='';});$('PKBN').value='';cpkt();reloadLog();}
+  else toast(r.error||'Failed','d');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MANUAL PAGE
+// ═══════════════════════════════════════════════════════════
+async function rManual(){
+  $('PG').innerHTML=`<div class="ph"><div class="pt">✏️ Manual Entry</div><div class="ps">Saves to Google Sheet instantly</div></div>
+  ${manForm('M')}
+  <div class="cd" style="margin-top:16px">
+    <div class="cdh"><div class="cdt">My Recent Entries Today</div><button class="btn bgh bsm" onclick="loadManRecent()">🔄 Refresh</button></div>
+    <div class="tw"><table>
+      <thead><tr><th>Time</th><th>Part No</th><th>Description</th><th>Qty</th><th>Delete</th></tr></thead>
+      <tbody id="MRECENT"><tr><td colspan="5" style="text-align:center;padding:16px;color:#94a3b8">Loading…</td></tr></tbody>
+    </table></div>
+  </div>`;
+  await loadManRecent();
+}
+
+async function loadManRecent(){
+  const tb=$('MRECENT');if(!tb)return;
+  const counts=await fetchCounts(today(),S.user.username);
+  if(!counts.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:16px;color:#94a3b8">No entries today</td></tr>';return;}
+  tb.innerHTML=[...counts].reverse().map(c=>`<tr id="R_${c.id}">
+    <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(c.time||'').slice(0,5)}</td>
+    <td class="tpn">${esc(c.partNo)}</td>
+    <td>${esc(tr2(c.desc,26))}</td>
+    <td class="tq" style="color:#059669;font-size:15px;font-weight:800">${c.qty}</td>
+    <td><button class="btn bda bsm" style="padding:4px 10px" onclick="delRow('${c.id}','R_${c.id}')">🗑</button></td>
+  </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// BINS
+// ═══════════════════════════════════════════════════════════
+async function rBins(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
+  const counts=await fetchCounts(today());
+  const byBin={};counts.forEach(c=>{if(!byBin[c.bin])byBin[c.bin]=[];byBin[c.bin].push(c);});
+  const iByBin={};S.items.forEach(i=>{const b=i.bin||'?';if(!iByBin[b])iByBin[b]=[];iByBin[b].push(i);});
+  pg.innerHTML=`<div class="ph"><div><div class="pt">📦 Bin Locations</div></div>
+    <div style="display:flex;gap:6px"><span class="bg bgs">● Done</span><span class="bg bgw">● Partial</span><span class="bg bgg">● Not Started</span></div>
+  </div>
+  <div class="bgrid">${S.bins.map(b=>{
+    const items=iByBin[b.bin]||[],done=byBin[b.bin]?.length||0,total=items.length;
+    const pct=total?Math.round(done/total*100):0,cls=pct===100?'co':pct>0?'pa':'';
+    return`<div class="bcrd ${cls}" onclick="binDet('${esc(b.bin)}')">
+      <div class="bnn">${esc(b.bin)}</div><div class="bnd">${esc(b.description||'')}</div>
+      <div class="bnp">${pct}%</div>
+      <div style="font-size:10px;color:#64748b;margin-top:2px">${done}/${total}</div>
+      <div class="prg" style="margin-top:8px"><div class="prgf" style="width:${pct}%;background:${pct===100?'#059669':pct>0?'#d97706':'#e2e8f0'}"></div></div>
+    </div>`;
+  }).join('')||'<div class="emp"><div class="emp-i">📦</div><div class="emp-t">No bins</div></div>'}</div>`;
+}
+
+async function binDet(bn){
+  const counts=await fetchCounts();
+  const items=S.items.filter(i=>(i.bin||'').trim()===bn.trim());
+  const cMap={};counts.filter(c=>c.bin===bn).forEach(c=>{cMap[c.partNo]=(cMap[c.partNo]||0)+(parseFloat(c.qty)||0);});
+  const done=items.filter(i=>cMap[i.partNo]!==undefined).length,total=items.length,pct=total?Math.round(done/total*100):0;
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}" ${b.bin===bn?'selected':''}>${esc(b.bin)}</option>`).join('');
+  modal(`<div class="md mdxl"><div class="mdh"><div class="mdt">📦 ${esc(bn)} · ${pct}% Done (${done}/${total})</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div style="padding:10px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="flex:1"><div class="prg"><div class="prgf" style="width:${pct}%;background:#2563eb"></div></div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bwa bsm" onclick="openTransfer('${esc(bn)}')">🔀 Transfer Parts</button>
+      <button class="btn bpr bsm" onclick="openCreateBin()">＋ New Bin</button>
+    </div>
+  </div>
+  <div class="tw" style="max-height:500px;overflow-y:auto"><table>
+    <thead><tr><th>#</th><th>Part No</th><th>Desc</th><th>DMS Qty</th><th>Counted</th><th>Diff</th><th>Status</th><th>Move</th></tr></thead>
+    <tbody>${items.map((item,i)=>{const cnt=cMap[item.partNo];const dms=parseFloat(item.systemQty)||0;const diff=cnt!==undefined?cnt-dms:null;const st=cnt===undefined?'Not Counted':diff===0?'Match':diff<0?'Short':'Excess';const sb=st==='Match'?'bgs':st==='Short'?'bgd':st==='Excess'?'bgw':'bgg';const dc=st==='Short'?'ds':st==='Excess'?'de':st==='Match'?'dm':'';return`<tr><td style="font-size:10px">${i+1}</td><td class="tpn">${esc(item.partNo)}</td><td>${esc(tr2(item.desc,20))}</td><td class="tq">${dms}</td><td class="tq">${cnt!==undefined?cnt:'—'}</td><td class="tq ${dc}">${diff!==null?(diff>0?'▲':diff<0?'▼':'±')+Math.abs(diff):'—'}</td><td><span class="bg ${sb}">${st}</span></td><td><button class="btn bgh bsm" style="padding:3px 8px;font-size:10px" onclick="movePart('${esc(item.partNo)}','${esc(bn)}')">🔀</button></td></tr>`}).join('')}</tbody>
+  </table></div>
+  <div class="mdf"><button class="btn bgh" onclick="closeMd()">Close</button></div></div>`);
+}
+
+// Move single part to another bin
+function movePart(pn, currentBin){
+  const item=S.items.find(i=>i.partNo===pn);if(!item)return;
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}" ${b.bin===currentBin?'selected':''}>${esc(b.bin)}</option>`).join('');
+  modal(`<div class="md"><div class="mdh"><div class="mdt">🔀 Move Part</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div class="mdb">
+    <div style="background:#f8fafc;border-radius:var(--rs);padding:12px;margin-bottom:14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:800;color:#2563eb">${esc(pn)}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:3px">${esc(item.desc||'')}</div>
+    </div>
+    <div class="fl" style="margin-bottom:12px">
+      <label class="fll">Current Bin</label>
+      <div style="padding:9px 12px;background:#fef2f2;border-radius:var(--rs);font-family:'JetBrains Mono',monospace;font-weight:700;color:#dc2626">${esc(currentBin||'No Bin')}</div>
+    </div>
+    <div class="fl">
+      <label class="fll">Move To Bin *</label>
+      <select class="fi" id="MVBIN"><option value="">Select new bin…</option>${bo}</select>
+    </div>
+  </div>
+  <div class="mdf">
+    <button class="btn bgh" onclick="closeMd()">Cancel</button>
+    <button class="btn bpr" onclick="confirmMove('${esc(pn)}','${esc(currentBin)}')">🔀 Move Now</button>
+  </div></div>`);
+}
+
+async function confirmMove(pn, oldBin){
+  const newBin=$('MVBIN')?.value;
+  if(!newBin){toast('Select a bin','w');return;}
+  if(newBin===oldBin){toast('Same bin selected','w');return;}
+  const item=S.items.find(i=>i.partNo===pn);
+  if(!item)return;
+  item.bin=newBin;
+  const r=await api({action:'saveItem',item});
+  if(r.success){
+    toast(`✅ ${pn} moved → ${newBin}`,'s');
+    localStorage.setItem(IK,JSON.stringify(S.items));
+    closeMd();closeMd(); // close both modals
+    rBins();
+  } else toast(r.error||'Failed','d');
+}
+
+// Transfer ALL parts from one bin to another
+function openTransfer(fromBin){
+  const items=S.items.filter(i=>(i.bin||'').trim()===fromBin.trim());
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}" ${b.bin===fromBin?'disabled':''}>${esc(b.bin)}</option>`).join('');
+  modal(`<div class="md"><div class="mdh"><div class="mdt">🔀 Transfer Parts from ${esc(fromBin)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div class="mdb">
+    <div class="al alw">This will move <strong>${items.length} parts</strong> from <strong>${esc(fromBin)}</strong> to the selected bin.</div>
+    <div class="fl" style="margin-bottom:14px">
+      <label class="fll">Transfer ALL to Bin *</label>
+      <select class="fi" id="TRBIN"><option value="">Select destination bin…</option>${bo}</select>
+    </div>
+    <div style="font-size:12px;color:#64748b">Parts: ${items.slice(0,5).map(i=>i.partNo).join(', ')}${items.length>5?` +${items.length-5} more`:''}</div>
+  </div>
+  <div class="mdf">
+    <button class="btn bgh" onclick="closeMd()">Cancel</button>
+    <button class="btn bda" onclick="confirmTransfer('${esc(fromBin)}')">🔀 Transfer All ${items.length} Parts</button>
+  </div></div>`);
+}
+
+async function confirmTransfer(fromBin){
+  const toBin=$('TRBIN')?.value;
+  if(!toBin){toast('Select destination bin','w');return;}
+  const items=S.items.filter(i=>(i.bin||'').trim()===fromBin.trim());
+  if(!items.length){toast('No parts in this bin','w');return;}
+  const btn=document.querySelector('.mdf .bda');
+  if(btn){btn.disabled=true;btn.textContent='Moving…';}
+  let n=0;
+  for(const item of items){
+    item.bin=toBin;
+    const r=await api({action:'saveItem',item});
+    if(r.success)n++;
+  }
+  localStorage.setItem(IK,JSON.stringify(S.items));
+  toast(`✅ ${n} parts moved from ${fromBin} → ${toBin}`,'s',4000);
+  closeMd();closeMd();
+  rBins();
+}
+
+// Create new bin — auto saves to Google Sheet
+function openCreateBin(){
+  modal(`<div class="md"><div class="mdh"><div class="mdt">＋ Create New Bin</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div class="mdb">
+    <div class="al ali" style="margin-bottom:14px">New bin will be automatically created in your Google Sheet bins tab.</div>
+    <div class="fl" style="margin-bottom:12px">
+      <label class="fll">Bin Name *</label>
+      <input class="fi mn" id="CNBN" placeholder="e.g. BAF01A1" style="text-transform:uppercase">
+    </div>
+    <div class="fg f2">
+      <div class="fl">
+        <label class="fll">Description</label>
+        <input class="fi" id="CNBD" placeholder="Shelf description">
+      </div>
+      <div class="fl">
+        <label class="fll">Zone/Area</label>
+        <input class="fi" id="CNBZ" placeholder="Zone A">
+      </div>
+    </div>
+  </div>
+  <div class="mdf">
+    <button class="btn bgh" onclick="closeMd()">Cancel</button>
+    <button class="btn bpr" onclick="createNewBin()">＋ Create & Save to Sheet</button>
+  </div></div>`);
+}
+
+async function createNewBin(){
+  const name=($('CNBN')?.value||'').trim().toUpperCase();
+  if(!name){toast('Enter bin name','w');return;}
+  if(S.bins.find(b=>b.bin===name)){toast('Bin already exists','w');return;}
+  const desc=$('CNBD')?.value||'';
+  const zone=$('CNBZ')?.value||'';
+  const r=await api({action:'saveBin',bin:name,description:desc,zone});
+  if(r.success){
+    S.bins.push({bin:name,description:desc,zone});
+    S.bins.sort((a,b)=>a.bin.localeCompare(b.bin));
+    localStorage.setItem(BK,JSON.stringify(S.bins));
+    toast(`✅ Bin ${name} created in Google Sheet!`,'s');
+    closeMd();closeMd();
+    rBins();
+  } else toast(r.error||'Failed','d');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCAN LOG PAGE
+// ═══════════════════════════════════════════════════════════
+async function rScanLog(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳</div>';
+  const counts=await fetchCounts(today(),S.user.username);
+  pg.innerHTML=`<div class="ph"><div><div class="pt">📋 My Scan Log</div><div class="ps">${counts.length} records today</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bgh bsm" onclick="rScanLog()">🔄 Refresh</button>
+      <button class="btn bda bsm" onclick="delAll()">🗑 Delete All</button>
+    </div>
+  </div>
+  <div class="cd"><div class="tw"><table>
+    <thead><tr><th>Time</th><th>Part No</th><th>Desc</th><th>Bin</th><th>Qty</th><th>Type</th><th>Delete</th></tr></thead>
+    <tbody>${[...counts].reverse().map(c=>`<tr id="R_${c.id}">
+      <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(c.time||'').slice(0,5)}</td>
+      <td class="tpn">${esc(c.partNo)}</td><td>${esc(tr2(c.desc,22))}</td>
+      <td><span class="bg bgp" style="font-size:9px">${esc(c.bin||'—')}</span></td>
+      <td class="tq">${c.qty}</td><td><span class="bg bgg" style="font-size:9px">${c.type||'QR'}</span></td>
+      <td><button class="btn bda bsm" style="padding:3px 8px" onclick="delRow('${c.id}','R_${c.id}')">🗑</button></td>
+    </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;padding:24px;color:#94a3b8">No scans today</td></tr>'}</tbody>
+  </table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// VARIANCE
+// ═══════════════════════════════════════════════════════════
+async function rVariance(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
+  const counts=await fetchCounts();
+  const cMap={};counts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  pg.innerHTML=`<div class="ph"><div><div class="pt">📊 Variance Report</div><div class="ps">DMS qty = System Qty from items sheet</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bgh bsm" onclick="expVar('all')">⬇ Export</button>
+      <button class="btn bgh bsm" onclick="showEmail('variance')">📧 Email</button>
+    </div>
+  </div>
+  <div class="cd"><div class="fb">
+    <input class="fin" id="VFS" placeholder="🔍 Search part / description" oninput="dVT()">
+    <select class="fin" id="VFB" onchange="dVT()"><option value="">All Bins</option>${bo}</select>
+    <select class="fin" id="VFST" onchange="dVT()"><option value="">All Status</option><option value="match">Match</option><option value="short">Short</option><option value="excess">Excess</option><option value="notcounted">Not Counted</option></select>
+  </div>
+  <div id="VTBL"></div><div id="VSUM" class="smb"></div><div id="VPAG" class="pag"></div></div>`;
+  S.pd.vm=cMap;S.pg.v={p:1,sz:PGSZ};dVT();
+}
+
+function dVT(){
+  const w=$('VTBL'),sm=$('VSUM'),pag=$('VPAG');if(!w)return;
+  const cm=S.pd.vm||{};const s=($('VFS')?.value||'').toUpperCase(),b=$('VFB')?.value||'',st=$('VFST')?.value||'';
+  const p=S.pg.v||{p:1,sz:PGSZ};
+  let rows=S.items.map(item=>{const c=cm[item.partNo];const cnt=c??null;const dms=parseFloat(item.systemQty)||0;const diff=cnt!==null?cnt-dms:null;const st2=cnt===null?'notcounted':diff===0?'match':diff<0?'short':'excess';return{item,cnt,dms,diff,st:st2};});
+  if(s)rows=rows.filter(r=>(r.item.partNo||'').toUpperCase().includes(s)||(r.item.desc||'').toUpperCase().includes(s));
+  if(b)rows=rows.filter(r=>(r.item.bin||'')===b);
+  if(st)rows=rows.filter(r=>r.st===st);
+  rows.sort((a,bb)=>({short:0,excess:1,match:2,notcounted:3}[a.st]||3)-({short:0,excess:1,match:2,notcounted:3}[bb.st]||3));
+  const tots={match:0,short:0,excess:0,notcounted:0};rows.forEach(r=>tots[r.st]++);
+  if(sm)sm.innerHTML=`<div class="smi">Total: <strong>${rows.length}</strong></div><div class="smi" style="color:#059669">✅ ${tots.match}</div><div class="smi" style="color:#dc2626">🔻 ${tots.short}</div><div class="smi" style="color:#d97706">🔺 ${tots.excess}</div><div class="smi" style="color:#94a3b8">⬜ ${tots.notcounted}</div>`;
+  const tot=rows.length,pages=Math.ceil(tot/p.sz),st2=(p.p-1)*p.sz;
+  const sl={match:'Match',short:'Short',excess:'Excess',notcounted:'Not Counted'};
+  w.innerHTML=`<div class="tw"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Bin</th><th>DMS Qty</th><th>Counted</th><th>Diff</th><th>Status</th></tr></thead>
+  <tbody>${rows.slice(st2,st2+p.sz).map((r,i)=>{const sb=r.st==='match'?'bgs':r.st==='short'?'bgd':r.st==='excess'?'bgw':'bgg';const dc=r.st==='short'?'ds':r.st==='excess'?'de':r.st==='match'?'dm':'';const ds=r.diff!==null?(r.diff>0?'▲':r.diff<0?'▼':'±')+Math.abs(r.diff):'—';return`<tr><td style="font-size:10px">${st2+i+1}</td><td class="tpn">${esc(r.item.partNo)}</td><td>${esc(tr2(r.item.desc,24))}</td><td><span class="bg bgp" style="font-size:9px">${esc(r.item.bin||'—')}</span></td><td class="tq">${r.dms}</td><td class="tq">${r.cnt!==null?r.cnt:'—'}</td><td class="tq ${dc}">${ds}</td><td><span class="bg ${sb}">${sl[r.st]}</span></td></tr>`;}).join('')||'<tr><td colspan="8" style="text-align:center;padding:24px;color:#94a3b8">No items</td></tr>'}</tbody></table></div>`;
+  if(pag){let h=`<span class="pi">${st2+1}–${Math.min(st2+p.sz,tot)} of ${tot}</span>`;h+=`<button class="pb" onclick="vpg(${p.p-1})" ${p.p<=1?'disabled':''}>‹</button>`;for(let i=Math.max(1,p.p-2);i<=Math.min(pages,p.p+2);i++)h+=`<button class="pb ${i===p.p?'on':''}" onclick="vpg(${i})">${i}</button>`;h+=`<button class="pb" onclick="vpg(${p.p+1})" ${p.p>=pages?'disabled':''}>›</button>`;pag.innerHTML=h;}
+}
+function vpg(n){S.pg.v.p=n;dVT();}
+function expVar(type){const cm=S.pd.vm||{};let rows=S.items.map(i=>{const c=cm[i.partNo];const cnt=c??null;const dms=parseFloat(i.systemQty)||0;const diff=cnt!==null?cnt-dms:null;const st=cnt===null?'Not Counted':diff===0?'Match':diff<0?'Short':'Excess';return{pn:i.partNo,d:i.desc,b:i.bin,dms,cnt:cnt!==null?cnt:'',diff:diff!==null?diff:'',st};});if(type==='short')rows=rows.filter(r=>r.st==='Short');dlCSV('Part No,Description,Bin,DMS Qty,Counted,Diff,Status\n'+rows.map(r=>`"${r.pn}","${(r.d||'').replace(/"/g,'""')}","${r.b||''}",${r.dms},${r.cnt},${r.diff},${r.st}`).join('\n'),`variance_${today()}.csv`);}
+
+// ═══════════════════════════════════════════════════════════
+// DAYWISE
+// ═══════════════════════════════════════════════════════════
+async function rDaywise(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳</div>';
+  const counts=await fetchCounts();
+  const byD={};counts.forEach(c=>{if(!byD[c.date])byD[c.date]={n:0,bins:new Set(),aud:new Set()};byD[c.date].n++;if(c.bin)byD[c.date].bins.add(c.bin);if(c.auditor)byD[c.date].aud.add(c.auditor);});
+  const rows=Object.entries(byD).sort((a,b)=>b[0].localeCompare(a[0]));
+  pg.innerHTML=`<div class="ph"><div class="pt">📅 Day-wise Report</div><button class="btn bgh bsm" onclick="showEmail('daywise')">📧 Email</button></div>
+  <div class="sg s3" style="margin-bottom:14px">
+    <div class="st"><div class="stl">Audit Days</div><div class="stv">${rows.length}</div></div>
+    <div class="st"><div class="stl">Total Scans</div><div class="stv">${counts.length}</div></div>
+    <div class="st"><div class="stl">Avg / Day</div><div class="stv">${rows.length?Math.round(counts.length/rows.length):0}</div></div>
+  </div>
+  <div class="cd" style="margin-bottom:14px"><div class="cdh"><div class="cdt">Items per Day</div></div><div style="padding:12px"><canvas id="DCH" style="max-height:230px"></canvas></div></div>
+  <div class="cd"><div class="tw"><table>
+    <thead><tr><th>Date</th><th>Day</th><th>Items Scanned</th><th>Bins</th><th>Auditors</th></tr></thead>
+    <tbody>${rows.map(([date,v])=>`<tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${fmtD(date)}</td><td style="color:#64748b">${new Date(date).toLocaleDateString('en-IN',{weekday:'short'})}</td><td class="tq">${v.n}</td><td class="tq">${v.bins.size}</td><td style="font-size:11px">${[...v.aud].join(', ')}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">No data</td></tr>'}</tbody>
+  </table></div></div>`;
+  setTimeout(()=>{const ctx=$('DCH');if(ctx&&rows.length){if(S.charts.d)S.charts.d.destroy();S.charts.d=new Chart(ctx,{type:'bar',data:{labels:rows.map(r=>r[0]).reverse(),datasets:[{label:'Items',data:rows.map(r=>r[1].n).reverse(),backgroundColor:'rgba(37,99,235,.7)',borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:'#64748b'}},x:{ticks:{color:'#64748b'}}}}});}},100);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FULL SUMMARY
+// ═══════════════════════════════════════════════════════════
+async function rFullSummary(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading full audit data…</div>';
+  const counts=await fetchCounts();
+  const cMap={};counts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
+  const tots={match:0,short:0,excess:0,nc:0};
+  S.items.forEach(i=>{const c=cMap[i.partNo];if(!c&&c!==0){tots.nc++;return;}const d=c-(parseFloat(i.systemQty)||0);if(d===0)tots.match++;else if(d<0)tots.short++;else tots.excess++;});
+  const total=S.items.length,cnt=total-tots.nc,pct=total?Math.round(cnt/total*100):0;
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  const cats=[...new Set(S.items.map(i=>i.category).filter(Boolean))].sort();
+  pg.innerHTML=`<div class="ph"><div><div class="pt">📄 Full Audit Summary</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bgh bsm" onclick="expFull()">⬇ Export</button>
+      <button class="btn bgh bsm" onclick="showEmail('full')">📧 Email</button>
+      <button class="btn bgh bsm" onclick="window.print()">🖨 Print</button>
+    </div>
+  </div>
+  <div class="sg s4" style="margin-bottom:14px">
+    <div class="st"><div class="stl">Total SKUs</div><div class="stv">${fmt(total)}</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div><div class="sts">${pct}% counted</div></div>
+    <div class="st"><div class="stl" style="color:#059669">✅ Match</div><div class="stv" style="color:#059669">${fmt(tots.match)}</div></div>
+    <div class="st"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626">${fmt(tots.short)}</div></div>
+    <div class="st"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706">${fmt(tots.excess)}</div></div>
+  </div>
+  <div class="cd"><div class="fb">
+    <input class="fin" id="FSS" placeholder="🔍 Search" oninput="dFT()">
+    <select class="fin" id="FSB" onchange="dFT()"><option value="">All Bins</option>${bo}</select>
+    <select class="fin" id="FSST" onchange="dFT()"><option value="">All Status</option><option value="match">Match</option><option value="short">Short</option><option value="excess">Excess</option><option value="notcounted">Not Counted</option></select>
+    <select class="fin" id="FSC" onchange="dFT()"><option value="">All Categories</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+  </div><div id="FTBL"></div><div id="FPAG" class="pag"></div></div>`;
+  S.pd.fm=cMap;S.pg.f={p:1,sz:PGSZ};dFT();
+}
+
+function dFT(){
+  const w=$('FTBL'),pag=$('FPAG');if(!w)return;
+  const cm=S.pd.fm||{};const s=($('FSS')?.value||'').toUpperCase(),b=$('FSB')?.value||'',st=$('FSST')?.value||'',cat=$('FSC')?.value||'';
+  const p=S.pg.f||{p:1,sz:PGSZ};
+  let rows=S.items.map(item=>{const c=cm[item.partNo];const cnt=c??null;const dms=parseFloat(item.systemQty)||0;const diff=cnt!==null?cnt-dms:null;const st2=cnt===null?'notcounted':diff===0?'match':diff<0?'short':'excess';return{item,cnt,dms,diff,st:st2};});
+  if(s)rows=rows.filter(r=>(r.item.partNo||'').toUpperCase().includes(s)||(r.item.desc||'').toUpperCase().includes(s));
+  if(b)rows=rows.filter(r=>(r.item.bin||'')===b);if(st)rows=rows.filter(r=>r.st===st);if(cat)rows=rows.filter(r=>(r.item.category||'')===cat);
+  rows.sort((a,bb)=>({short:0,excess:1,match:2,notcounted:3}[a.st]||3)-({short:0,excess:1,match:2,notcounted:3}[bb.st]||3));
+  const tot=rows.length,pages=Math.ceil(tot/p.sz),st2=(p.p-1)*p.sz;
+  const sl={match:'Match',short:'Short',excess:'Excess',notcounted:'Not Counted'};
+  w.innerHTML=`<div class="tw"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Cat</th><th>Bin</th><th>DMS</th><th>Counted</th><th>Diff</th><th>Status</th></tr></thead>
+  <tbody>${rows.slice(st2,st2+p.sz).map((r,i)=>{const sb=r.st==='match'?'bgs':r.st==='short'?'bgd':r.st==='excess'?'bgw':'bgg';const sl2=sl[r.st];const dc=r.st==='short'?'ds':r.st==='excess'?'de':r.st==='match'?'dm':'';const ds=r.diff!==null?(r.diff>0?'▲':r.diff<0?'▼':'±')+Math.abs(r.diff):'—';return`<tr><td style="font-size:10px">${st2+i+1}</td><td class="tpn">${esc(r.item.partNo)}</td><td>${esc(tr2(r.item.desc,20))}</td><td style="font-size:10px;color:#64748b">${esc(tr2(r.item.category,12))}</td><td><span class="bg bgp" style="font-size:9px">${esc(r.item.bin||'—')}</span></td><td class="tq">${r.dms}</td><td class="tq">${r.cnt!==null?r.cnt:'—'}</td><td class="tq ${dc}">${ds}</td><td><span class="bg ${sb}">${sl2}</span></td></tr>`;}).join('')||'<tr><td colspan="9" style="text-align:center;padding:24px;color:#94a3b8">No items</td></tr>'}</tbody></table></div>`;
+  if(pag){let h=`<span class="pi">${Math.min(st2+1,tot)}–${Math.min(st2+p.sz,tot)} of ${tot}</span>`;h+=`<button class="pb" onclick="fpg(${p.p-1})" ${p.p<=1?'disabled':''}>‹</button>`;for(let i=Math.max(1,p.p-2);i<=Math.min(pages,p.p+2);i++)h+=`<button class="pb ${i===p.p?'on':''}" onclick="fpg(${i})">${i}</button>`;h+=`<button class="pb" onclick="fpg(${p.p+1})" ${p.p>=pages?'disabled':''}>›</button>`;pag.innerHTML=h;}
+}
+function fpg(n){S.pg.f.p=n;dFT();}
+function expFull(){const cm=S.pd.fm||{};dlCSV('Part No,Desc,Cat,Bin,DMS,Counted,Diff,Status\n'+S.items.map(i=>{const c=cm[i.partNo];const cnt=c??'';const d=parseFloat(i.systemQty)||0;const diff=cnt!==''?cnt-d:'';const st=cnt===''?'Not Counted':diff===0?'Match':diff<0?'Short':'Excess';return`"${i.partNo}","${(i.desc||'').replace(/"/g,'""')}","${i.category||''}","${i.bin||''}",${d},${cnt},${diff},${st}`;}).join('\n'),`full_audit_${today()}.csv`);}
+
+// ═══════════════════════════════════════════════════════════
+// EMAIL REPORT
+// ═══════════════════════════════════════════════════════════
+function showEmail(rtype){
+  const titles={variance:'Variance Report',daywise:'Day-wise Report',full:'Full Audit Summary'};
+  modal(`<div class="md"><div class="mdh"><div class="mdt">📧 Email Report</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div class="mdb">
+    <div class="al ali" style="margin-bottom:16px">📋 Report: <strong>${titles[rtype]||rtype}</strong></div>
+    <div class="fg">
+      <div class="fl"><label class="fll">To (Email Address) *</label><input class="fi" id="EMT" type="email" placeholder="manager@indiaMotors.com"></div>
+      <div class="fl"><label class="fll">CC (optional)</label><input class="fi" id="EMC" type="email" placeholder="owner@indiaMotors.com"></div>
+      <div class="fl"><label class="fll">Note (optional)</label><textarea class="fi" id="EMN" rows="2" placeholder="Any additional notes…"></textarea></div>
+    </div>
+  </div>
+  <div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" id="EMBTN" onclick="sendEmail('${rtype}')">📧 Send Report</button></div></div>`);
+}
+
+async function sendEmail(rtype){
+  const to=$('EMT')?.value?.trim();if(!to||!to.includes('@')){toast('Enter valid email','w');return;}
+  const btn=$('EMBTN');if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  const r=await api({action:'sendEmailReport',email:to,cc:$('EMC')?.value?.trim()||'',reportType:rtype,note:$('EMN')?.value?.trim()||'',requestedBy:S.user.name||S.user.username,date:today()});
+  if(r.success){toast('Report sent to '+to,'s');closeMd();}
+  else{toast(r.error||'Email failed — run authorizeEmail() in Apps Script first','d',6000);if(btn){btn.disabled=false;btn.textContent='📧 Send Report';}}
+}
+
+// ═══════════════════════════════════════════════════════════
+// ITEM MASTER
+// ═══════════════════════════════════════════════════════════
+async function rItemMaster(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
+  if(S.online){const r=await api({action:'getItems'});if(r.success&&r.items){S.items=r.items;localStorage.setItem(IK,JSON.stringify(r.items));}}
+  const isMaster=S.user?.role==='master_auditor';
+  const cats=[...new Set(S.items.map(i=>i.category).filter(Boolean))].sort();
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  pg.innerHTML=`<div class="ph"><div><div class="pt">🗃️ Item Master</div><div class="ps">${fmt(S.items.length)} SKUs · System Qty = DMS reference</div></div>
+    <div style="display:flex;gap:8px">${isMaster?`<button class="btn bpr bsm" onclick="addItem()">＋ Add</button><button class="btn bgh bsm" onclick="bulkImp()">⬆ Import</button>`:''}
+    <button class="btn bgh bsm" onclick="expItems()">⬇ Export</button></div>
+  </div>
+  <div class="cd"><div class="fb">
+    <input class="fin" id="IMS" placeholder="🔍 Search part, description, category" oninput="dIT()">
+    <select class="fin" id="IMC" onchange="dIT()"><option value="">All Categories</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+    <select class="fin" id="IMB" onchange="dIT()"><option value="">All Bins</option><option value="__nb__">No Bin</option>${bo}</select>
+  </div><div id="IMTBL"></div><div id="IMPAG" class="pag"></div></div>`;
+  S.pg.im={p:1,sz:PGSZ};dIT();
+}
+
+function dIT(){
+  const w=$('IMTBL'),pag=$('IMPAG');if(!w)return;
+  const isMaster=S.user?.role==='master_auditor';
+  const s=($('IMS')?.value||'').toUpperCase(),c=$('IMC')?.value||'',b=$('IMB')?.value||'';
+  const p=S.pg.im||{p:1,sz:PGSZ};
+  let items=[...S.items];
+  if(s)items=items.filter(i=>(i.partNo||'').toUpperCase().includes(s)||(i.desc||'').toUpperCase().includes(s)||(i.category||'').toUpperCase().includes(s));
+  if(c)items=items.filter(i=>(i.category||'')===c);
+  if(b==='__nb__')items=items.filter(i=>!i.bin);else if(b)items=items.filter(i=>(i.bin||'')===b);
+  const tot=items.length,pages=Math.ceil(tot/p.sz),st=(p.p-1)*p.sz;
+  w.innerHTML=`<div class="tw"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Category</th><th>Bin</th><th>System Qty</th><th>MRP</th>${isMaster?'<th>Actions</th>':''}</tr></thead>
+  <tbody>${items.slice(st,st+p.sz).map((item,i)=>`<tr id="IM_${esc(item.partNo)}">
+    <td style="font-size:10px">${st+i+1}</td>
+    <td class="tpn">${esc(item.partNo)}</td>
+    <td style="max-width:170px">${esc(tr2(item.desc,28))}</td>
+    <td style="font-size:10px;color:#64748b">${esc(item.category||'—')}</td>
+    <td>${item.bin?`<span class="bg bgp" style="font-size:9px">${esc(item.bin)}</span>`:`<span style="color:#94a3b8;font-size:10px">—</span>`}</td>
+    <td class="tq">${item.systemQty||0}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${fmtM(item.mrp)}</td>
+    ${isMaster?`<td><div style="display:flex;gap:4px">
+      <button class="btn bgh bsm" onclick="editItem('${esc(item.partNo)}')">✏</button>
+      <button class="btn bda bsm" style="padding:4px 8px" onclick="dItem('${esc(item.id||item.partNo)}','${esc(item.partNo)}')">🗑</button>
+    </div></td>`:''}
+  </tr>`).join('')||`<tr><td colspan="${isMaster?8:7}" style="text-align:center;padding:24px;color:#94a3b8">No items found</td></tr>`}</tbody></table></div>`;
+  if(pag){let h=`<span class="pi">${Math.min(st+1,tot)}–${Math.min(st+p.sz,tot)} of ${tot}</span>`;h+=`<button class="pb" onclick="impg(${p.p-1})" ${p.p<=1?'disabled':''}>‹</button>`;for(let i=Math.max(1,p.p-2);i<=Math.min(pages,p.p+2);i++)h+=`<button class="pb ${i===p.p?'on':''}" onclick="impg(${i})">${i}</button>`;h+=`<button class="pb" onclick="impg(${p.p+1})" ${p.p>=pages?'disabled':''}>›</button>`;pag.innerHTML=h;}
+}
+function impg(n){S.pg.im.p=n;dIT();}
+
+function addItem(){const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');modal(`<div class="md"><div class="mdh"><div class="mdt">＋ Add Item</div><button class="mdc" onclick="closeMd()">✕</button></div><div class="mdb"><div class="fg f2"><div class="fl"><label class="fll">Part No *</label><input class="fi mn" id="NIP"></div><div class="fl"><label class="fll">Bin</label><select class="fi" id="NIB"><option value="">No Bin</option>${bo}</select></div></div><div class="fl" style="margin-bottom:11px"><label class="fll">Description</label><input class="fi" id="NID"></div><div class="fg f2"><div class="fl"><label class="fll">Category</label><input class="fi" id="NIC"></div><div class="fl"><label class="fll">System Qty (DMS)</label><input class="fi" id="NIQ" type="number" value="0"></div></div><div class="fg f2"><div class="fl"><label class="fll">MRP ₹</label><input class="fi" id="NIM" type="number" value="0"></div><div class="fl"><label class="fll">HSN</label><input class="fi mn" id="NIH"></div></div></div><div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" onclick="svItem()">Save</button></div></div>`);}
+async function svItem(){const pn=($('NIP')?.value||'').trim().toUpperCase();if(!pn){toast('Part No required','w');return;}const item={partNo:pn,desc:$('NID')?.value||'',category:$('NIC')?.value||'',bin:$('NIB')?.value||'',systemQty:parseInt($('NIQ')?.value)||0,unit:'Nos',hsn:$('NIH')?.value||'',mrp:parseFloat($('NIM')?.value)||0,dlc:0,moq:1};const r=await api({action:'saveItem',item});if(r.success){toast('Saved','s');closeMd();S.items.push(item);localStorage.setItem(IK,JSON.stringify(S.items));dIT();}else toast(r.error||'Failed','d');}
+function editItem(pn){const item=S.items.find(i=>i.partNo===pn);if(!item)return;const bo=S.bins.map(b=>`<option value="${esc(b.bin)}" ${b.bin===item.bin?'selected':''}>${esc(b.bin)}</option>`).join('');modal(`<div class="md"><div class="mdh"><div class="mdt">✏️ ${esc(pn)}</div><button class="mdc" onclick="closeMd()">✕</button></div><div class="mdb"><input type="hidden" id="EIP" value="${esc(pn)}"><div class="fg f2"><div class="fl"><label class="fll">Bin</label><select class="fi" id="EIB"><option value="">No Bin</option>${bo}</select></div><div class="fl"><label class="fll">System Qty (DMS)</label><input class="fi" id="EIQ" type="number" value="${item.systemQty||0}"></div></div><div class="fl" style="margin-bottom:11px"><label class="fll">Description</label><input class="fi" id="EID" value="${esc(item.desc||'')}"></div><div class="fl"><label class="fll">MRP ₹</label><input class="fi" id="EIM" type="number" value="${item.mrp||0}"></div></div><div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" onclick="updItem()">Save</button></div></div>`);}
+async function updItem(){const pn=$('EIP')?.value;const item=S.items.find(i=>i.partNo===pn);if(!item)return;item.desc=$('EID')?.value||item.desc;item.bin=$('EIB')?.value||'';item.systemQty=parseInt($('EIQ')?.value)||0;item.mrp=parseFloat($('EIM')?.value)||0;const r=await api({action:'saveItem',item});if(r.success){toast('Updated','s');closeMd();localStorage.setItem(IK,JSON.stringify(S.items));dIT();}else toast(r.error||'Failed','d');}
+async function dItem(id,pn){if(!confirm(`Delete ${pn}?`))return;const row=$(`IM_${pn}`);if(row){row.style.opacity='.4';row.style.background='#fef2f2';}const r=await api({action:'deleteItem',id});if(r.success){toast('Deleted','s');S.items=S.items.filter(i=>i.partNo!==pn);localStorage.setItem(IK,JSON.stringify(S.items));row?.remove();}else{toast(r.error||'Failed','d');if(row){row.style.opacity='1';row.style.background='';}};}
+function expItems(){dlCSV('Part No,Description,Category,Bin,System Qty,Unit,HSN,MRP\n'+S.items.map(i=>`"${i.partNo}","${(i.desc||'').replace(/"/g,'""')}","${i.category||''}","${i.bin||''}",${i.systemQty||0},"${i.unit||'Nos'}","${i.hsn||''}",${i.mrp||0}`).join('\n'),`items_${today()}.csv`);}
+
+let bRows=[];
+function bulkImp(){modal(`<div class="md mdlg"><div class="mdh"><div class="mdt">⬆ Bulk Import</div><button class="mdc" onclick="closeMd()">✕</button></div><div class="mdb"><div class="al ali">Format: Part #, HSN, Description, MRP, DLC, MOQ, Stock on Hand, Category</div><div class="dz" onclick="$('BIF').click()"><div style="font-size:36px;margin-bottom:8px">📄</div><div style="font-weight:700;color:#475569">Drop CSV or tap to browse</div></div><input type="file" id="BIF" accept=".csv" style="display:none" onchange="prevBulk(this)"><div id="BIPREV" style="margin-top:12px"></div><div class="fl" style="margin-top:10px"><label class="fll">Mode</label><select class="fi" id="BIMOD"><option value="add_new_only">Add New Only</option><option value="update_existing">Update + Add New</option></select></div></div><div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" id="BIBTN" style="display:none" onclick="doBulk()">Import</button></div></div>`);}
+function prevBulk(input){const f=input.files[0];if(!f)return;const prev=$('BIPREV');const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(Boolean);bRows=lines.slice(1).map(l=>l.split(',').map(v=>(v||'').trim().replace(/"/g,''))).filter(r=>r[0]).map(r=>({partNo:r[0].trim(),hsn:r[1]||'',desc:r[2]||'',mrp:parseFloat(r[3])||0,dlc:parseFloat(r[4])||0,moq:parseInt(r[5])||1,systemQty:parseInt(r[6])||0,category:r[7]||'',unit:'Nos'}));if(prev)prev.innerHTML=`<div class="snpc"><div style="font-size:16px;font-weight:800">${bRows.length} parts detected</div></div>`;const b=$('BIBTN');if(b)b.style.display='inline-flex';};reader.readAsText(f);}
+async function doBulk(){if(!bRows.length){toast('No data','w');return;}const mode=$('BIMOD')?.value||'add_new_only';const btn=$('BIBTN');if(btn){btn.disabled=true;btn.textContent='Importing…';}const r=await api({action:'importItems',items:bRows,mode});if(r.success){toast(`Done — Added:${r.added||0} Updated:${r.updated||0}`,'s');closeMd();await syncItems();dIT();}else toast(r.error||'Failed','d');if(btn){btn.disabled=false;btn.textContent='Import';}}
+
+// ═══════════════════════════════════════════════════════════
+// DMS
+// ═══════════════════════════════════════════════════════════
+async function rDMS(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳</div>';
+  const r=await api({action:'getDMSSnapshots'});const snaps=(r.success&&r.snapshots)||[];const active=snaps.find(s=>s.isActive==='TRUE')||snaps[0]||{};
+  pg.innerHTML=`<div class="ph"><div class="pt">⬆ DMS Upload</div></div>
+  <div class="tbr">
+    <button class="tb2 on" onclick="swTab('TDMS','DMSTABS',this)">📊 DMS Snapshot</button>
+    <button class="tb2" onclick="swTab('TDAILY','DMSTABS',this)">📅 Daily Stock Update</button>
+  </div>
+  <div id="DMSTABS">
+  <div class="tp on" id="TDMS">
+  <div class="al alw">⚠️ After upload, click "Apply to Items Sheet" to update System Qty column. This is what the app uses for variance comparison.</div>
+  <div class="snpc"><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Active Snapshot → System Qty in items sheet</div>
+    <div style="font-size:16px;font-weight:800">${esc(active.snapshotName||'DMS Stock 21-Mar-2026')}</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:#475569">
+      <span>📅 ${esc(active.uploadDate||'21-03-2026')}</span><span>📦 ${fmt(parseInt(active.totalParts)||0)}</span><span>👤 ${esc(active.uploadedBy||'')}</span>
+    </div>
+  </div>
+  <div class="cd" style="margin-bottom:16px"><div class="cdh"><div class="cdt">Upload New DMS Stock</div></div><div class="cdb">
+    <div class="ib" style="margin-bottom:12px">📋 CSV Format: Part #, HSN, Part Description, MRP, DLC, MOQ, <strong>Stock on Hand</strong>, Category<br><small>Stock on Hand → updates System Qty in items sheet</small></div>
+    <div class="dz" onclick="$('DMSF').click()"><div style="font-size:36px;margin-bottom:8px">📊</div><div style="font-weight:700;color:#475569">Drop DMS CSV here or tap to browse</div></div>
+    <input type="file" id="DMSF" accept=".csv" style="display:none" onchange="prevDMS(this)">
+    <div id="DMSPREV" style="margin-top:12px"></div>
+  </div></div>
+  <div class="cd"><div class="cdh"><div class="cdt">Snapshot History</div></div><div class="tw"><table>
+    <thead><tr><th>Name</th><th>Date</th><th>Parts</th><th>Status</th><th></th></tr></thead>
+    <tbody>${snaps.map(s=>`<tr><td style="font-weight:700;font-size:12px">${esc(s.snapshotName||s.snapshotId)}</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${esc(s.uploadDate||'—')}</td><td class="tq">${fmt(parseInt(s.totalParts)||0)}</td><td>${s.isActive==='TRUE'?'<span class="bg bgs">● Active</span>':'<span class="bg bgg">Inactive</span>'}</td><td><button class="btn bgh bsm" onclick="setSnap('${esc(s.snapshotId)}')">Set Active</button></td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">No snapshots</td></tr>'}</tbody>
+  </table></div></div>`;
+}
+
+  </div><!-- end TDMS -->
+
+  <!-- DAILY STOCK UPDATE TAB -->
+  <div class="tp" id="TDAILY">
+    <div class="al ali">📅 <strong>Daily Stock Update:</strong> Upload today's DMS stock report. System Qty in items sheet will be updated immediately. Use this every day before starting audit.</div>
+    <div class="cd" style="margin-bottom:14px"><div class="cdh"><div class="cdt">📅 Upload Today's Stock</div></div><div class="cdb">
+      <div class="ib" style="margin-bottom:12px">📋 Same CSV format: Part #, HSN, Description, MRP, DLC, MOQ, <strong>Stock on Hand</strong>, Category<br><small>This directly updates System Qty — no snapshot saved</small></div>
+      <div class="dz" onclick="$('DAILYF').click()"><div style="font-size:36px;margin-bottom:8px">📅</div><div style="font-weight:700;color:#475569">Drop today's DMS CSV here</div><div style="font-size:11px;color:#94a3b8;margin-top:6px">Updates System Qty instantly</div></div>
+      <input type="file" id="DAILYF" accept=".csv" style="display:none" onchange="prevDaily(this)">
+      <div id="DAILYPREV" style="margin-top:12px"></div>
+    </div></div>
+  </div><!-- end TDAILY -->
+
+  </div><!-- end DMSTABS -->\`;
+}
+
+let dailyRows=[];
+function prevDaily(input){
+  const f=input.files[0];if(!f)return;
+  const area=$('DAILYPREV');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n').filter(Boolean);
+    dailyRows=lines.slice(1).map(l=>l.split(',').map(v=>(v||'').trim().replace(/"/g,''))).filter(r=>r[0]).map(r=>({
+      partNo:r[0].trim(),hsn:r[1]||'',desc:r[2]||'',mrp:parseFloat(r[3])||0,
+      dlc:parseFloat(r[4])||0,moq:parseInt(r[5])||1,systemQty:parseInt(r[6])||0,
+      category:r[7]||'',unit:'Nos'
+    }));
+    area.innerHTML=`<div class="snpc">
+      <div style="font-size:16px;font-weight:800">${dailyRows.length} parts found in file</div>
+      <div style="font-size:12px;color:#475569;margin-top:4px">${f.name} · ${dailyRows.filter(d=>S.items.find(i=>i.partNo===d.partNo)).length} matched in items sheet</div>
+    </div>
+    <div class="al als">✅ This will update System Qty for all matched parts immediately.</div>
+    <div style="display:flex;gap:9px">
+      <button class="btn bpr" onclick="applyDailyStock()">⚡ Update Stock Now</button>
+      <button class="btn bgh" onclick="$('DAILYPREV').innerHTML='';dailyRows=[]">Cancel</button>
+    </div>`;
+  };
+  reader.readAsText(f);
+}
+
+async function applyDailyStock(){
+  if(!dailyRows.length){toast('No data','w');return;}
+  const btn=document.querySelector('#DAILYPREV .bpr');
+  if(btn){btn.disabled=true;btn.textContent='Updating…';}
+  // Batch update — send in chunks of 200
+  let totalUpdated=0;
+  // First save as items update
+  for(let i=0;i<dailyRows.length;i+=200){
+    const chunk=dailyRows.slice(i,i+200);
+    const r=await api({action:'importItems',items:chunk,mode:'update_existing'});
+    if(r.success) totalUpdated+=(r.updated||0);
+  }
+  // Refresh items cache
+  await syncItems();
+  toast(`✅ Stock updated! ${totalUpdated} parts updated in items sheet`,'s',5000);
+  $('DAILYPREV').innerHTML=`<div class="al als">✅ Done! ${totalUpdated} parts updated. Items sheet System Qty is now current.</div>`;
+  dailyRows=[];
+}
+
+// ── DMS ORIGINAL FUNCTIONS ──
+let dmRows=[],dmSid='';
+function prevDMS(input){const f=input.files[0];if(!f)return;const area=$('DMSPREV');const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(Boolean);dmRows=lines.slice(1).map(l=>l.split(',').map(v=>(v||'').trim().replace(/"/g,''))).filter(r=>r[0]).map(r=>({partNo:r[0].trim(),hsn:r[1]||'',desc:r[2]||'',mrp:parseFloat(r[3])||0,dlc:parseFloat(r[4])||0,moq:parseInt(r[5])||1,dmsQty:parseInt(r[6])||0,category:r[7]||'',unit:'Nos'}));area.innerHTML=`<div class="snpc"><div style="font-size:16px;font-weight:800">${dmRows.length} parts found</div><div style="font-size:12px;margin-top:4px;color:#475569">${f.name} · ${dmRows.filter(d=>S.items.find(i=>i.partNo===d.partNo)).length} matched in items sheet</div></div><div class="fl" style="margin-bottom:10px"><label class="fll">Snapshot Name</label><input class="fi" id="DSNM" value="${f.name.replace(/\.[^.]+$/,'').replace(/_/g,' ')}"></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><input type="checkbox" id="DSACT" checked style="width:14px;height:14px;accent-color:#2563eb"><label for="DSACT" style="font-size:13px;font-weight:500;cursor:pointer">Set as Active Snapshot</label></div><div style="display:flex;gap:9px"><button class="btn bpr" onclick="saveDMS()">💾 Save Snapshot</button><button class="btn bgh" onclick="$('DMSPREV').innerHTML=''">Cancel</button></div><div id="APPLYP" style="display:none;margin-top:12px"><div class="al alw">✅ Saved! Now update System Qty in items sheet?<div style="margin-top:9px;display:flex;gap:8px"><button class="btn bsu bsm" onclick="applyDMS()">✅ Yes, Apply to Items Sheet</button><button class="btn bgh bsm" onclick="$('APPLYP').style.display='none'">Skip</button></div></div></div>`;};reader.readAsText(f);}
+async function saveDMS(){if(!dmRows.length){toast('No data','w');return;}const name=$('DSNM')?.value||'DMS-'+today(),setAct=$('DSACT')?.checked;const r=await api({action:'saveDMSSnapshot',snapshot:{name,date:today(),time:nowt(),uploadedBy:S.user.username,totalParts:dmRows.length}});if(!r.success){toast('Failed: '+r.error,'d');return;}dmSid=r.snapshotId;for(let i=0;i<dmRows.length;i+=200)await api({action:'saveDMSItems',snapshotId:dmSid,items:dmRows.slice(i,i+200).map(d=>({...d,snapshotId:dmSid}))});if(setAct)await api({action:'setActiveSnapshot',snapshotId:dmSid});toast('Snapshot saved!','s');const p=$('APPLYP');if(p)p.style.display='block';}
+async function applyDMS(){if(!dmSid)return;if(!confirm('Update System Qty in items sheet from this DMS data?\nPhysical count records will NOT be affected.'))return;const r=await api({action:'applySnapshotToMaster',snapshotId:dmSid});if(r.success){toast(`Updated ${r.updated||0} items in items sheet`,'s');const p=$('APPLYP');if(p)p.style.display='none';await syncItems();}else toast(r.error||'Failed','d');}
+async function setSnap(id){const r=await api({action:'setActiveSnapshot',snapshotId:id});if(r.success){toast('Updated','s');rDMS();}else toast(r.error||'Failed','d');}
+
+// ═══════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════
+async function rSettings(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳</div>';
+  const[ur,br,sr]=await Promise.all([api({action:'getUsers'}),api({action:'getBins'}),api({action:'getSessions'})]);
+  const users=(ur.success&&ur.users)||[],bins=(br.success&&br.bins)||S.bins,sessions=(sr.success&&sr.sessions)||[];
+  pg.innerHTML=`<div class="ph"><div class="pt">⚙️ Settings</div></div>
+  <div class="tbr"><button class="tb2 on" onclick="swTab('SSESS','STABS',this)">Sessions</button><button class="tb2" onclick="swTab('SUSERS','STABS',this)">Users</button><button class="tb2" onclick="swTab('SBINS','STABS',this)">Bins</button><button class="tb2" onclick="swTab('SDATA','STABS',this)">Data</button></div>
+  <div id="STABS">
+    <div class="tp on" id="SSESS"><div class="cd"><div class="cdh"><div class="cdt">Audit Sessions</div><button class="btn bpr bsm" onclick="newSess()">＋ New</button></div><div class="tw"><table><thead><tr><th>Name</th><th>Start</th><th>Status</th><th></th></tr></thead><tbody>${sessions.map(s=>`<tr><td style="font-weight:700;font-size:12px">${esc(s.sessionName)}</td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">${fmtD(s.startDate)}</td><td><span class="bg ${s.status==='active'?'bgs':'bgg'}">${s.status}</span></td><td>${s.status==='active'?`<button class="btn bgh bsm" onclick="closeSess('${s.sessionId}')">Close</button>`:''}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:20px;color:#94a3b8">No sessions</td></tr>'}</tbody></table></div></div></div>
+    <div class="tp" id="SUSERS"><div class="cd"><div class="cdh"><div class="cdt">Users</div><button class="btn bpr bsm" onclick="newUser()">＋ Add</button></div><div class="tw"><table><thead><tr><th>Username</th><th>Full Name</th><th>Role</th><th>Active</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${esc(u.username)}</td><td style="font-size:12px;font-weight:600">${esc(u.name)}</td><td><span class="bg ${u.role==='master_auditor'?'bgp':'bgg'}">${u.role==='master_auditor'?'Master':'Exec'}</span></td><td><span class="bg ${u.active==='TRUE'||u.active===true?'bgs':'bgd'}">${u.active==='TRUE'||u.active===true?'Active':'Off'}</span></td><td><button class="btn bgh bsm" onclick="edUser('${esc(u.username)}')">✏</button></td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">No users</td></tr>'}</tbody></table></div></div></div>
+    <div class="tp" id="SBINS"><div class="cd"><div class="cdh"><div class="cdt">Bins</div><button class="btn bpr bsm" onclick="newBin()">＋ Add</button></div><div class="tw"><table><thead><tr><th>Bin Name</th><th>Description</th><th>Zone</th><th></th></tr></thead><tbody>${bins.map(b=>`<tr><td class="tpn">${esc(b.bin)}</td><td style="font-size:12px">${esc(b.description||'—')}</td><td style="font-size:11px;color:#64748b">${esc(b.zone||'—')}</td><td><button class="btn bda bsm" onclick="rmBin('${esc(b.bin)}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:20px;color:#94a3b8">No bins</td></tr>'}</tbody></table></div></div></div>
+    <div class="tp" id="SDATA"><div class="cd"><div class="cdb" style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f8fafc;border-radius:var(--rs);border:1px solid var(--bd)"><div><div style="font-weight:700;font-size:13px">Export All Counts</div><div style="font-size:11px;color:#64748b">All physical count records</div></div><button class="btn bgh bsm" onclick="expAllCounts()">⬇</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f8fafc;border-radius:var(--rs);border:1px solid var(--bd)"><div><div style="font-weight:700;font-size:13px">Refresh Cache</div><div style="font-size:11px;color:#64748b">Re-sync items & bins from sheet</div></div><button class="btn bgh bsm" onclick="refAll()">🔄</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#fef2f2;border-radius:var(--rs);border:1px solid #fecaca"><div><div style="font-weight:700;font-size:13px;color:#dc2626">⚠️ Clear Today's Scans</div><div style="font-size:11px;color:#64748b">Permanently delete today's records</div></div><button class="btn bda bsm" onclick="clrToday()">🗑</button></div>
+    </div></div></div>
+  </div>`;
+}
+
+async function refAll(){await Promise.all([syncItems(),syncBins()]);toast('Cache refreshed','s');}
+async function expAllCounts(){const counts=await fetchCounts();dlCSV('ID,Part No,Description,Bin,Date,Qty Counted,Time,Type,Remarks,Auditor\n'+counts.map(c=>`"${c.id}","${c.partNo}","${(c.desc||'').replace(/"/g,'""')}","${c.bin||''}","${c.date}",${c.qty},"${c.time}","${c.type||'QR'}","${c.remarks||''}","${c.auditor}"`).join('\n'),`all_counts_${today()}.csv`);}
+async function clrToday(){if(prompt('Type DELETE to confirm:')!=='DELETE'){toast('Cancelled','w');return;}const counts=await fetchCounts(today());let d=0;for(const c of counts){const r=await api({action:'deleteCount',id:c.id});if(r.success)d++;}toast(`${d} deleted`,'s');}
+async function closeSess(id){if(!confirm('Close this audit session?'))return;const r=await api({action:'saveSession',session:{sessionId:id,status:'completed',endDate:today()}});if(r.success){toast('Closed','s');rSettings();}else toast(r.error,'d');}
+function newSess(){modal(`<div class="md"><div class="mdh"><div class="mdt">New Session</div><button class="mdc" onclick="closeMd()">✕</button></div><div class="mdb"><div class="fl" style="margin-bottom:12px"><label class="fll">Name *</label><input class="fi" id="NSN" placeholder="April 2026 Full Audit"></div><div class="fl"><label class="fll">Start Date</label><input class="fi" id="NSD" type="date" value="${today()}"></div></div><div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" onclick="svSess()">Create</button></div></div>`);}
+async function svSess(){const name=$('NSN')?.value||'';if(!name){toast('Name required','w');return;}const r=await api({action:'saveSession',session:{sessionId:uid('SESS'),sessionName:name,startDate:$('NSD')?.value||today(),status:'active',createdBy:S.user.username}});if(r.success){toast('Created','s');closeMd();rSettings();}else toast(r.error||'Failed','d');}
+function newUser(){modal(`<div class="md"><div class="mdh"><div class="mdt">Add User</div><button class="mdc" onclick="closeMd()">✕</button></div><div class="mdb"><div class="fg f2"><div class="fl"><label class="fll">Username *</label><input class="fi mn" id="NUU"></div><div class="fl"><label class="fll">Password *</label><input class="fi" id="NUP" type="password"></div></div><div class="fg f2"><div class="fl"><label class="fll">Full Name</label><input class="fi" id="NUN"></div><div class="fl"><label class="fll">Role</label><select class="fi" id="NUR"><option value="executive">Executive</option><option value="master_auditor">Master Auditor</option></select></div></div></div><div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" onclick="svUser()">Add</button></div></div>`);}
+async function svUser(){const u={username:($('NUU')?.value||'').trim(),password:$('NUP')?.value||'',name:$('NUN')?.value||'',role:$('NUR')?.value||'executive',active:'TRUE'};if(!u.username||!u.password){toast('Username & password required','w');return;}const r=await api({action:'saveUser',user:u});if(r.success){toast('Added','s');closeMd();rSettings();}else toast(r.error||'Failed','d');}
+function edUser(un){modal(`<div class="md"><div class="mdh"><div class="mdt">Edit: ${esc(un)}</div><button class="mdc" onclick="closeMd()">✕</button></div><div class="mdb"><input type="hidden" id="EUU" value="${esc(un)}"><div class="fl" style="margin-bottom:12px"><label class="fll">New Password (blank = keep)</label><input class="fi" id="EUP" type="password"></div><div class="fl"><label class="fll">Full Name</label><input class="fi" id="EUN"></div></div><div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" onclick="upUser()">Save</button></div></div>`);}
+async function upUser(){const u={username:$('EUU')?.value,name:$('EUN')?.value||''};const pw=$('EUP')?.value;if(pw)u.password=pw;const r=await api({action:'saveUser',user:u});if(r.success){toast('Updated','s');closeMd();rSettings();}else toast(r.error||'Failed','d');}
+function newBin(){modal(`<div class="md"><div class="mdh"><div class="mdt">Add Bins</div><button class="mdc" onclick="closeMd()">✕</button></div><div class="mdb"><div class="al ali">💡 Multiple bins: A-10, A-11, A-12</div><div class="fl" style="margin-bottom:12px"><label class="fll">Bin Name(s) *</label><input class="fi mn" id="NBN" placeholder="A-10, A-11"></div><div class="fg f2"><div class="fl"><label class="fll">Description</label><input class="fi" id="NBD"></div><div class="fl"><label class="fll">Zone/Area</label><input class="fi" id="NBZ" placeholder="Zone A"></div></div></div><div class="mdf"><button class="btn bgh" onclick="closeMd()">Cancel</button><button class="btn bpr" onclick="svBins()">Add</button></div></div>`);}
+async function svBins(){const names=($('NBN')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);if(!names.length){toast('Enter bin name','w');return;}const desc=$('NBD')?.value||'',zone=$('NBZ')?.value||'';let n=0;for(const b of names){const r=await api({action:'saveBin',bin:b,description:desc,zone});if(r.success){n++;S.bins.push({bin:b,description:desc,zone});}}localStorage.setItem(BK,JSON.stringify(S.bins));toast(`${n} bin(s) added`,'s');closeMd();rSettings();}
+async function rmBin(b){if(!confirm(`Delete bin ${b}?`))return;const r=await api({action:'deleteBin',bin:b});if(r.success){toast('Deleted','s');S.bins=S.bins.filter(x=>x.bin!==b);localStorage.setItem(BK,JSON.stringify(S.bins));rSettings();}else toast(r.error||'Failed','d');}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function swTab(id,cid,btn){const c=$(cid);if(!c)return;c.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));$(id)?.classList.add('on');btn?.closest('.tbr')?.querySelectorAll('.tb2').forEach(b=>b.classList.remove('on'));btn?.classList.add('on');}
+function dlCSV(csv,fn){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fn;a.click();}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  ['LU','LPW'].forEach(id=>{const el=$(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});});
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openGS();}if(e.key==='Escape')closeGS();});
+  document.addEventListener('click',e=>{document.querySelectorAll('.acl').forEach(l=>{if(!l.closest('.acw')?.contains(e.target))l.style.display='none';});if(!$('GSO').contains(e.target)&&e.target!==$('GSO')){}});
+  window.addEventListener('online',()=>{S.online=true;syncUI();flushQ();});
+  window.addEventListener('offline',()=>{S.online=false;syncUI();});
+  const s=loadSess();if(s){S.user=s;bootApp();}
+});
+</script>
+</body>
+</html>
