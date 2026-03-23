@@ -988,8 +988,27 @@ function onQR(raw){
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════
 async function rDash(){
-  const[sr,counts]=await Promise.all([api({action:'getStats'}),fetchCounts(today(),S.user.role==='master_auditor'?null:S.user.username)]);
+  const[sr,counts,allCounts]=await Promise.all([
+    api({action:'getStats'}),
+    fetchCounts(today(),S.user.role==='master_auditor'?null:S.user.username),
+    fetchCounts() // all counts for financial calc
+  ]);
   const st=sr.stats||{};
+  // Compute DLC-based financial summary from ALL counts vs items
+  const allMap={};
+  allCounts.forEach(c=>{if(!allMap[c.partNo])allMap[c.partNo]=0;allMap[c.partNo]+=parseFloat(c.qty)||0;});
+  let shortVal=0,excessVal=0,shortQty=0,excessQty=0;
+  S.items.forEach(item=>{
+    const cnt=allMap[item.partNo];
+    if(cnt===undefined)return;
+    const dms=parseFloat(item.systemQty)||0;
+    const dlc=parseFloat(item.dlc)||0;
+    const diff=cnt-dms;
+    if(diff<0){shortVal+=Math.abs(diff)*dlc;shortQty+=Math.abs(diff);}
+    else if(diff>0){excessVal+=diff*dlc;excessQty+=diff;}
+  });
+  st._shortVal=shortVal;st._excessVal=excessVal;
+  st._shortQty=shortQty;st._excessQty=excessQty;
   if(S.user.role==='master_auditor')mDash(st,counts);else eDash(st,counts);
 }
 
@@ -1013,6 +1032,39 @@ function mDash(st,counts){
     <div class="st" onclick="go('variance')"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626">${fmt(st.shortCount||0)}</div></div>
     <div class="st" onclick="go('variance')"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706">${fmt(st.excessCount||0)}</div></div>
   </div>
+
+  <!-- FINANCIAL SUMMARY CARD -->
+  <div class="cd" style="margin-bottom:16px;background:linear-gradient(135deg,#0f172a,#1e293b);border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(37,99,235,.15)"></div>
+    <div style="position:absolute;bottom:-30px;left:60px;width:80px;height:80px;border-radius:50%;background:rgba(124,58,237,.1)"></div>
+    <div style="padding:18px 20px;position:relative">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.6px">💰 Financial Impact (DLC Based)</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">All scanned parts vs DMS stock</div>
+        </div>
+        <button class="btn bsm" onclick="go('variance')" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:11px">View Details →</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:14px">
+          <div style="font-size:10px;font-weight:700;color:rgba(252,165,165,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔻 Short Loss</div>
+          <div style="font-size:20px;font-weight:800;color:#fca5a5;font-family:'JetBrains Mono',monospace;letter-spacing:-1px">₹${Math.round(st._shortVal||0).toLocaleString('en-IN')}</div>
+          <div style="font-size:10px;color:rgba(252,165,165,.5);margin-top:5px">${fmt(st._shortQty||0)} units short</div>
+        </div>
+        <div style="background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.25);border-radius:12px;padding:14px">
+          <div style="font-size:10px;font-weight:700;color:rgba(253,211,77,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔺 Excess Stock</div>
+          <div style="font-size:20px;font-weight:800;color:#fde68a;font-family:'JetBrains Mono',monospace;letter-spacing:-1px">₹${Math.round(st._excessVal||0).toLocaleString('en-IN')}</div>
+          <div style="font-size:10px;color:rgba(253,211,77,.5);margin-top:5px">${fmt(st._excessQty||0)} units excess</div>
+        </div>
+        <div style="background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);border-radius:12px;padding:14px">
+          <div style="font-size:10px;font-weight:700;color:rgba(147,197,253,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Total Impact</div>
+          <div style="font-size:20px;font-weight:800;color:#93c5fd;font-family:'JetBrains Mono',monospace;letter-spacing:-1px">₹${Math.round((st._shortVal||0)+(st._excessVal||0)).toLocaleString('en-IN')}</div>
+          <div style="font-size:10px;color:rgba(147,197,253,.5);margin-top:5px">${fmt((st._shortQty||0)+(st._excessQty||0))} units total</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Quick search -->
   <div class="cd" style="margin-bottom:16px">
     <div class="cdh"><div class="cdt">🔍 Quick Search</div><button class="btn bgh bsm" onclick="openGS()">Full Search</button></div>
