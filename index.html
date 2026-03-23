@@ -386,9 +386,21 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
   .sb{position:fixed;left:0;top:0;bottom:0;transform:translateX(-110%);z-index:200;
     transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:8px 0 32px rgba(0,0,0,.3)}
   .sb.on{transform:translateX(0)}.ov.on{display:block}.tb-m{display:flex}
-  .pg{padding:16px;padding-bottom:85px}.bn{display:block}.fab{display:flex}
+  .pg{padding:12px;padding-bottom:85px}.bn{display:block}.fab{display:flex}
   .s4,.s3{grid-template-columns:1fr 1fr}.cg{grid-template-columns:1fr}.f2{grid-template-columns:1fr}
-  .gs-ov{padding:8px 8px 8px}
+  .gs-ov{padding:8px}
+  /* Financial card header row fix */
+  .fin-hdr{flex-direction:column;align-items:flex-start!important;gap:8px!important}
+  /* Tables scroll on mobile */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Variance table — hide DLC Rate col on very small screens */
+  .stv{font-size:clamp(18px,5vw,28px)!important}
+  /* Bottom nav text */
+  .bni .bit{font-size:8px}
+  /* Page title */
+  .pt{font-size:18px}
+  /* Topbar */
+  .tb-s{display:none}
 }
 @media(min-width:769px){.bn,.fab{display:none!important}}
 @media print{
@@ -653,6 +665,8 @@ async function bootApp(){
   $('APP').classList.add('on');
   setUserUI();buildNav();syncUI();
   await Promise.all([syncItems(),syncBins(),loadAuditSess()]);
+  // Set initial history state
+  history.replaceState({page:'dashboard'}, '', '#dashboard');
   go('dashboard');
   if(window.innerWidth<=768){
     document.querySelector('.bn').style.display='block';
@@ -696,10 +710,14 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
-function go(p){
+function go(p, fromPopState){
   if(!S.user)return;
   if(['variance','daywise','fullsummary','uncounted','dms','settings'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
   stopCam();closeSB();setNav(p);
+  // Push to browser history so back button works
+  if(!fromPopState){
+    history.pushState({page:p}, '', '#'+p);
+  }
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
   ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
     variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,
@@ -1027,10 +1045,10 @@ function mDash(st,counts){
     </div>
   </div>
   <div class="sg s4">
-    <div class="st"><div class="stl">Total SKUs</div><div class="stv">${fmt(total)}</div><div class="sts">items sheet</div></div>
-    <div class="st" onclick="go('fullsummary')"><div class="stl">Counted Today</div><div class="stv" style="color:#2563eb">${fmt(todC)}</div><div class="sts">${pct}% done</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div></div>
-    <div class="st" onclick="go('variance')"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626">${fmt(st.shortCount||0)}</div></div>
-    <div class="st" onclick="go('variance')"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706">${fmt(st.excessCount||0)}</div></div>
+    <div class="st"><div class="stl">Total SKUs</div><div class="stv" style="font-size:clamp(18px,4vw,28px)">${fmt(total)}</div><div class="sts">items sheet</div></div>
+    <div class="st" onclick="go('fullsummary')"><div class="stl">Counted Today</div><div class="stv" style="color:#2563eb;font-size:clamp(18px,4vw,28px)">${fmt(todC)}</div><div class="sts">${pct}% done</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div></div>
+    <div class="st" onclick="go('variance')"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626;font-size:clamp(18px,4vw,28px)">${fmt(st.shortCount||0)}</div></div>
+    <div class="st" onclick="go('variance')"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706;font-size:clamp(18px,4vw,28px)">${fmt(st.excessCount||0)}</div></div>
   </div>
 
   <!-- FINANCIAL SUMMARY CARD -->
@@ -1038,28 +1056,34 @@ function mDash(st,counts){
     <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(37,99,235,.15)"></div>
     <div style="position:absolute;bottom:-30px;left:60px;width:80px;height:80px;border-radius:50%;background:rgba(124,58,237,.1)"></div>
     <div style="padding:18px 20px;position:relative">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="fin-hdr" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
         <div>
           <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.6px">💰 Financial Impact (DLC Based)</div>
           <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">All scanned parts vs DMS stock</div>
         </div>
         <button class="btn bsm" onclick="go('variance')" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:11px">View Details →</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-        <div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:14px">
-          <div style="font-size:10px;font-weight:700;color:rgba(252,165,165,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔻 Short Loss</div>
-          <div style="font-size:20px;font-weight:800;color:#fca5a5;font-family:'JetBrains Mono',monospace;letter-spacing:-1px">₹${Math.round(st._shortVal||0).toLocaleString('en-IN')}</div>
-          <div style="font-size:10px;color:rgba(252,165,165,.5);margin-top:5px">${fmt(st._shortQty||0)} units short</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <!-- Row 1: Short + Excess side by side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:12px">
+            <div style="font-size:9px;font-weight:700;color:rgba(252,165,165,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🔻 Short Loss</div>
+            <div style="font-size:18px;font-weight:800;color:#fca5a5;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px;word-break:break-all">₹${Math.round(st._shortVal||0).toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:rgba(252,165,165,.5);margin-top:4px">${fmt(st._shortQty||0)} units short</div>
+          </div>
+          <div style="background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.25);border-radius:12px;padding:12px">
+            <div style="font-size:9px;font-weight:700;color:rgba(253,211,77,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🔺 Excess Stock</div>
+            <div style="font-size:18px;font-weight:800;color:#fde68a;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px;word-break:break-all">₹${Math.round(st._excessVal||0).toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:rgba(253,211,77,.5);margin-top:4px">${fmt(st._excessQty||0)} units excess</div>
+          </div>
         </div>
-        <div style="background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.25);border-radius:12px;padding:14px">
-          <div style="font-size:10px;font-weight:700;color:rgba(253,211,77,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔺 Excess Stock</div>
-          <div style="font-size:20px;font-weight:800;color:#fde68a;font-family:'JetBrains Mono',monospace;letter-spacing:-1px">₹${Math.round(st._excessVal||0).toLocaleString('en-IN')}</div>
-          <div style="font-size:10px;color:rgba(253,211,77,.5);margin-top:5px">${fmt(st._excessQty||0)} units excess</div>
-        </div>
-        <div style="background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);border-radius:12px;padding:14px">
-          <div style="font-size:10px;font-weight:700;color:rgba(147,197,253,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Total Impact</div>
-          <div style="font-size:20px;font-weight:800;color:#93c5fd;font-family:'JetBrains Mono',monospace;letter-spacing:-1px">₹${Math.round((st._shortVal||0)+(st._excessVal||0)).toLocaleString('en-IN')}</div>
-          <div style="font-size:10px;color:rgba(147,197,253,.5);margin-top:5px">${fmt((st._shortQty||0)+(st._excessQty||0))} units total</div>
+        <!-- Row 2: Total Impact full width -->
+        <div style="background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:9px;font-weight:700;color:rgba(147,197,253,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">📊 Total Financial Impact</div>
+            <div style="font-size:11px;color:rgba(147,197,253,.5)">${fmt((st._shortQty||0)+(st._excessQty||0))} units variance</div>
+          </div>
+          <div style="font-size:24px;font-weight:800;color:#93c5fd;font-family:'JetBrains Mono',monospace;letter-spacing:-1px">₹${Math.round((st._shortVal||0)+(st._excessVal||0)).toLocaleString('en-IN')}</div>
         </div>
       </div>
     </div>
@@ -2243,6 +2267,28 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('click',e=>{document.querySelectorAll('.acl').forEach(l=>{if(!l.closest('.acw')?.contains(e.target))l.style.display='none';});if(!$('GSO').contains(e.target)&&e.target!==$('GSO')){}});
   window.addEventListener('online',()=>{S.online=true;syncUI();flushQ();});
   window.addEventListener('offline',()=>{S.online=false;syncUI();});
+
+  // ── BACK BUTTON SUPPORT ──────────────────────────────
+  // When user presses back, navigate to previous page inside app
+  window.addEventListener('popstate',(e)=>{
+    if(!S.user)return; // not logged in — let browser handle
+    if(e.state&&e.state.page){
+      // Navigate to previous page WITHOUT pushing new history entry
+      go(e.state.page, true);
+    } else {
+      // No state — go to dashboard
+      go('dashboard', true);
+    }
+  });
+
+  // Handle hash on load (e.g. if user bookmarked a page)
+  window.addEventListener('hashchange',()=>{
+    if(!S.user)return;
+    const hash=location.hash.replace('#','');
+    const validPages=['dashboard','scan','manual','bins','scanlog','variance','daywise','fullsummary','uncounted','itemmaster','dms','settings'];
+    if(validPages.includes(hash))go(hash,true);
+  });
+
   const s=loadSess();if(s){S.user=s;bootApp();}
 });
 </script>
