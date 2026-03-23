@@ -147,7 +147,9 @@ input,button,select,textarea{font-family:'Inter',sans-serif;font-size:inherit}
 .ov{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:199;backdrop-filter:blur(2px)}
 /* ── MAIN ───────────────────────────────── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#f0f4f8}
-.pg{flex:1;overflow-y:auto;padding:24px}
+.pg{flex:1;overflow-y:auto;padding:24px;padding-bottom:60px}
+.footer-pwrd{text-align:center;padding:14px 0 6px;font-size:11px;color:#94a3b8;font-weight:500;letter-spacing:.3px}
+.footer-pwrd span{color:#e11d48}
 
 /* ── BOTTOM NAV ─────────────────────────── */
 .bn{display:none;position:fixed;bottom:0;left:0;right:0;
@@ -389,7 +391,18 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
   .gs-ov{padding:8px 8px 8px}
 }
 @media(min-width:769px){.bn,.fab{display:none!important}}
-@media print{.sb,.tb,.bn,.fab{display:none!important}.pg{padding:0;overflow:visible}.main{overflow:visible}}
+@media print{
+  .sb,.tb,.bn,.fab,.footer-pwrd,.btn,.fb,.pag,.tb-srch,.gs-ov{display:none!important}
+  .pg{padding:0;overflow:visible}
+  .main{overflow:visible}
+  body{background:#fff}
+  .cd{box-shadow:none;border:1px solid #ccc}
+  .print-header{display:block!important}
+  @page{margin:15mm}
+}
+.print-header{display:none;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #0f172a}
+.print-header h2{font-size:18px;font-weight:800;color:#0f172a}
+.print-header p{font-size:12px;color:#64748b;margin-top:4px}
 </style>
 </head>
 <body>
@@ -478,7 +491,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
       </div>
     </div>
     <div class="ov" id="OV" onclick="closeSB()"></div>
-    <div class="main"><div class="pg" id="PG"></div></div>
+    <div class="main"><div class="pg" id="PG"></div><div class="footer-pwrd">Powered by Naveen <span>❤️</span></div></div>
   </div>
   <nav class="bn">
     <div class="bnr">
@@ -663,7 +676,7 @@ function buildNav(){
     {l:'Dashboard',i:'🏠',p:'dashboard'},{l:'Scan & Count',i:'📷',p:'scan'},
     {l:'Manual Entry',i:'✏️',p:'manual'},{l:'Bin Locations',i:'📦',p:'bins'},
     {l:'My Scan Log',i:'📋',p:'scanlog'},
-    ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},
+    ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},{l:'Uncounted Parts',i:'⬜',p:'uncounted'},
             {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
           :[{l:'Item Master',i:'🗃️',p:'itemmaster'}])
   ];
@@ -685,11 +698,11 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 // ═══════════════════════════════════════════════════════════
 function go(p){
   if(!S.user)return;
-  if(['variance','daywise','fullsummary','dms','settings'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
+  if(['variance','daywise','fullsummary','uncounted','dms','settings'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
   stopCam();closeSB();setNav(p);
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
   ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
-    variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,
+    variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,
     itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF)();
 }
 function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
@@ -1264,7 +1277,14 @@ function renderCardsInto(area){
           <option value="${esc(m?.bin||'')}">${m?.bin?`Default: ${esc(m.bin)}`:'No bin'}</option>${bo}
         </select>
       </span></div>
-      ${!m?`<div style="margin-top:8px"><button class="btn bwa bsm" onclick="addSave(${i})">+ Add to Master & Save</button></div>`:''}
+      ${!m?`<div style="margin-top:8px;padding:10px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px">
+        <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:4px">⚠️ Part not in Item Master</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px">For scanning this part, please contact:<br><strong style="color:#0f172a">Naveen Ji</strong> or <strong style="color:#0f172a">Ashok Ji</strong></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn bwa bsm" onclick="addSave(${i})">+ Add to Master & Save</button>
+          <button class="btn bgh bsm" onclick="removeFromQueue(${i})">✕ Skip</button>
+        </div>
+      </div>`:''}
     </div>`;
   });
   area.innerHTML=h;
@@ -1684,6 +1704,80 @@ async function rScanLog(){
 // ═══════════════════════════════════════════════════════════
 // VARIANCE
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// UNCOUNTED PARTS
+// ═══════════════════════════════════════════════════════════
+async function rUncounted(){
+  const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
+  const counts=await fetchCounts();
+  const counted=new Set(counts.map(c=>c.partNo));
+  let uncounted=S.items.filter(i=>!counted.has(i.partNo));
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  const cats=[...new Set(S.items.map(i=>i.category).filter(Boolean))].sort();
+  pg.innerHTML=`<div class="ph">
+    <div><div class="pt">⬜ Uncounted Parts</div><div class="ps">${uncounted.length} parts not yet scanned</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bgh bsm" onclick="expUncounted()">⬇ Export</button>
+      <button class="btn bpr bsm" onclick="go('scan')">📷 Start Scanning</button>
+      <button class="btn bgh bsm" onclick="printReport('Uncounted Parts')">🖨 Print</button>
+    </div>
+  </div>
+  <div class="cd">
+    <div class="fb">
+      <input class="fin" id="UFS" placeholder="🔍 Search part / description" oninput="dUT()">
+      <select class="fin" id="UFB" onchange="dUT()"><option value="">All Bins</option><option value="__nb__">No Bin</option>${bo}</select>
+      <select class="fin" id="UFC" onchange="dUT()"><option value="">All Categories</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+    </div>
+    <div id="UTBL"></div>
+    <div id="UPAG" class="pag"></div>
+  </div>`;
+  S.pd.uc=uncounted;S.pg.u={p:1,sz:PGSZ};dUT();
+}
+
+function dUT(){
+  const w=$('UTBL'),pag=$('UPAG');if(!w)return;
+  const p=S.pg.u||{p:1,sz:PGSZ};
+  let rows=[...(S.pd.uc||[])];
+  const s=($('UFS')?.value||'').toUpperCase(),b=$('UFB')?.value||'',cat=$('UFC')?.value||'';
+  if(s)rows=rows.filter(i=>(i.partNo||'').toUpperCase().includes(s)||(i.desc||'').toUpperCase().includes(s));
+  if(b==='__nb__')rows=rows.filter(i=>!i.bin);
+  else if(b)rows=rows.filter(i=>(i.bin||'')===b);
+  if(cat)rows=rows.filter(i=>(i.category||'')===cat);
+  const tot=rows.length,pages=Math.ceil(tot/p.sz),st=(p.p-1)*p.sz;
+  let tbody='';
+  rows.slice(st,st+p.sz).forEach(function(item,i){
+    tbody+='<tr>'
+      +'<td style="font-size:10px">'+(st+i+1)+'</td>'
+      +'<td class="tpn">'+esc(item.partNo)+'</td>'
+      +'<td>'+esc(tr2(item.desc,26))+'</td>'
+      +'<td style="font-size:10px;color:#64748b">'+esc(item.category||'—')+'</td>'
+      +'<td>'+(item.bin?'<span class="bg bgp" style="font-size:9px">'+esc(item.bin)+'</span>':'<span style="color:#94a3b8;font-size:10px">No Bin</span>')+'</td>'
+      +'<td class="tq">'+fmt(item.systemQty||0)+'</td>'
+      +'<td style="font-size:11px;color:#64748b">&#8377;'+parseFloat(item.dlc||0).toFixed(2)+'</td>'
+      +'<td><button class="btn bpr bsm" style="padding:3px 10px" onclick="go(&quot;scan&quot;)">📷 Scan</button></td>'
+      +'</tr>';
+  });
+  if(!tbody)tbody='<tr><td colspan="8" style="text-align:center;padding:24px;color:#94a3b8">All parts counted! 🎉</td></tr>';
+  w.innerHTML='<div class="tw"><table>'
+    +'<thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Category</th><th>Bin</th><th>DMS Qty</th><th>DLC Rate</th><th>Scan</th></tr></thead>'
+    +'<tbody>'+tbody+'</tbody></table></div>';
+  if(pag){
+    let h='<span class="pi">'+(Math.min(st+1,tot))+'–'+Math.min(st+p.sz,tot)+' of '+tot+'</span>';
+    h+='<button class="pb" onclick="upg('+(p.p-1)+')" '+(p.p<=1?'disabled':'')+'>‹</button>';
+    for(let i=Math.max(1,p.p-2);i<=Math.min(pages,p.p+2);i++)
+      h+='<button class="pb '+(i===p.p?'on':'')+'" onclick="upg('+i+')">'+i+'</button>';
+    h+='<button class="pb" onclick="upg('+(p.p+1)+')" '+(p.p>=pages?'disabled':'')+'>›</button>';
+    pag.innerHTML=h;
+  }
+}
+function upg(n){S.pg.u.p=n;dUT();}
+function expUncounted(){
+  const rows=S.pd.uc||[];
+  dlCSV('Part No,Description,Category,Bin,DMS Qty,DLC Rate\n'
+    +rows.map(i=>`"${i.partNo}","${(i.desc||'').replace(/"/g,'""')}","${i.category||''}","${i.bin||''}",${i.systemQty||0},${i.dlc||0}`).join('\n'),
+    `uncounted_${today()}.csv`);
+}
+
 async function rVariance(){
   const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
   const counts=await fetchCounts();
@@ -1693,6 +1787,7 @@ async function rVariance(){
     <div style="display:flex;gap:8px">
       <button class="btn bgh bsm" onclick="expVar('all')">⬇ Export</button>
       <button class="btn bgh bsm" onclick="showEmail('variance')">📧 Email</button>
+      <button class="btn bgh bsm" onclick="printReport('Variance Report')">🖨 Print</button>
     </div>
   </div>
   <div class="cd"><div class="fb">
@@ -1706,22 +1801,85 @@ async function rVariance(){
 
 function dVT(){
   const w=$('VTBL'),sm=$('VSUM'),pag=$('VPAG');if(!w)return;
-  const cm=S.pd.vm||{};const s=($('VFS')?.value||'').toUpperCase(),b=$('VFB')?.value||'',st=$('VFST')?.value||'';
+  const cm=S.pd.vm||{};
+  const s=($('VFS')?.value||'').toUpperCase(),b=$('VFB')?.value||'',st=$('VFST')?.value||'';
   const p=S.pg.v||{p:1,sz:PGSZ};
-  let rows=S.items.map(item=>{const c=cm[item.partNo];const cnt=c??null;const dms=parseFloat(item.systemQty)||0;const diff=cnt!==null?cnt-dms:null;const st2=cnt===null?'notcounted':diff===0?'match':diff<0?'short':'excess';return{item,cnt,dms,diff,st:st2};});
+  let rows=S.items.map(item=>{
+    const c=cm[item.partNo];const cnt=c??null;
+    const dms=parseFloat(item.systemQty)||0;
+    const diff=cnt!==null?cnt-dms:null;
+    const st2=cnt===null?'notcounted':diff===0?'match':diff<0?'short':'excess';
+    return{item,cnt,dms,diff,st:st2};
+  });
   if(s)rows=rows.filter(r=>(r.item.partNo||'').toUpperCase().includes(s)||(r.item.desc||'').toUpperCase().includes(s));
   if(b)rows=rows.filter(r=>(r.item.bin||'')===b);
   if(st)rows=rows.filter(r=>r.st===st);
   rows.sort((a,bb)=>({short:0,excess:1,match:2,notcounted:3}[a.st]||3)-({short:0,excess:1,match:2,notcounted:3}[bb.st]||3));
   const tots={match:0,short:0,excess:0,notcounted:0};rows.forEach(r=>tots[r.st]++);
-  if(sm)sm.innerHTML=`<div class="smi">Total: <strong>${rows.length}</strong></div><div class="smi" style="color:#059669">✅ ${tots.match}</div><div class="smi" style="color:#dc2626">🔻 ${tots.short}</div><div class="smi" style="color:#d97706">🔺 ${tots.excess}</div><div class="smi" style="color:#94a3b8">⬜ ${tots.notcounted}</div>`;
+  // DLC value totals
+  const dlcTot={short:0,excess:0};
+  rows.forEach(r=>{
+    if((r.st==='short'||r.st==='excess')&&r.diff!==null)
+      dlcTot[r.st]+=Math.abs(r.diff)*(parseFloat(r.item.dlc)||0);
+  });
+  if(sm)sm.innerHTML='<div class="smi">Total: <strong>'+rows.length+'</strong></div>'
+    +'<div class="smi" style="color:#059669">✅ '+tots.match+'</div>'
+    +'<div class="smi" style="color:#dc2626">🔻 '+tots.short+'</div>'
+    +'<div class="smi" style="color:#d97706">🔺 '+tots.excess+'</div>'
+    +'<div class="smi" style="color:#94a3b8">⬜ '+tots.notcounted+'</div>';
   const tot=rows.length,pages=Math.ceil(tot/p.sz),st2=(p.p-1)*p.sz;
   const sl={match:'Match',short:'Short',excess:'Excess',notcounted:'Not Counted'};
-  w.innerHTML=`<div class="tw"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Bin</th><th>DMS Qty</th><th>Counted</th><th>Diff</th><th>Status</th></tr></thead>
-  <tbody>${rows.slice(st2,st2+p.sz).map((r,i)=>{const sb=r.st==='match'?'bgs':r.st==='short'?'bgd':r.st==='excess'?'bgw':'bgg';const dc=r.st==='short'?'ds':r.st==='excess'?'de':r.st==='match'?'dm':'';const ds=r.diff!==null?(r.diff>0?'▲':r.diff<0?'▼':'±')+Math.abs(r.diff):'—';return`<tr><td style="font-size:10px">${st2+i+1}</td><td class="tpn">${esc(r.item.partNo)}</td><td>${esc(tr2(r.item.desc,24))}</td><td><span class="bg bgp" style="font-size:9px">${esc(r.item.bin||'—')}</span></td><td class="tq">${r.dms}</td><td class="tq">${r.cnt!==null?r.cnt:'—'}</td><td class="tq ${dc}">${ds}</td><td><span class="bg ${sb}">${sl[r.st]}</span></td></tr>`;}).join('')||'<tr><td colspan="8" style="text-align:center;padding:24px;color:#94a3b8">No items</td></tr>'}</tbody></table></div>`;
-  if(pag){let h=`<span class="pi">${st2+1}–${Math.min(st2+p.sz,tot)} of ${tot}</span>`;h+=`<button class="pb" onclick="vpg(${p.p-1})" ${p.p<=1?'disabled':''}>‹</button>`;for(let i=Math.max(1,p.p-2);i<=Math.min(pages,p.p+2);i++)h+=`<button class="pb ${i===p.p?'on':''}" onclick="vpg(${i})">${i}</button>`;h+=`<button class="pb" onclick="vpg(${p.p+1})" ${p.p>=pages?'disabled':''}>›</button>`;pag.innerHTML=h;}
+  let tbody='';
+  rows.slice(st2,st2+p.sz).forEach(function(r,i){
+    const sb=r.st==='match'?'bgs':r.st==='short'?'bgd':r.st==='excess'?'bgw':'bgg';
+    const dc=r.st==='short'?'ds':r.st==='excess'?'de':r.st==='match'?'dm':'';
+    const ds=r.diff!==null?(r.diff>0?'▲':r.diff<0?'▼':'±')+Math.abs(r.diff):'—';
+    const dlc=parseFloat(r.item.dlc)||0;
+    const showVal=(r.st==='short'||r.st==='excess')&&r.diff!==null;
+    const val=showVal?('₹'+Math.round(Math.abs(r.diff)*dlc).toLocaleString('en-IN')):'—';
+    const valColor=r.st==='short'?'color:#dc2626':r.st==='excess'?'color:#d97706':'color:#94a3b8';
+    tbody+='<tr>'
+      +'<td style="font-size:10px">'+(st2+i+1)+'</td>'
+      +'<td class="tpn">'+esc(r.item.partNo)+'</td>'
+      +'<td>'+esc(tr2(r.item.desc,22))+'</td>'
+      +'<td><span class="bg bgp" style="font-size:9px">'+esc(r.item.bin||'—')+'</span></td>'
+      +'<td class="tq">'+r.dms+'</td>'
+      +'<td class="tq">'+(r.cnt!==null?r.cnt:'—')+'</td>'
+      +'<td class="tq '+dc+'">'+ds+'</td>'
+      +'<td class="tq" style="color:#64748b;font-size:11px">₹'+dlc.toFixed(2)+'</td>'
+      +'<td class="tq" style="'+valColor+';font-weight:700">'+val+'</td>'
+      +'<td><span class="bg '+sb+'">'+sl[r.st]+'</span></td>'
+      +'</tr>';
+  });
+  if(!tbody)tbody='<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8">No items</td></tr>';
+  let valBar='';
+  if(dlcTot.short>0||dlcTot.excess>0){
+    valBar='<div style="display:flex;gap:16px;padding:12px 16px;background:#f8fafc;border-top:1px solid var(--bd);flex-wrap:wrap;align-items:center">'
+      +'<div style="font-size:12px;font-weight:700;color:#dc2626">🔻 Short Value: ₹'+Math.round(dlcTot.short).toLocaleString('en-IN')+'</div>'
+      +'<div style="font-size:12px;font-weight:700;color:#d97706">🔺 Excess Value: ₹'+Math.round(dlcTot.excess).toLocaleString('en-IN')+'</div>'
+      +'<div style="font-size:12px;font-weight:800;color:#0f172a;margin-left:auto">💰 Total Impact: ₹'+Math.round(dlcTot.short+dlcTot.excess).toLocaleString('en-IN')+'</div>'
+      +'</div>';
+  }
+  w.innerHTML='<div class="tw"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Bin</th><th>DMS</th><th>Counted</th><th>Diff</th><th>DLC Rate</th><th>💰 Value</th><th>Status</th></tr></thead><tbody>'+tbody+'</tbody></table></div>'+valBar;
+  if(pag){
+    let h='<span class="pi">'+(st2+1)+'–'+Math.min(st2+p.sz,tot)+' of '+tot+'</span>';
+    h+='<button class="pb" onclick="vpg('+(p.p-1)+')" '+(p.p<=1?'disabled':'')+'>‹</button>';
+    for(let i=Math.max(1,p.p-2);i<=Math.min(pages,p.p+2);i++)
+      h+='<button class="pb '+(i===p.p?'on':'')+'" onclick="vpg('+i+')">'+i+'</button>';
+    h+='<button class="pb" onclick="vpg('+(p.p+1)+')" '+(p.p>=pages?'disabled':'')+'>›</button>';
+    pag.innerHTML=h;
+  }
 }
 function vpg(n){S.pg.v.p=n;dVT();}
+
+function printReport(title){
+  // Add print header temporarily
+  let hdr=document.querySelector('.print-header');
+  if(!hdr){hdr=document.createElement('div');hdr.className='print-header';$('PG').prepend(hdr);}
+  hdr.innerHTML='<h2>🏍️ India Motors — '+title+'</h2><p>Date: '+fmtD(new Date())+' &nbsp;·&nbsp; Generated by: '+(S.user?.name||'')+'</p><p style="margin-top:4px;font-size:11px;color:#94a3b8">Powered by Naveen ❤️ &nbsp;·&nbsp; India Motors, Alwar, Rajasthan</p>';
+  window.print();
+  setTimeout(()=>hdr.remove(),1000);
+}
 function expVar(type){const cm=S.pd.vm||{};let rows=S.items.map(i=>{const c=cm[i.partNo];const cnt=c??null;const dms=parseFloat(i.systemQty)||0;const diff=cnt!==null?cnt-dms:null;const st=cnt===null?'Not Counted':diff===0?'Match':diff<0?'Short':'Excess';return{pn:i.partNo,d:i.desc,b:i.bin,dms,cnt:cnt!==null?cnt:'',diff:diff!==null?diff:'',st};});if(type==='short')rows=rows.filter(r=>r.st==='Short');dlCSV('Part No,Description,Bin,DMS Qty,Counted,Diff,Status\n'+rows.map(r=>`"${r.pn}","${(r.d||'').replace(/"/g,'""')}","${r.b||''}",${r.dms},${r.cnt},${r.diff},${r.st}`).join('\n'),`variance_${today()}.csv`);}
 
 // ═══════════════════════════════════════════════════════════
