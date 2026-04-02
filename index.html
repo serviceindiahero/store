@@ -446,6 +446,49 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .print-header{display:none;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #0f172a}
 .print-header h2{font-size:18px;font-weight:800;color:#0f172a}
 .print-header p{font-size:12px;color:#64748b;margin-top:4px}
+
+/* ── QR GENERATOR ─────────────────────────── */
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:14px}
+.qr-card{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:.2s;cursor:pointer}
+.qr-card:hover{border-color:#2563eb;box-shadow:0 4px 16px rgba(37,99,235,.12);transform:translateY(-2px)}
+.qr-card canvas{max-width:150px;max-height:150px;margin:0 auto;display:block}
+.qr-pn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;color:#0f172a;margin-top:8px;word-break:break-all}
+.qr-desc{font-size:10px;color:#64748b;margin-top:2px;line-height:1.3}
+.qr-bin{font-size:9px;background:#eff6ff;color:#2563eb;border-radius:4px;padding:2px 6px;margin-top:4px;display:inline-block;font-weight:700}
+.qr-print-sheet{display:none}
+@media print{
+  .qr-print-sheet{display:block!important}
+  .qr-print-item{break-inside:avoid;border:1px solid #ccc;border-radius:8px;padding:10px;text-align:center;margin:6px}
+  .qr-print-grid{display:flex;flex-wrap:wrap;gap:8px}
+}
+
+/* ── MOVING PARTS / ORDER PLANNING ───────── */
+.mv-tab-bar{display:flex;gap:0;border-bottom:2px solid var(--bd);margin-bottom:16px;overflow-x:auto}
+.mv-tab{padding:10px 18px;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:.15s}
+.mv-tab.on{color:#2563eb;border-bottom-color:#2563eb}
+.mv-tab:hover{color:#2563eb}
+.mv-badge{display:inline-block;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:800;margin-left:5px;vertical-align:middle}
+.mv-fast{background:#dcfce7;color:#166534}
+.mv-med{background:#fef9c3;color:#854d0e}
+.mv-slow{background:#fee2e2;color:#991b1b}
+.mv-dead{background:#f1f5f9;color:#64748b}
+.mv-tbl-wrap{overflow-x:auto;border-radius:var(--rs);border:1px solid var(--bd)}
+.mv-summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+@media(max-width:768px){.mv-summary-cards{grid-template-columns:1fr 1fr}}
+.mv-sc{background:#fff;border:1px solid var(--bd);border-radius:var(--rs);padding:14px;text-align:center}
+.mv-sc-v{font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace}
+.mv-sc-l{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+/* ORDER PLAN TABLE */
+.op-row-high{background:#fff7ed}
+.op-row-med{background:#f0fdf4}
+.op-row-low{background:#f8fafc}
+.op-priority-h{color:#c2410c;font-weight:800}
+.op-priority-m{color:#166534;font-weight:700}
+.op-priority-l{color:#64748b;font-weight:600}
+.op-qty-box{display:inline-block;background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe;border-radius:6px;padding:3px 10px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px}
+.prog-bar-wrap{height:6px;background:#f1f5f9;border-radius:6px;overflow:hidden;min-width:60px}
+.prog-bar-fill{height:100%;border-radius:6px;transition:width .5s}
 </style>
 </head>
 <body>
@@ -722,9 +765,9 @@ function buildNav(){
     {l:'Manual Entry',i:'✏️',p:'manual'},{l:'Bin Locations',i:'📦',p:'bins'},
     {l:'My Scan Log',i:'📋',p:'scanlog'},
     ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},{l:'Uncounted Parts',i:'⬜',p:'uncounted'},{l:'FOC Dashboard',i:'🎁',p:'foc'},
+            {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Order Planning',i:'🛒',p:'orderplan'},{sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},
             {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
           :[{l:'Item Master',i:'🗃️',p:'itemmaster'}])
-  ];
   nav.innerHTML=ls.map(l=>l.sec?`<div class="ns">${l.sec}</div>`
     :`<div class="ni" data-p="${l.p}" onclick="go('${l.p}')"><span class="ic">${l.i}</span>${l.l}</div>`).join('');
 }
@@ -743,7 +786,7 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 // ═══════════════════════════════════════════════════════════
 function go(p, fromPopState){
   if(!S.user)return;
-  if(['variance','daywise','fullsummary','uncounted','foc','dms','settings'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
+  if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','orderplan','qrgen'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
   stopCam();closeSB();setNav(p);
   // Push to browser history so back button works
   if(!fromPopState){
@@ -752,6 +795,7 @@ function go(p, fromPopState){
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
   ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
     variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,foc:rFOC,
+    movingparts:rMovingParts,orderplan:rOrderPlan,qrgen:rQRGen,
     itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF)();
 }
 function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
@@ -2558,6 +2602,639 @@ function swTab(id,cid,btn){const c=$(cid);if(!c)return;c.querySelectorAll('.tp')
 function dlCSV(csv,fn){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fn;a.click();}
 
 // ═══════════════════════════════════════════════════════════
+// QR GENERATOR — Local Parts Category Only
+// ═══════════════════════════════════════════════════════════
+// Minimal QR code generator (pure JS, no external lib needed for simple text)
+// We'll use a tiny canvas-based approach via the qrcode-generator pattern
+function makeQRDataURL(text, size){
+  // Build a simple data matrix representation using Canvas 2D
+  // For production QR we embed a pure-JS QR lib inline (minified subset)
+  return new Promise(resolve=>{
+    const canvas=document.createElement('canvas');
+    canvas.width=size;canvas.height=size;
+    const ctx=canvas.getContext('2d');
+    // Use the browser's built-in QR generation via img/svg if available
+    // Fallback: use a public QR API via URL (works offline after cache)
+    const img=new Image();
+    // Use goqr.me API - lightweight and reliable
+    img.crossOrigin='anonymous';
+    img.onload=()=>{ctx.drawImage(img,0,0,size,size);resolve(canvas.toDataURL('image/png'));};
+    img.onerror=()=>{
+      // Fallback: draw placeholder
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);
+      ctx.strokeStyle='#0f172a';ctx.lineWidth=2;ctx.strokeRect(4,4,size-8,size-8);
+      ctx.fillStyle='#0f172a';ctx.font=`${Math.floor(size/12)}px monospace`;
+      ctx.textAlign='center';ctx.fillText(text.slice(0,16),size/2,size/2);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.src=`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&margin=4`;
+  });
+}
+
+let QRGenData={cat:'LOCAL PARTS',filter:'',page:1,sz:40,items:[]};
+
+async function rQRGen(){
+  const pg=$('PG');
+  // Get all LOCAL PARTS items
+  const localItems=S.items.filter(i=>(i.category||'').toUpperCase().includes('LOCAL'));
+  QRGenData.items=localItems;
+  QRGenData.page=1;
+
+  // Get unique categories that have "local" in them
+  const cats=[...new Set(S.items.map(i=>i.category||'').filter(c=>c.toLowerCase().includes('local')))];
+  const catOpts=cats.map(c=>`<option value="${esc(c)}" ${c===QRGenData.cat?'selected':''}>${esc(c)}</option>`).join('');
+
+  pg.innerHTML=`
+  <div class="print-header"><h2>🏍️ India Motors — QR Label Sheet</h2><p>Local Parts · ${new Date().toLocaleDateString('en-IN')}</p></div>
+  <div class="ph"><div class="pt">⬡ QR Generator</div><div class="ps">Local Parts — Print & Stick Labels</div></div>
+
+  <div class="cd" style="margin-bottom:14px">
+    <div class="cdh"><div class="cdt">Filter & Options</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn bgh bsm" onclick="qrPrintAll()">🖨️ Print All</button>
+        <button class="btn bpr bsm" onclick="qrDlSheet()">⬇️ Download CSV</button>
+      </div>
+    </div>
+    <div class="cdb" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div style="flex:1;min-width:180px">
+        <label class="fll">Search Part</label>
+        <input class="fi" id="QRSI" placeholder="Part no or description…" oninput="qrFilter()" autocapitalize="none" value="${esc(QRGenData.filter)}">
+      </div>
+      <div style="min-width:160px">
+        <label class="fll">Category</label>
+        <select class="fi" id="QRCAT" onchange="qrFilter()">
+          <option value="">All Local Categories</option>${catOpts}
+        </select>
+      </div>
+      <div style="min-width:100px">
+        <label class="fll">QR Size (px)</label>
+        <select class="fi" id="QRSZ" onchange="qrFilter()">
+          <option value="80">80px — Tiny</option>
+          <option value="120" selected>120px — Small</option>
+          <option value="160">160px — Medium</option>
+          <option value="200">200px — Large</option>
+        </select>
+      </div>
+    </div>
+    <div style="padding:10px 18px;background:#f8fafc;border-top:1px solid var(--bd);font-size:12px;color:#64748b">
+      <strong id="QRCOUNT">${localItems.length}</strong> Local Parts · QR encodes: Part Number + Description + Bin
+    </div>
+  </div>
+
+  <div id="QRGRID" class="qr-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8">⏳ Generating QR codes…</div>
+  </div>
+  <div id="QRPAG" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 0"></div>`;
+
+  setTimeout(()=>qrRenderPage(),100);
+}
+
+function qrFilter(){
+  const q=($('QRSI')?.value||'').trim().toLowerCase();
+  const cat=$('QRCAT')?.value||'';
+  const sz=parseInt($('QRSZ')?.value)||120;
+  QRGenData.sz=sz;QRGenData.filter=q;QRGenData.page=1;
+  const localItems=S.items.filter(i=>{
+    const catOk=cat?(i.category||'')===(cat):(i.category||'').toLowerCase().includes('local');
+    const qOk=!q||((i.partNo||'').toLowerCase().includes(q)||(i.desc||'').toLowerCase().includes(q));
+    return catOk&&qOk;
+  });
+  QRGenData.items=localItems;
+  if($('QRCOUNT'))$('QRCOUNT').textContent=localItems.length;
+  qrRenderPage();
+}
+
+async function qrRenderPage(){
+  const grid=$('QRGRID'),pag=$('QRPAG');if(!grid)return;
+  const items=QRGenData.items;
+  const sz=QRGenData.sz||120;
+  const PGSZ=Math.floor(400/((sz+14)*((sz+14)/200+0.5)))||20; // dynamic page size
+  const pgsz=24; // fixed 24 per page for cleanliness
+  const pages=Math.max(1,Math.ceil(items.length/pgsz));
+  const p=Math.max(1,Math.min(QRGenData.page,pages));
+  QRGenData.page=p;
+  const slice=items.slice((p-1)*pgsz,p*pgsz);
+
+  if(!items.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8"><div style="font-size:36px;margin-bottom:10px">🔍</div><div>No Local Parts found</div></div>';pag.innerHTML='';return;}
+
+  grid.innerHTML=slice.map((item,i)=>`
+    <div class="qr-card" onclick="qrZoom('${esc(item.partNo)}','${(item.desc||'').replace(/'/g,"\\'")}','${esc(item.bin||'')}')">
+      <canvas id="QRC_${i}" width="${sz}" height="${sz}" style="width:${sz}px;height:${sz}px;max-width:100%"></canvas>
+      <div class="qr-pn">${esc(item.partNo)}</div>
+      <div class="qr-desc">${esc(tr2(item.desc||'',32))}</div>
+      ${item.bin?`<span class="qr-bin">📍 ${esc(item.bin)}</span>`:''}
+      <div style="font-size:9px;color:#94a3b8;margin-top:4px">MRP: ₹${item.mrp||0} · Qty: ${item.systemQty||0}</div>
+    </div>`).join('');
+
+  // Generate QR codes async
+  for(let i=0;i<slice.length;i++){
+    const item=slice[i];
+    const qrText=`${item.partNo}|${item.desc||''}|${item.bin||''}|MRP:${item.mrp||0}`;
+    const canvas=$(`QRC_${i}`);
+    if(!canvas)continue;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrText)}&margin=2&ecc=M`;
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=((c,im)=>()=>{const ctx=c.getContext('2d');ctx.drawImage(im,0,0,c.width,c.height);})(canvas,img);
+    img.onerror=((c,it)=>()=>{const ctx=c.getContext('2d');ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#2563eb';ctx.font=`${Math.floor(c.width/10)}px monospace`;ctx.textAlign='center';ctx.fillText(it.partNo.slice(0,10),c.width/2,c.height/2);})(canvas,item);
+    img.src=url;
+  }
+
+  // Pagination
+  if(pages>1){
+    let h=`<button class="pb" onclick="qrPg(${p-1})" ${p<=1?'disabled':''}>‹</button>`;
+    for(let i=Math.max(1,p-2);i<=Math.min(pages,p+2);i++)h+=`<button class="pb ${i===p?'on':''}" onclick="qrPg(${i})">${i}</button>`;
+    h+=`<button class="pb" onclick="qrPg(${p+1})" ${p>=pages?'disabled':''}>›</button>`;
+    h=`<span class="pi">Page ${p}/${pages} · ${items.length} parts</span>`+h;
+    pag.innerHTML=h;
+  }else pag.innerHTML='';
+}
+
+function qrPg(n){QRGenData.page=n;qrRenderPage();}
+
+function qrZoom(pn,desc,bin){
+  const sz=200;
+  const qrText=`${pn}|${desc}|${bin}|India Motors`;
+  modal(`<div class="md"><div class="mdh"><div class="mdt" style="font-family:'JetBrains Mono',monospace">${esc(pn)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div class="mdb" style="text-align:center">
+    <canvas id="QRZC" width="${sz}" height="${sz}" style="border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1)"></canvas>
+    <div style="font-size:11px;color:#64748b;margin-top:8px">${esc(desc)}</div>
+    ${bin?`<div style="margin-top:4px"><span class="bg bgp">📍 ${esc(bin)}</span></div>`:''}
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
+      <button class="btn bpr bsm" onclick="qrDownload('${esc(pn)}')">⬇️ Download PNG</button>
+      <button class="btn bgh bsm" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div></div>`);
+  setTimeout(()=>{
+    const canvas=$('QRZC');if(!canvas)return;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrText)}&margin=4&ecc=M`;
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,canvas.width,canvas.height);};
+    img.src=url;
+  },200);
+}
+
+function qrDownload(pn){
+  const canvas=$('QRZC');if(!canvas)return;
+  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`QR_${pn}.png`;a.click();
+}
+
+function qrPrintAll(){window.print();}
+function qrDlSheet(){
+  const items=QRGenData.items;
+  const csv='Part No,Description,Category,Bin,MRP,System Qty\n'+items.map(i=>`"${i.partNo}","${(i.desc||'').replace(/"/g,'""')}","${i.category||''}","${i.bin||''}",${i.mrp||0},${i.systemQty||0}`).join('\n');
+  dlCSV(csv,`local_parts_qr_${today()}.csv`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SALES DATA PARSER — for CSV from DMS (Parts Sale history)
+// ═══════════════════════════════════════════════════════════
+let S_SALES=[];// parsed sales records
+
+function parseSalesCSV(text){
+  // Handle UTF-16 LE BOM and wide-char encoding from the Hero DMS export
+  // The CSV has spaces between each character (wide format)
+  const lines=text.split(/\r?\n/);
+  const records=[];
+  for(let li=1;li<lines.length;li++){
+    const line=lines[li].trim();
+    if(!line)continue;
+    // Split by tab (the file uses tab separators in wide format)
+    // Remove wide-char spacing: every char is followed by space
+    // Strategy: collapse double-spaces, remove leading space from each token
+    const raw=line.replace(/\r/g,'');
+    // Parse tab-separated, strip quotes and extra spaces
+    const cols=raw.split('\t').map(c=>c.replace(/^"|"$/g,'').replace(/\s+/g,' ').trim());
+    if(cols.length<12)continue;
+    const partNo=cols[0].replace(/\s/g,'').trim();
+    if(!partNo||partNo==='-'||partNo==='Part#')continue;
+    const qty=parseFloat(cols[2].replace(/\s/g,'').replace(/,/g,''))||0;
+    // Price = column J (index 9) - DLC rate - strip "Rs." prefix
+    const priceRaw=cols[9].replace(/Rs\.\s*/,'').replace(/\s/g,'').replace(/,/g,'');
+    const price=parseFloat(priceRaw)||0;
+    // Total = column P (index 15)
+    const totalRaw=cols[15].replace(/Rs\.\s*/,'').replace(/\s/g,'').replace(/,/g,'');
+    const total=parseFloat(totalRaw)||0;
+    const desc=cols[1].replace(/\s+/g,' ').trim();
+    const cat=cols[16].replace(/\s+/g,' ').trim();
+    const closeDate=cols[12].replace(/\s+/g,' ').trim(); // Job Card Close Date
+    // Parse date
+    let dateObj=null;
+    try{
+      // Format: DD/MM/YYYY HH:MM:SS AM/PM
+      const dp=closeDate.split(' ')[0];
+      if(dp){const [d,m,y]=dp.split('/');dateObj=new Date(`${y}-${m}-${d}`);}
+    }catch{}
+    if(!dateObj||isNaN(dateObj))continue;
+    records.push({partNo,desc,qty,price,total,cat,date:dateObj});
+  }
+  return records;
+}
+
+function computeMovingStats(records, monthsBack){
+  const cutoff=new Date();cutoff.setMonth(cutoff.getMonth()-monthsBack);
+  const filtered=records.filter(r=>r.date>=cutoff&&r.qty>0);
+  const map={};
+  filtered.forEach(r=>{
+    const k=r.partNo;
+    if(!map[k])map[k]={partNo:k,desc:r.desc,cat:r.cat,totalQty:0,totalVal:0,txns:0,months:new Set()};
+    map[k].totalQty+=r.qty;
+    map[k].totalVal+=r.total||r.qty*r.price;
+    map[k].txns++;
+    map[k].months.add(`${r.date.getFullYear()}-${r.date.getMonth()}`);
+  });
+  return Object.values(map).map(x=>({...x,months:x.months.size,avgMonthly:x.totalQty/monthsBack}));
+}
+
+function classifyMoving(avgMonthly, months, period){
+  // Fast: avg >= 5/month or appears in >70% months
+  // Medium: avg >= 1/month  
+  // Slow: avg > 0 but < 1/month
+  // Dead: 0
+  if(avgMonthly<=0)return'dead';
+  if(avgMonthly>=5||months>=period*0.7)return'fast';
+  if(avgMonthly>=1)return'medium';
+  return'slow';
+}
+
+async function rMovingParts(){
+  const pg=$('PG');
+  pg.innerHTML=`<div class="ph"><div class="pt">📈 Moving Parts Analysis</div><div class="ps">Upload Parts Sale CSV to analyze consumption</div></div>
+  <div class="cd" style="margin-bottom:14px">
+    <div class="cdh"><div class="cdt">📤 Upload Parts Sale Data (DMS Export)</div></div>
+    <div class="cdb">
+      <div class="ib" style="margin-bottom:12px">📋 Upload the Parts Sale CSV from Hero DMS — Sep 2025 to Mar 2026 (or any period). DLC rate in column J will be used automatically.</div>
+      <div class="dz" onclick="$('MCSV').click()" style="cursor:pointer">
+        <div style="font-size:36px;margin-bottom:8px">📊</div>
+        <div style="font-weight:700;color:#475569">Drop Parts Sale CSV or click to browse</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px">Supports Hero DMS tab-separated export</div>
+      </div>
+      <input type="file" id="MCSV" accept=".csv,.txt" style="display:none" onchange="loadSalesCSV(this,'mv')">
+      ${S_SALES.length?`<div class="snpc" style="margin-top:12px">✅ <strong>${S_SALES.length}</strong> sales records loaded · <button class="btn bgh bsm" onclick="showMovingReport()">View Report</button></div>`:''}
+    </div>
+  </div>
+  ${S_SALES.length?mvReportHTML():'<div class="cd"><div class="cdh"><div class="cdt">📊 Report</div></div><div class="emp"><div class="emp-i">📊</div><div class="emp-t">Upload CSV to see report</div></div></div>'}`;
+}
+
+function loadSalesCSV(input, target){
+  const f=input.files[0];if(!f)return;
+  toast('Parsing sales data…','i');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    // Try UTF-16 first (Hero DMS exports in UTF-16 LE)
+    let text=e.target.result;
+    S_SALES=parseSalesCSV(text);
+    if(S_SALES.length===0){
+      // Try treating as raw text with different encoding
+      toast('Trying alternate parse…','i');
+    }
+    toast(`✅ ${S_SALES.length} records loaded`,'s');
+    if(target==='mv')showMovingReport();
+    else if(target==='op')showOrderPlan();
+  };
+  reader.readAsText(f,'utf-8');
+}
+
+function showMovingReport(){
+  const pg=$('PG');if(!pg)return;
+  pg.innerHTML=`<div class="ph"><div class="pt">📈 Moving Parts Analysis</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bgh bsm" onclick="rMovingParts()">⬅ Back</button>
+      <button class="btn bpr bsm" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>${mvReportHTML()}`;
+}
+
+function mvReportHTML(){
+  const stats6=computeMovingStats(S_SALES,6);
+  const stats3=computeMovingStats(S_SALES,3);
+
+  const classify6=stats6.map(x=>({...x,class:classifyMoving(x.avgMonthly,x.months,6)}));
+  const fast6=classify6.filter(x=>x.class==='fast').sort((a,b)=>b.totalQty-a.totalQty);
+  const med6=classify6.filter(x=>x.class==='medium').sort((a,b)=>b.totalQty-a.totalQty);
+  const slow6=classify6.filter(x=>x.class==='slow').sort((a,b)=>b.totalQty-a.totalQty);
+  const dead6=classify6.filter(x=>x.class==='dead');
+
+  const classify3=computeMovingStats(S_SALES,3).map(x=>({...x,class:classifyMoving(x.avgMonthly,x.months,3)}));
+  const fast3=classify3.filter(x=>x.class==='fast').sort((a,b)=>b.totalQty-a.totalQty);
+  const slow3=classify3.filter(x=>x.class==='slow').sort((a,b)=>a.totalQty-b.totalQty);
+
+  const totalVal6=classify6.reduce((s,x)=>s+x.totalVal,0);
+
+  const mvTblRows=(arr,period)=>arr.slice(0,100).map((x,i)=>{
+    const cls=x.class==='fast'?'mv-fast':x.class==='medium'?'mv-med':x.class==='slow'?'mv-slow':'mv-dead';
+    const label=x.class==='fast'?'🔥 Fast':x.class==='medium'?'⚡ Medium':x.class==='slow'?'🐌 Slow':'💀 Dead';
+    return`<tr>
+      <td style="font-size:11px;color:#94a3b8">${i+1}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(x.partNo)}</td>
+      <td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis">${esc(tr2(x.desc,30))}</td>
+      <td><span class="mv-badge ${cls}">${label}</span></td>
+      <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(x.totalQty)}</td>
+      <td style="text-align:right;font-size:11px;color:#059669;font-weight:700">₹${fmt(Math.round(x.totalVal))}</td>
+      <td style="text-align:right;font-size:11px">${x.avgMonthly.toFixed(1)}/mo</td>
+      <td style="text-align:center"><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${Math.min(100,(x.avgMonthly/10)*100)}%;background:${x.class==='fast'?'#059669':x.class==='medium'?'#d97706':x.class==='slow'?'#dc2626':'#94a3b8'}"></div></div></td>
+    </tr>`;
+  }).join('');
+
+  return`
+  <div class="mv-summary-cards" style="margin-bottom:16px">
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#059669">${fast6.length}</div><div class="mv-sc-l">🔥 Fast Moving</div><div style="font-size:10px;color:#94a3b8">≥5/month or regular</div></div>
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#d97706">${med6.length}</div><div class="mv-sc-l">⚡ Medium Moving</div><div style="font-size:10px;color:#94a3b8">1–5/month</div></div>
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#dc2626">${slow6.length}</div><div class="mv-sc-l">🐌 Slow Moving</div><div style="font-size:10px;color:#94a3b8">&lt;1/month</div></div>
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#94a3b8">${dead6.length}</div><div class="mv-sc-l">💀 Zero Movement</div><div style="font-size:10px;color:#94a3b8">No sales in 6M</div></div>
+  </div>
+
+  <div class="mv-tab-bar" id="MVTABS">
+    <div class="mv-tab on" onclick="mvSetTab('MV6M','MVTABS',this)">6-Month Report <span class="mv-badge mv-fast">${classify6.length}</span></div>
+    <div class="mv-tab" onclick="mvSetTab('MV3M','MVTABS',this)">3-Month Report <span class="mv-badge mv-med">${classify3.length}</span></div>
+    <div class="mv-tab" onclick="mvSetTab('MVFAST','MVTABS',this)">🔥 Fast <span class="mv-badge mv-fast">${fast6.length}</span></div>
+    <div class="mv-tab" onclick="mvSetTab('MVSLOW','MVTABS',this)">🐌 Slow <span class="mv-badge mv-slow">${slow6.length}</span></div>
+  </div>
+
+  <div id="MV6M" class="mv-panel" style="display:block">
+    <div class="cd">
+      <div class="cdh"><div class="cdt">📊 6-Month Full Report (Oct 2025 – Mar 2026)</div>
+        <button class="btn bgh bsm" onclick="dlMovingCSV(6)">⬇️ Export CSV</button>
+      </div>
+      <div class="mv-tbl-wrap"><table>
+        <thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Total Qty</th><th style="text-align:right">Value (₹)</th><th style="text-align:right">Avg/Month</th><th>Activity</th></tr></thead>
+        <tbody>${mvTblRows(classify6.sort((a,b)=>b.totalQty-a.totalQty),6)}</tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div id="MV3M" class="mv-panel" style="display:none">
+    <div class="cd">
+      <div class="cdh"><div class="cdt">📊 3-Month Report (Jan 2026 – Mar 2026)</div>
+        <button class="btn bgh bsm" onclick="dlMovingCSV(3)">⬇️ Export CSV</button>
+      </div>
+      <div class="mv-tbl-wrap"><table>
+        <thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Total Qty</th><th style="text-align:right">Value (₹)</th><th style="text-align:right">Avg/Month</th><th>Activity</th></tr></thead>
+        <tbody>${mvTblRows(classify3.sort((a,b)=>b.totalQty-a.totalQty),3)}</tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div id="MVFAST" class="mv-panel" style="display:none">
+    <div class="cd">
+      <div class="cdh"><div class="cdt">🔥 Fast Moving Parts — Top ${fast6.length}</div>
+        <div style="font-size:11px;color:#059669;font-weight:700">High Priority Stock — Never let these run out!</div>
+      </div>
+      <div class="mv-tbl-wrap"><table>
+        <thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Total Qty</th><th style="text-align:right">Value (₹)</th><th style="text-align:right">Avg/Month</th><th>Activity</th></tr></thead>
+        <tbody>${mvTblRows(fast6,6)}</tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div id="MVSLOW" class="mv-panel" style="display:none">
+    <div class="cd">
+      <div class="cdh"><div class="cdt">🐌 Slow Moving Parts — ${slow6.length} parts</div>
+        <div style="font-size:11px;color:#dc2626;font-weight:700">Review these — consider reducing stock</div>
+      </div>
+      <div class="mv-tbl-wrap"><table>
+        <thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Total Qty</th><th style="text-align:right">Value (₹)</th><th style="text-align:right">Avg/Month</th><th>Activity</th></tr></thead>
+        <tbody>${mvTblRows(slow6,6)}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
+function mvSetTab(id, tabbar, btn){
+  document.querySelectorAll('.mv-panel').forEach(p=>{p.style.display='none';});
+  const el=$(id);if(el)el.style.display='block';
+  document.querySelectorAll(`#${tabbar} .mv-tab`).forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function dlMovingCSV(months){
+  const stats=computeMovingStats(S_SALES,months).map(x=>({...x,class:classifyMoving(x.avgMonthly,x.months,months)}));
+  stats.sort((a,b)=>b.totalQty-a.totalQty);
+  const csv=`Part No,Description,Category,Class,Total Qty (${months}M),Total Value,Avg/Month,Active Months\n`
+    +stats.map(x=>`"${x.partNo}","${(x.desc||'').replace(/"/g,'""')}","${x.cat||''}","${x.class}",${x.totalQty},${Math.round(x.totalVal)},${x.avgMonthly.toFixed(2)},${x.months}`).join('\n');
+  dlCSV(csv,`moving_parts_${months}M_${today()}.csv`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ORDER PLANNING — Based on 6M consumption + current stock
+// ═══════════════════════════════════════════════════════════
+let ORDER_PORTAL=[];// portal order details uploaded by user
+
+async function rOrderPlan(){
+  const pg=$('PG');
+  pg.innerHTML=`<div class="ph"><div class="pt">🛒 Order Planning</div><div class="ps">AI-powered suggestion based on 6-month consumption history</div></div>
+
+  <div class="cd" style="margin-bottom:14px">
+    <div class="cdh"><div class="cdt">Step 1 — Upload Sales History</div></div>
+    <div class="cdb">
+      <div class="dz" onclick="$('OPCSV').click()">
+        <div style="font-size:28px;margin-bottom:6px">📊</div>
+        <div style="font-weight:700;color:#475569">${S_SALES.length?`✅ ${S_SALES.length} records loaded — Re-upload to refresh`:'Upload Parts Sale CSV (DMS Export)'}</div>
+      </div>
+      <input type="file" id="OPCSV" accept=".csv,.txt" style="display:none" onchange="loadSalesCSV(this,'op')">
+    </div>
+  </div>
+
+  <div class="cd" style="margin-bottom:14px">
+    <div class="cdh"><div class="cdt">Step 2 — Upload Portal Order Details (Optional)</div></div>
+    <div class="cdb">
+      <div class="al ali" style="margin-bottom:10px">📋 Upload your dealer portal order CSV to compare suggested vs actual order. Format: Part No, Order Qty, Unit Price</div>
+      <div class="dz" onclick="$('OPORD').click()">
+        <div style="font-size:28px;margin-bottom:6px">📋</div>
+        <div style="font-weight:700;color:#475569">${ORDER_PORTAL.length?`✅ ${ORDER_PORTAL.length} order lines loaded`:'Upload Portal Order CSV (Optional)'}</div>
+      </div>
+      <input type="file" id="OPORD" accept=".csv" style="display:none" onchange="loadPortalOrder(this)">
+    </div>
+  </div>
+
+  <div class="cd" style="margin-bottom:14px">
+    <div class="cdh"><div class="cdt">Step 3 — Order Parameters</div></div>
+    <div class="cdb">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div class="fl"><label class="fll">Cover Period (weeks)</label><input class="fi" id="OPCOV" type="number" value="4" min="1" max="26" placeholder="4"></div>
+        <div class="fl"><label class="fll">Safety Stock (weeks)</label><input class="fi" id="OPSAF" type="number" value="2" min="0" max="12" placeholder="2"></div>
+        <div class="fl"><label class="fll">Lead Time (days)</label><input class="fi" id="OPLT" type="number" value="7" min="1" max="30" placeholder="7"></div>
+      </div>
+      <div style="margin-top:12px">
+        <label class="fll">Include Categories</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="OPCATS"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-bottom:18px">
+    <button class="btn bpr" style="padding:14px 32px;font-size:14px" onclick="genOrderPlan()">🚀 Generate Order Plan</button>
+  </div>
+
+  <div id="OPRESULT"></div>`;
+
+  // Populate category filters
+  setTimeout(()=>{
+    const cats=[...new Set(S.items.map(i=>i.category||'').filter(Boolean))];
+    const el=$('OPCATS');
+    if(el)el.innerHTML=cats.map(c=>`<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;background:#f8fafc;border:1px solid var(--bd);border-radius:6px;padding:4px 10px"><input type="checkbox" checked value="${esc(c)}"> ${esc(c)}</label>`).join('');
+  },100);
+}
+
+function loadPortalOrder(input){
+  const f=input.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split(/\r?\n/).filter(Boolean);
+    ORDER_PORTAL=lines.slice(1).map(l=>l.split(',').map(v=>v.trim().replace(/"/g,''))).filter(r=>r[0]).map(r=>({partNo:r[0].trim().toUpperCase(),orderQty:parseFloat(r[1])||0,unitPrice:parseFloat(r[2])||0}));
+    toast(`✅ ${ORDER_PORTAL.length} portal order lines loaded`,'s');
+  };
+  reader.readAsText(f);
+}
+
+function genOrderPlan(){
+  if(!S_SALES.length){toast('Please upload Parts Sale CSV first','w');return;}
+  const coverWeeks=parseFloat($('OPCOV')?.value)||4;
+  const safetyWeeks=parseFloat($('OPSAF')?.value)||2;
+  const leadDays=parseFloat($('OPLT')?.value)||7;
+  const coverMonths=coverWeeks/4.33;
+  const safetyMonths=safetyWeeks/4.33;
+  const totalCoverMonths=coverMonths+safetyMonths;
+
+  // Get selected categories
+  const selCats=new Set([...(document.querySelectorAll('#OPCATS input:checked')||[])].map(cb=>cb.value));
+
+  const stats6=computeMovingStats(S_SALES,6);
+  const statsMap={};stats6.forEach(x=>statsMap[x.partNo]=x);
+
+  // Build order plan: for each item in master
+  const plan=[];
+  S.items.forEach(item=>{
+    if(!selCats.has(item.category||''))return;
+    const s=statsMap[item.partNo];
+    const avgMonthly=s?s.avgMonthly:0;
+    const currentStock=parseFloat(item.systemQty)||0;
+    const dlc=parseFloat(item.dlc)||parseFloat(item.mrp)||0;
+
+    // Demand for cover period + safety stock
+    const demandNeeded=avgMonthly*totalCoverMonths;
+    // Reorder Point = demand during lead time + safety stock
+    const rop=avgMonthly*(leadDays/30)+avgMonthly*safetyMonths;
+    // Suggested order qty
+    let suggestQty=Math.max(0,Math.ceil(demandNeeded-currentStock));
+    // Round up to MOQ
+    const moq=parseInt(item.moq)||1;
+    if(suggestQty>0&&suggestQty%moq!==0)suggestQty=Math.ceil(suggestQty/moq)*moq;
+
+    // Priority
+    let priority='low';
+    if(currentStock===0&&avgMonthly>0)priority='critical';
+    else if(currentStock<=rop&&avgMonthly>0)priority='high';
+    else if(avgMonthly>0&&suggestQty>0)priority='medium';
+
+    if(priority==='low'&&suggestQty===0)return; // skip if no order needed
+
+    // Check against portal order
+    const portal=ORDER_PORTAL.find(o=>o.partNo===item.partNo.trim().toUpperCase());
+
+    plan.push({
+      partNo:item.partNo,desc:item.desc,category:item.category,bin:item.bin,
+      currentStock,avgMonthly:avgMonthly||0,dlc,moq,
+      demandNeeded:Math.round(demandNeeded*10)/10,
+      rop:Math.round(rop*10)/10,
+      suggestQty,
+      portalQty:portal?.orderQty||0,
+      portalPrice:portal?.unitPrice||0,
+      totalCost:suggestQty*dlc,
+      priority,
+      stockDays:avgMonthly>0?Math.round((currentStock/avgMonthly)*30):999
+    });
+  });
+
+  // Sort: critical first, then high, then medium
+  const pOrder={critical:0,high:1,medium:2,low:3};
+  plan.sort((a,b)=>pOrder[a.priority]-pOrder[b.priority]||b.avgMonthly-a.avgMonthly);
+
+  const totalCost=plan.reduce((s,x)=>s+x.totalCost,0);
+  const critCount=plan.filter(x=>x.priority==='critical').length;
+  const highCount=plan.filter(x=>x.priority==='high').length;
+  const medCount=plan.filter(x=>x.priority==='medium').length;
+
+  const prLabel={critical:'🚨 Critical',high:'⚠️ High',medium:'✅ Order',low:'— Low'};
+  const prStyle={critical:'color:#dc2626;font-weight:800',high:'color:#d97706;font-weight:700',medium:'color:#059669;font-weight:600',low:'color:#94a3b8'};
+  const prRowBg={critical:'#fff1f2',high:'#fffbeb',medium:'#f0fdf4',low:'#f8fafc'};
+
+  const res=$('OPRESULT');if(!res)return;
+  res.innerHTML=`
+  <div class="mv-summary-cards" style="margin-bottom:16px">
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#dc2626">${critCount}</div><div class="mv-sc-l">🚨 Critical — Order Now</div></div>
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#d97706">${highCount}</div><div class="mv-sc-l">⚠️ High Priority</div></div>
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#059669">${medCount}</div><div class="mv-sc-l">✅ Medium Priority</div></div>
+    <div class="mv-sc"><div class="mv-sc-v" style="color:#2563eb">₹${fmt(Math.round(totalCost))}</div><div class="mv-sc-l">💰 Est. Order Value</div></div>
+  </div>
+
+  <div class="cd">
+    <div class="cdh"><div class="cdt">📋 Order Plan — ${plan.length} parts</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn bgh bsm" onclick="dlOrderPlan()">⬇️ Export CSV</button>
+        <button class="btn bpr bsm" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </div>
+    <div style="padding:10px 16px;background:#f8fafc;border-bottom:1px solid var(--bd);font-size:11px;color:#64748b">
+      📐 Parameters: Cover ${coverWeeks}W + Safety ${safetyWeeks}W · Lead ${leadDays} days · Based on 6-month avg consumption
+      ${ORDER_PORTAL.length?` · Portal order: <strong>${ORDER_PORTAL.length} lines</strong>`:' · <em>No portal order uploaded — showing suggested qty only</em>'}
+    </div>
+    <div class="mv-tbl-wrap"><table>
+      <thead>
+        <tr>
+          <th>#</th><th>Part No</th><th>Description</th><th>Cat</th><th>Bin</th>
+          <th style="text-align:right">Stock</th><th style="text-align:right">Avg/Mo</th>
+          <th style="text-align:right">Stock Days</th><th style="text-align:right">Suggest Qty</th>
+          ${ORDER_PORTAL.length?'<th style="text-align:right">Portal Qty</th><th style="text-align:right">Diff</th>':''}
+          <th style="text-align:right">DLC (₹)</th><th style="text-align:right">Est. Cost</th>
+          <th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${plan.map((x,i)=>{
+          const diff=ORDER_PORTAL.length?x.portalQty-x.suggestQty:null;
+          const stockDaysCls=x.stockDays<14?'color:#dc2626;font-weight:800':x.stockDays<30?'color:#d97706;font-weight:700':'color:#059669';
+          return`<tr style="background:${prRowBg[x.priority]}">
+            <td style="font-size:11px;color:#94a3b8">${i+1}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(x.partNo)}</td>
+            <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis">${esc(tr2(x.desc,28))}</td>
+            <td style="font-size:10px;color:#64748b">${esc(tr2(x.category||'',12))}</td>
+            <td><span class="bg bgp" style="font-size:9px">${esc(x.bin||'—')}</span></td>
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${fmt(x.currentStock)}</td>
+            <td style="text-align:right;font-size:11px">${x.avgMonthly.toFixed(1)}</td>
+            <td style="text-align:right;font-size:11px;${stockDaysCls}">${x.stockDays===999?'∞':x.stockDays+'d'}</td>
+            <td style="text-align:right"><span class="op-qty-box">${x.suggestQty}</span></td>
+            ${ORDER_PORTAL.length?`
+              <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${x.portalQty||'—'}</td>
+              <td style="text-align:right;font-weight:700;color:${diff>0?'#059669':diff<0?'#dc2626':'#94a3b8'}">${diff!==null&&x.portalQty?(diff>0?'+':'')+diff:'—'}</td>`:''}
+            <td style="text-align:right;font-size:11px">₹${fmt(x.dlc)}</td>
+            <td style="text-align:right;font-size:11px;font-weight:700">₹${fmt(Math.round(x.totalCost))}</td>
+            <td style="white-space:nowrap"><span style="${prStyle[x.priority]}">${prLabel[x.priority]}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+      <tfoot><tr style="background:#f8fafc;font-weight:800">
+        <td colspan="${ORDER_PORTAL.length?11:9}" style="text-align:right;font-size:12px">Total Estimated Order Value:</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:14px;color:#2563eb">₹${fmt(Math.round(totalCost))}</td>
+        <td></td>
+      </tr></tfoot>
+    </table></div>
+  </div>`;
+
+  // Store plan for CSV download
+  window._orderPlan=plan;
+  window._orderParams={coverWeeks,safetyWeeks,leadDays,hasPortal:ORDER_PORTAL.length>0};
+}
+
+function dlOrderPlan(){
+  const plan=window._orderPlan||[];
+  const p=window._orderParams||{};
+  const csv=`India Motors — Order Plan · ${today()} · Cover:${p.coverWeeks||4}W Safety:${p.safetyWeeks||2}W Lead:${p.leadDays||7}days\nPart No,Description,Category,Bin,Current Stock,Avg/Month,Stock Days,Suggest Qty,${p.hasPortal?'Portal Qty,Difference,':''}DLC Rate,Est Cost,Priority\n`
+    +plan.map(x=>`"${x.partNo}","${(x.desc||'').replace(/"/g,'""')}","${x.category||''}","${x.bin||''}",${x.currentStock},${x.avgMonthly.toFixed(2)},${x.stockDays===999?999:x.stockDays},${x.suggestQty},${p.hasPortal?x.portalQty+','+(x.portalQty-x.suggestQty)+',':''}${x.dlc},${Math.round(x.totalCost)},"${x.priority}"`).join('\n');
+  dlCSV(csv,`order_plan_${today()}.csv`);
+}
+
+
+// ═══════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
@@ -2584,7 +3261,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('hashchange',()=>{
     if(!S.user)return;
     const hash=location.hash.replace('#','');
-    const validPages=['dashboard','scan','manual','bins','scanlog','variance','daywise','fullsummary','uncounted','foc','itemmaster','dms','settings'];
+    const validPages=['dashboard','scan','manual','bins','scanlog','variance','daywise','fullsummary','uncounted','foc','movingparts','orderplan','qrgen','itemmaster','dms','settings'];
     if(validPages.includes(hash))go(hash,true);
   });
 
