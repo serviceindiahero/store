@@ -597,7 +597,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbw5ELKal2HM85kw5Bz8SKonAZMp_EcX_dUQgoVc_Xgv7X6P06hv7slnJcIRLCTJQW65Yg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzJwZAXANli9xHtEjkZ8L9j3ITMEUiEixGXyl0N_Clqr7uyR4pjLLpMYDiwxiSSMvMc7w/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -2674,37 +2674,42 @@ function qrRenderPage(){
   QRGenData.page=p;
   const slice=items.slice((p-1)*pgsz,p*pgsz);
   if(!items.length){
-    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:600">No Local Parts found</div><div style="font-size:12px;margin-top:6px">Add items with "LOCAL" in category name</div></div>';
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:600">No items found</div></div>';
     pag.innerHTML='';return;
   }
   grid.innerHTML=slice.map((item,i)=>{
     const safeDesc=(item.desc||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
     const safeBin=(item.bin||'').replace(/'/g,"\\'");
+    // HMCL official label card design
     return`<div class="qr-card" onclick="qrZoom('${esc(item.partNo)}','${safeDesc}','${safeBin}')">
-      <canvas id="QRC_${i}" width="${sz}" height="${sz}" style="width:${sz}px;height:${sz}px;max-width:100%"></canvas>
-      <div class="qr-pn">${esc(item.partNo)}</div>
-      <div class="qr-desc">${esc(tr2(item.desc||'',34))}</div>
-      ${item.bin?`<span class="qr-bin">📍 ${esc(item.bin)}</span>`:''}
-      <div style="font-size:9px;color:#94a3b8;margin-top:4px">MRP ₹${item.mrp||0} · DLC ₹${item.dlc||0}</div>
+      <div style="background:#1e3a5f;border-radius:6px 6px 0 0;padding:4px 8px;margin:-14px -14px 10px -14px;display:flex;align-items:center;gap:6px">
+        <span style="font-size:9px;font-weight:800;color:#fff;letter-spacing:.5px">🏍️ INDIA MOTORS</span>
+        <span style="font-size:8px;color:rgba(255,255,255,.5);margin-left:auto">Hero MotoCorp</span>
+      </div>
+      <canvas id="QRC_${i}" width="${sz}" height="${sz}" style="width:${sz}px;height:${sz}px;max-width:100%;border:2px solid #0f172a;border-radius:4px"></canvas>
+      <div class="qr-pn" style="margin-top:6px;font-size:12px">${esc(item.partNo)}</div>
+      <div class="qr-desc">${esc(tr2(item.desc||'',32))}</div>
+      <div style="display:flex;justify-content:center;gap:5px;margin-top:5px;flex-wrap:wrap">
+        ${item.bin?`<span class="qr-bin">📍 ${esc(item.bin)}</span>`:''}
+        <span style="font-size:8px;background:#f0fdf4;color:#059669;border-radius:4px;padding:1px 5px;font-weight:700">MRP ₹${item.mrp||0}</span>
+      </div>
     </div>`;
   }).join('');
 
-  // Load QR images — format: PARTNO only (for scanner compatibility)
-  // Hero DMS scanners read just the part number
+  // QR data = PARTNO only (Hero DMS scanner reads part number)
+  // This is exactly what HMCL official labels contain
   for(let i=0;i<slice.length;i++){
     const item=slice[i];
     const canvas=$(`QRC_${i}`);if(!canvas)continue;
-    // QR data = just the part number (same as what Hero DMS prints)
-    const qrData=item.partNo;
+    const qrData=item.partNo; // HMCL format: part number only
     const qrSz=sz*2;
-    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${qrSz}x${qrSz}&data=${encodeURIComponent(qrData)}&ecc=H&margin=1`;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${qrSz}x${qrSz}&data=${encodeURIComponent(qrData)}&ecc=H&margin=2&color=0f172a`;
     const img=new Image();img.crossOrigin='anonymous';
     img.onload=((c,im)=>()=>{const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(im,0,0,c.width,c.height);})(canvas,img);
     img.onerror=((c,it)=>()=>{const ctx=c.getContext('2d');ctx.fillStyle='#f0f4ff';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#2563eb';ctx.font=`bold ${Math.floor(c.width/10)}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(it.partNo.slice(0,12),c.width/2,c.height/2);})(canvas,item);
     img.src=url;
   }
 
-  // Pagination
   if(pages>1){
     let h=`<span class="pi">Page ${p}/${pages} · ${items.length} parts</span>`;
     h+=`<button class="pb" onclick="qrPg(${p-1})" ${p<=1?'disabled':''}>‹ Prev</button>`;
@@ -2717,30 +2722,57 @@ function qrRenderPage(){
 function qrPg(n){QRGenData.page=n;qrRenderPage();}
 
 function qrZoom(pn,desc,bin){
-  const sz=220;
-  // QR data = part number only (Hero DMS scanner compatible)
-  const qrData=pn;
+  const sz=240;
+  const qrData=pn; // HMCL official: part number only
+  // Get item details for label
+  const item=findItem(pn)||{mrp:0,dlc:0,category:'',hsn:''};
   modal(`<div class="md"><div class="mdh"><div class="mdt" style="font-family:'JetBrains Mono',monospace;font-size:13px">⬡ ${esc(pn)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
-  <div class="mdb" style="text-align:center;padding:20px">
-    <canvas id="QRZC" width="${sz}" height="${sz}" style="border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1)"></canvas>
-    <div style="font-size:13px;font-weight:700;color:#0f172a;margin-top:10px">${esc(pn)}</div>
-    <div style="font-size:11px;color:#64748b;margin-top:3px">${esc(desc||'')}</div>
-    ${bin?`<div style="margin-top:6px"><span class="bg bgp">📍 ${esc(bin)}</span></div>`:''}
-    <div style="margin-top:8px;font-size:10px;color:#94a3b8;background:#f8fafc;border-radius:6px;padding:4px 10px;display:inline-block">
-      Scans as: <strong>${esc(pn)}</strong>
+  <div class="mdb" style="padding:16px">
+    <!-- HMCL-style official label preview -->
+    <div id="QRLABEL" style="background:#fff;border:2px solid #0f172a;border-radius:10px;overflow:hidden;max-width:280px;margin:0 auto;font-family:'Inter',sans-serif">
+      <div style="background:#1e3a5f;padding:8px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#fff;letter-spacing:.5px">🏍️ INDIA MOTORS</div>
+          <div style="font-size:8px;color:rgba(255,255,255,.6);margin-top:1px">Hero MotoCorp Authorized Dealer</div>
+        </div>
+        <div style="font-size:8px;color:rgba(255,255,255,.5)">ID:12172</div>
+      </div>
+      <div style="padding:12px;text-align:center">
+        <canvas id="QRZC" width="${sz}" height="${sz}" style="border:2px solid #0f172a;border-radius:6px;max-width:100%"></canvas>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:#0f172a;margin-top:8px;letter-spacing:.5px">${esc(pn)}</div>
+        <div style="font-size:11px;color:#475569;margin-top:3px;line-height:1.3">${esc(desc||'')}</div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap">
+          ${bin?`<span style="background:#eff6ff;color:#2563eb;border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700">📍 ${esc(bin)}</span>`:''}
+          ${item.mrp?`<span style="background:#f0fdf4;color:#059669;border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700">MRP ₹${item.mrp}</span>`:''}
+          ${item.category?`<span style="background:#fafafa;color:#64748b;border-radius:4px;padding:2px 8px;font-size:9px;font-weight:600">${esc(item.category)}</span>`:''}
+        </div>
+      </div>
+      <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:5px 12px;text-align:center;font-size:8px;color:#94a3b8">
+        Alwar, Rajasthan · Scan to count in audit
+      </div>
     </div>
-    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center">
-      <button class="btn bpr" onclick="qrDownloadZoom('${esc(pn)}')">⬇️ Download PNG</button>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn bpr" onclick="qrDownloadLabel('${esc(pn)}')">⬇️ Download Label</button>
       <button class="btn bgh" onclick="window.print()">🖨️ Print</button>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:10px;color:#94a3b8">
+      QR encodes: <code style="background:#f1f5f9;padding:1px 6px;border-radius:3px;font-weight:700">${esc(pn)}</code> · Compatible with Hero DMS scanner
     </div>
   </div></div>`);
   setTimeout(()=>{
     const canvas=$('QRZC');if(!canvas)return;
-    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrData)}&ecc=H&margin=2`;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrData)}&ecc=H&margin=2&color=0f172a`;
     const img=new Image();img.crossOrigin='anonymous';
     img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);};
     img.src=url;
   },200);
+}
+
+function qrDownloadLabel(pn){
+  // Download just the QR canvas as PNG
+  const canvas=$('QRZC');if(!canvas){toast('QR not ready','w');return;}
+  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`HMCL_QR_${pn}.png`;a.click();
+  toast('QR label downloaded','s');
 }
 
 function qrDownloadZoom(pn){
@@ -2897,14 +2929,19 @@ function getSalesStatsForPeriod(monthsBack){
 }
 
 // ═══════════════════════════════════════════════════════════
-// MOVING PARTS DASHBOARD
+// MOVING PARTS DASHBOARD v5 — Charts + Month Filter + History
 // ═══════════════════════════════════════════════════════════
+let _mvCurrentStats=null,_mvCurrentFilter='all',_mvPeriod=6;
+let _mvMonthFilter=''; // specific month filter e.g. '2025-11'
+let _mvChartInstance=null,_mvTrendChart=null;
+
 async function rMovingParts(){
   const pg=$('PG');
   pg.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8;flex-direction:column;gap:12px">
-    <div style="font-size:40px">⏳</div><div style="font-size:14px;font-weight:600">Loading sales data from Google Sheets…</div>
+    <div style="font-size:40px;animation:spin 1.5s linear infinite">⏳</div>
+    <div style="font-size:14px;font-weight:600">Loading sales history from Google Sheets…</div>
+    <div style="font-size:12px;color:#cbd5e1">India Motors · sales_history sheet</div>
   </div>`;
-
   await ensureSalesLoaded();
   renderMovingDashboard();
 }
@@ -2914,174 +2951,302 @@ function renderMovingDashboard(){
   const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
   const meta=S_SALES_META;
 
-  // Compute stats for 6M and 3M
   const stats6=hasSales?getSalesStatsForPeriod(6):{};
   const stats3=hasSales?getSalesStatsForPeriod(3):{};
+  const stats12=hasSales?getSalesStatsForPeriod(12):{};
 
   const fast6=Object.entries(stats6).filter(([,v])=>v.class==='fast');
   const med6=Object.entries(stats6).filter(([,v])=>v.class==='medium');
   const slow6=Object.entries(stats6).filter(([,v])=>v.class==='slow');
+  const dead6=Object.entries(stats6).filter(([,v])=>v.class==='dead');
 
-  // Compute total sale value
-  let totalSaleVal=0;
+  let totalSaleVal=0,totalQtyAll=0;
   if(hasSales){
     Object.entries(stats6).forEach(([pn,v])=>{
       totalSaleVal+=v.totalQty*(S_SALES_INFO[pn]?.dlc||0);
+      totalQtyAll+=v.totalQty;
     });
   }
 
-  // Top fast movers for the trending chart
-  const topFast=fast6.sort((a,b)=>b[1].totalQty-a[1].totalQty).slice(0,10);
+  // Month list for filter dropdown (from metadata)
+  const months=hasSales?(meta.months||[]):[]; 
+
+  // Monthly totals for the bar chart
+  const monthlyTotals={};
+  if(hasSales){
+    Object.entries(S_SALES_MAP).forEach(([pn,mmap])=>{
+      Object.entries(mmap).forEach(([m,q])=>{
+        monthlyTotals[m]=(monthlyTotals[m]||0)+q;
+      });
+    });
+  }
+  const chartMonths=Object.keys(monthlyTotals).sort().slice(-12);
+  const chartQtys=chartMonths.map(m=>monthlyTotals[m]||0);
+  const chartVals=chartMonths.map(m=>{
+    let v=0;
+    Object.entries(S_SALES_MAP).forEach(([pn,mmap])=>{
+      v+=(mmap[m]||0)*(S_SALES_INFO[pn]?.dlc||0);
+    });
+    return Math.round(v);
+  });
 
   pg.innerHTML=`
+  <!-- PAGE HEADER -->
   <div class="ph" style="align-items:center;flex-wrap:wrap;gap:10px">
     <div>
       <div class="pt">📈 Moving Parts Dashboard</div>
-      <div class="ps">${hasSales?`${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} to ${meta.dateTo}`:'No sales data loaded'}</div>
+      <div class="ps">${hasSales
+        ?`${meta.uniqueParts.toLocaleString('en-IN')} parts · ${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} → ${meta.dateTo}`
+        :'No sales history loaded yet'}</div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
-      <button class="btn bgh bsm" onclick="mvUploadCSV()" id="MVUPLBTN">
-        ${hasSales?'🔄 Update CSV':'⬆️ Upload CSV'}
-      </button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;align-items:center">
+      ${hasSales?`
+      <select class="fi" id="MVMONTHSEL" onchange="mvMonthFilter()" style="padding:6px 10px;font-size:12px;width:auto">
+        <option value="">📅 All Months</option>
+        ${months.map(m=>`<option value="${m}">${m}</option>`).join('')}
+      </select>
+      <select class="fi" id="MVPERIODSEL" onchange="mvPeriodFilter()" style="padding:6px 10px;font-size:12px;width:auto">
+        <option value="3">Last 3 Months</option>
+        <option value="6" selected>Last 6 Months</option>
+        <option value="12">Last 12 Months</option>
+      </select>
+      `:''}
+      <button class="btn bgh bsm" onclick="mvShowUploadModal()" title="Add sales data from Hero DMS CSV">📥 Add Sales Data</button>
+      ${hasSales?`<button class="btn bgh bsm" onclick="mvDlReport(6)">⬇️ Export</button>`:''}
       <input type="file" id="MVSFILE" accept=".csv,.txt" style="display:none" onchange="mvHandleFile(this)">
-      <button class="btn bgh bsm" onclick="mvDlReport(6)">⬇️ Export 6M</button>
-      <button class="btn bpr bsm" onclick="window.print()">🖨️ Print</button>
     </div>
   </div>
 
   ${!hasSales?`
-  <!-- No data state -->
-  <div class="cd" style="margin-bottom:16px">
-    <div style="text-align:center;padding:60px 20px">
-      <div style="font-size:56px;margin-bottom:16px">📊</div>
-      <div style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:8px">Upload Parts Sale History</div>
-      <div style="font-size:13px;color:#64748b;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto">
-        Upload the Hero DMS CSV export (Sep 2025 – Mar 2026). Data saves permanently to Google Sheets — upload once, access always.
+  <!-- EMPTY STATE — clean, no ugly upload in main area -->
+  <div class="cd" style="margin-bottom:20px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);padding:48px 32px;text-align:center">
+      <div style="font-size:64px;margin-bottom:16px">📊</div>
+      <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:8px">Sales History Not Loaded</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.6);max-width:380px;margin:0 auto 24px;line-height:1.6">
+        Upload Hero DMS Parts Sale CSV once — data saves permanently to Google Sheets <code style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:4px">sales_history</code> tab and is available forever.
       </div>
-      <button class="btn bpr" style="padding:14px 32px;font-size:14px" onclick="mvUploadCSV()">⬆️ Upload Parts Sale CSV</button>
+      <button class="btn bpr" style="padding:13px 28px;font-size:14px;box-shadow:0 4px 20px rgba(37,99,235,.4)" onclick="mvShowUploadModal()">
+        📥 Upload Hero DMS Sales CSV
+      </button>
+      <div style="margin-top:16px;font-size:11px;color:rgba(255,255,255,.3)">
+        Format: Hero DMS Parts Sale Export (UTF-16 LE, Tab-separated)
+      </div>
     </div>
   </div>
   `:`
-  <!-- SUMMARY CARDS -->
-  <div class="sg s4" style="margin-bottom:16px">
-    <div class="st" style="border-left:4px solid #059669" onclick="mvShowTab('fast')">
+  <!-- KPI CARDS -->
+  <div class="sg s4" style="margin-bottom:18px">
+    <div class="st" style="border-left:4px solid #059669;cursor:pointer" onclick="mvShowClassTab('fast')">
       <div class="stl">🔥 Fast Moving</div>
       <div class="stv" style="color:#059669">${fast6.length}</div>
-      <div class="sts">≥2/month avg · High priority</div>
-      <div class="stb"><div class="stbf" style="width:${Math.min(100,fast6.length/10*100)}%;background:#059669"></div></div>
+      <div class="sts">≥10/mo or sold 80%+ months</div>
+      <div class="stb"><div class="stbf" style="background:#059669;width:${Math.min(100,Math.round(fast6.length/(Object.keys(stats6).length||1)*100))}%"></div></div>
     </div>
-    <div class="st" style="border-left:4px solid #d97706" onclick="mvShowTab('medium')">
+    <div class="st" style="border-left:4px solid #d97706;cursor:pointer" onclick="mvShowClassTab('medium')">
       <div class="stl">⚡ Medium Moving</div>
       <div class="stv" style="color:#d97706">${med6.length}</div>
-      <div class="sts">Occasional demand</div>
-      <div class="stb"><div class="stbf" style="width:${Math.min(100,med6.length/10*100)}%;background:#d97706"></div></div>
+      <div class="sts">2–9/mo avg demand</div>
+      <div class="stb"><div class="stbf" style="background:#d97706;width:${Math.min(100,Math.round(med6.length/(Object.keys(stats6).length||1)*100))}%"></div></div>
     </div>
-    <div class="st" style="border-left:4px solid #dc2626" onclick="mvShowTab('slow')">
-      <div class="stl">🐌 Slow Moving</div>
-      <div class="stv" style="color:#dc2626">${slow6.length}</div>
-      <div class="sts">Review & reduce stock</div>
-      <div class="stb"><div class="stbf" style="width:${Math.min(100,slow6.length/10*100)}%;background:#dc2626"></div></div>
+    <div class="st" style="border-left:4px solid #dc2626;cursor:pointer" onclick="mvShowClassTab('slow')">
+      <div class="stl">🐌 Slow / Dead</div>
+      <div class="stv" style="color:#dc2626">${slow6.length+dead6.length}</div>
+      <div class="sts">Review overstock risk</div>
+      <div class="stb"><div class="stbf" style="background:#dc2626;width:${Math.min(100,Math.round((slow6.length+dead6.length)/(Object.keys(stats6).length||1)*100))}%"></div></div>
     </div>
-    <div class="st" style="border-left:4px solid #2563eb">
+    <div class="st" style="border-left:4px solid #7c3aed">
       <div class="stl">💰 6M Sale Value</div>
-      <div class="stv" style="color:#2563eb;font-size:20px">₹${(totalSaleVal/100000).toFixed(1)}L</div>
-      <div class="sts">${Object.keys(stats6).length} parts sold in 6M</div>
+      <div class="stv" style="color:#7c3aed;font-size:22px">₹${(totalSaleVal/100000).toFixed(1)}L</div>
+      <div class="sts">${totalQtyAll.toLocaleString('en-IN')} units · ${Object.keys(stats6).length} parts</div>
     </div>
   </div>
 
-  <!-- TOP 10 FAST MOVERS CHART -->
-  <div class="cg" style="margin-bottom:16px">
-    <div class="cd" style="grid-column:1/-1">
-      <div class="cdh"><div class="cdt">🔥 Top 10 Fast Movers — 6 Month</div></div>
-      <div style="padding:16px;overflow-x:auto">
-        ${topFast.map(([pn,v])=>{
-          const maxQty=topFast[0]?.[1]?.totalQty||1;
-          const pct=Math.round((v.totalQty/maxQty)*100);
-          const item=findItem(pn);
-          return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;min-width:400px">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(pn)}">${esc(pn)}</div>
-            <div style="flex:1;height:22px;background:#f1f5f9;border-radius:4px;overflow:hidden;position:relative">
-              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2563eb,#059669);border-radius:4px;transition:width .5s"></div>
-              <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#0f172a">${fmt(v.totalQty)} units</span>
-            </div>
-            <div style="font-size:10px;color:#64748b;width:70px;text-align:right">${v.avgMonthly.toFixed(1)}/mo</div>
-          </div>`;
-        }).join('')}
+  <!-- CHARTS ROW -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px" id="MVCHARTROW">
+    <!-- Monthly Volume Bar Chart -->
+    <div class="cd">
+      <div class="cdh"><div class="cdt">📊 Monthly Sale Volume (Units)</div></div>
+      <div style="padding:14px;height:220px;position:relative">
+        <canvas id="MV_MONTH_CHART"></canvas>
+      </div>
+    </div>
+    <!-- Movement Pie Chart -->
+    <div class="cd">
+      <div class="cdh"><div class="cdt">🥧 Movement Mix — 6 Months</div></div>
+      <div style="padding:14px;height:220px;position:relative;display:flex;align-items:center;justify-content:center;gap:20px">
+        <canvas id="MV_PIE_CHART" style="max-height:190px;max-width:190px"></canvas>
+        <div style="font-size:11px;line-height:2">
+          <div><span style="display:inline-block;width:10px;height:10px;background:#059669;border-radius:2px;margin-right:6px"></span>Fast: ${fast6.length}</div>
+          <div><span style="display:inline-block;width:10px;height:10px;background:#d97706;border-radius:2px;margin-right:6px"></span>Medium: ${med6.length}</div>
+          <div><span style="display:inline-block;width:10px;height:10px;background:#dc2626;border-radius:2px;margin-right:6px"></span>Slow: ${slow6.length}</div>
+          <div><span style="display:inline-block;width:10px;height:10px;background:#94a3b8;border-radius:2px;margin-right:6px"></span>Dead: ${dead6.length}</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- TABS -->
-  <div class="tbr" id="MVTABS" style="margin-bottom:0">
-    <button class="tb2 on" id="MVTAB_all" onclick="mvShowTab('all')">📋 All Parts (${Object.keys(stats6).length})</button>
-    <button class="tb2" id="MVTAB_fast" onclick="mvShowTab('fast')">🔥 Fast (${fast6.length})</button>
-    <button class="tb2" id="MVTAB_medium" onclick="mvShowTab('medium')">⚡ Medium (${med6.length})</button>
-    <button class="tb2" id="MVTAB_slow" onclick="mvShowTab('slow')">🐌 Slow (${slow6.length})</button>
-    <button class="tb2" id="MVTAB_3m" onclick="mvShowTab('3m')">📅 3-Month</button>
+  <!-- TOP 10 BAR CHART (custom HTML bars — no extra lib) -->
+  <div class="cd" style="margin-bottom:18px">
+    <div class="cdh">
+      <div class="cdt">🔥 Top 10 Fast Movers — 6 Month Total</div>
+      <div style="font-size:11px;color:#94a3b8">${meta.dateFrom} → ${meta.dateTo}</div>
+    </div>
+    <div style="padding:16px 18px" id="MVTOP10">
+      ${(()=>{
+        const top=fast6.sort((a,b)=>b[1].totalQty-a[1].totalQty).slice(0,10);
+        const maxQ=top[0]?.[1]?.totalQty||1;
+        return top.map(([pn,v],i)=>{
+          const info=S_SALES_INFO[pn]||{};
+          const pct=Math.round((v.totalQty/maxQ)*100);
+          const val=Math.round(v.totalQty*(info.dlc||0));
+          return`<div style="display:grid;grid-template-columns:20px 150px 1fr 80px 70px;align-items:center;gap:8px;margin-bottom:9px">
+            <div style="font-size:10px;color:#94a3b8;text-align:right">${i+1}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;color:#2563eb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(pn)}">${esc(pn)}</div>
+            <div style="height:20px;background:#f1f5f9;border-radius:4px;overflow:hidden;position:relative">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#059669,#10b981);border-radius:4px"></div>
+              <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:${pct>35?'#fff':'#0f172a'}">${esc(tr2(info.desc||'',20))}</span>
+            </div>
+            <div style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px">${fmt(v.totalQty)}</div>
+            <div style="text-align:right;font-size:10px;color:#059669;font-weight:700">₹${fmt(val)}</div>
+          </div>`;
+        }).join('');
+      })()}
+    </div>
   </div>
 
+  <!-- DATA TABLE WITH TABS + FILTER -->
+  <div class="tbr" id="MVTABS" style="margin-bottom:0">
+    <button class="tb2 on" id="MVTAB_all" onclick="mvShowClassTab('all')">📋 All (${Object.keys(stats6).length})</button>
+    <button class="tb2" id="MVTAB_fast" onclick="mvShowClassTab('fast')">🔥 Fast (${fast6.length})</button>
+    <button class="tb2" id="MVTAB_medium" onclick="mvShowClassTab('medium')">⚡ Medium (${med6.length})</button>
+    <button class="tb2" id="MVTAB_slow" onclick="mvShowClassTab('slow')">🐌 Slow (${slow6.length})</button>
+    <button class="tb2" id="MVTAB_dead" onclick="mvShowClassTab('dead')">💀 Dead (${dead6.length})</button>
+  </div>
   <div class="cd" id="MVTBLCARD">
     <div class="cdh">
       <div class="cdt" id="MVTBLTITLE">All Parts — 6 Month Analysis</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <input class="fi" id="MVFILTER" placeholder="Filter…" oninput="mvFilterTable()" style="width:160px;padding:5px 10px;font-size:12px" autocomplete="off" autocapitalize="none">
-        <button class="btn bgh bsm" id="MVEXPORT" onclick="mvDlReport(6)">⬇️ Export</button>
+        <input class="fi" id="MVFILTER" placeholder="Part / description…" oninput="mvFilterTable()" style="width:180px;padding:5px 10px;font-size:12px" autocomplete="off" autocapitalize="none">
+        <button class="btn bgh bsm" onclick="mvDlReport(_mvPeriod)">⬇️ Export</button>
       </div>
     </div>
-    <div class="tw" id="MVTBLWRAP">
-      <!-- table rendered by mvShowTab -->
-    </div>
+    <div class="tw" id="MVTBLWRAP"></div>
   </div>
   `}`;
 
-  if(hasSales) setTimeout(()=>mvShowTab('all'),100);
+  if(hasSales){
+    setTimeout(()=>{
+      mvShowClassTab('all');
+      // Draw monthly volume chart
+      const ctx1=document.getElementById('MV_MONTH_CHART');
+      if(ctx1&&window.Chart){
+        if(_mvChartInstance){_mvChartInstance.destroy();_mvChartInstance=null;}
+        _mvChartInstance=new Chart(ctx1,{
+          type:'bar',
+          data:{
+            labels:chartMonths.map(m=>{const[y,mo]=m.split('-');return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(mo)-1]+' '+y.slice(2);}),
+            datasets:[{
+              label:'Units Sold',
+              data:chartQtys,
+              backgroundColor:'rgba(37,99,235,0.7)',
+              borderColor:'#2563eb',
+              borderWidth:1,
+              borderRadius:4
+            }]
+          },
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.toLocaleString('en-IN')} units`}}},scales:{y:{beginAtZero:true,ticks:{font:{size:10}}},x:{ticks:{font:{size:9}}}}}
+        });
+      }
+      // Draw pie chart
+      const ctx2=document.getElementById('MV_PIE_CHART');
+      if(ctx2&&window.Chart&&(fast6.length+med6.length+slow6.length+dead6.length)>0){
+        new Chart(ctx2,{
+          type:'doughnut',
+          data:{
+            labels:['Fast','Medium','Slow','Dead'],
+            datasets:[{data:[fast6.length,med6.length,slow6.length,dead6.length],backgroundColor:['#059669','#d97706','#dc2626','#94a3b8'],borderWidth:2,borderColor:'#fff'}]
+          },
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} parts`}}},cutout:'60%'}
+        });
+      }
+    },100);
+  }
 }
 
-let _mvCurrentStats=null,_mvCurrentFilter='all';
+function mvMonthFilter(){
+  _mvMonthFilter=$('MVMONTHSEL')?.value||'';
+  // Filter S_SALES_MAP to specific month, rebuild stats
+  if(_mvMonthFilter){
+    // Show parts active in that month, sorted by qty
+    const entries=Object.entries(S_SALES_MAP)
+      .filter(([pn,mmap])=>mmap[_mvMonthFilter]>0)
+      .map(([pn,mmap])=>{
+        const q=mmap[_mvMonthFilter]||0;
+        const info=S_SALES_INFO[pn]||{};
+        return[pn,{class:q>=10?'fast':q>=2?'medium':'slow',totalQty:q,avgMonthly:q,activeMonths:1,info,months:[_mvMonthFilter]}];
+      })
+      .sort((a,b)=>b[1].totalQty-a[1].totalQty);
+    _mvCurrentStats=entries;
+    _mvCurrentFilter='all';
+    const wrap=$('MVTBLWRAP');
+    if(wrap) renderMvTable(entries,1,_mvMonthFilter);
+    const title=$('MVTBLTITLE');
+    if(title) title.textContent=`${_mvMonthFilter} — ${entries.length} parts sold`;
+  } else {
+    _mvMonthFilter='';
+    mvShowClassTab(_mvCurrentFilter||'all');
+  }
+}
 
-function mvShowTab(filter){
+function mvPeriodFilter(){
+  _mvPeriod=parseInt($('MVPERIODSEL')?.value)||6;
+  mvShowClassTab(_mvCurrentFilter||'all');
+}
+
+function mvShowClassTab(filter){
   _mvCurrentFilter=filter;
-  // Update tab buttons
-  ['all','fast','medium','slow','3m'].forEach(t=>{
-    const btn=$(`MVTAB_${t}`);if(btn){btn.classList.toggle('on',t===filter);}
+  _mvMonthFilter='';
+  if($('MVMONTHSEL')) $('MVMONTHSEL').value='';
+
+  ['all','fast','medium','slow','dead'].forEach(t=>{
+    const btn=$(`MVTAB_${t}`);if(btn) btn.classList.toggle('on',t===filter);
   });
 
-  const stats6=getSalesStatsForPeriod(6);
-  const stats3=getSalesStatsForPeriod(3);
-  const use=filter==='3m'?stats3:stats6;
-  const period=filter==='3m'?3:6;
-
-  let entries=Object.entries(use);
-  if(filter==='fast')     entries=entries.filter(([,v])=>v.class==='fast');
-  else if(filter==='medium') entries=entries.filter(([,v])=>v.class==='medium');
-  else if(filter==='slow')   entries=entries.filter(([,v])=>v.class==='slow');
-
+  const stats=getSalesStatsForPeriod(_mvPeriod||6);
+  let entries=Object.entries(stats);
+  if(filter!=='all') entries=entries.filter(([,v])=>v.class===filter);
   entries.sort((a,b)=>b[1].avgMonthly-a[1].avgMonthly);
   _mvCurrentStats=entries;
 
   const title=$('MVTBLTITLE');
-  if(title){const labels={all:'All Parts',fast:'🔥 Fast Moving',medium:'⚡ Medium Moving',slow:'🐌 Slow Moving','3m':'3-Month'};
-    title.textContent=`${labels[filter]||filter} — ${entries.length} parts · ${period}M analysis`;}
-
-  renderMvTable(entries,period);
+  const labels={all:'All Parts',fast:'🔥 Fast Moving',medium:'⚡ Medium Moving',slow:'🐌 Slow Moving',dead:'💀 Dead Stock'};
+  if(title) title.textContent=`${labels[filter]||filter} — ${entries.length} parts · ${_mvPeriod||6}M analysis`;
+  renderMvTable(entries,_mvPeriod||6);
 }
+
+// Keep old name for backward compat
+function mvShowTab(f){mvShowClassTab(f);}
 
 function mvFilterTable(){
   const q=($('MVFILTER')?.value||'').toLowerCase().trim();
   if(!_mvCurrentStats) return;
   const filtered=q?_mvCurrentStats.filter(([pn,v])=>pn.toLowerCase().includes(q)||(v.info?.desc||'').toLowerCase().includes(q)):_mvCurrentStats;
-  const period=_mvCurrentFilter==='3m'?3:6;
-  renderMvTable(filtered,period);
+  renderMvTable(filtered,_mvPeriod||6);
 }
 
-function renderMvTable(entries,period){
+function renderMvTable(entries,period,monthLabel){
   const wrap=$('MVTBLWRAP');if(!wrap)return;
   if(!entries.length){
-    wrap.innerHTML='<div class="emp" style="padding:40px"><div class="emp-i">📊</div><div class="emp-t">No parts found</div></div>';
+    wrap.innerHTML='<div style="text-align:center;padding:48px;color:#94a3b8"><div style="font-size:40px;margin-bottom:10px">📊</div><div style="font-weight:600">No parts found</div></div>';
     return;
   }
-  const clsLabel={fast:'<span class="mv-badge mv-fast">🔥 Fast</span>',medium:'<span class="mv-badge mv-med">⚡ Medium</span>',slow:'<span class="mv-badge mv-slow">🐌 Slow</span>',dead:'<span class="mv-badge mv-dead">💀 Dead</span>'};
-  const clsBg={fast:'',medium:'',slow:'background:#fffbeb',dead:'background:#f8fafc'};
+  const clsLabel={
+    fast:'<span style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">🔥 Fast</span>',
+    medium:'<span style="background:#fffbeb;color:#d97706;border:1px solid #fde68a;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">⚡ Medium</span>',
+    slow:'<span style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">🐌 Slow</span>',
+    dead:'<span style="background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">💀 Dead</span>'
+  };
   const maxQty=entries[0]?.[1]?.avgMonthly||1;
 
   wrap.innerHTML=`<table>
@@ -3089,11 +3254,11 @@ function renderMvTable(entries,period){
       <th style="width:28px">#</th>
       <th>Part No</th><th>Description</th><th>Category</th>
       <th style="text-align:center">Status</th>
-      <th style="text-align:right">Total Qty (${period}M)</th>
-      <th style="text-align:right">Avg/Month</th>
+      <th style="text-align:right">Total Qty${monthLabel?'':' ('+period+'M)'}</th>
+      <th style="text-align:right">${monthLabel?'Month Qty':'Avg/Month'}</th>
       <th style="text-align:right">Active Months</th>
       <th style="text-align:right">Est. Value</th>
-      <th>Trend</th>
+      <th style="min-width:80px">Trend</th>
     </tr></thead>
     <tbody>
     ${entries.slice(0,300).map(([pn,v],i)=>{
@@ -3101,36 +3266,66 @@ function renderMvTable(entries,period){
       const dlc=parseFloat(info.dlc)||0;
       const val=v.totalQty*dlc;
       const pct=Math.min(100,(v.avgMonthly/maxQty)*100);
-      const item=findItem(pn);
-      const stock=item?parseFloat(item.systemQty)||0:0;
-      return`<tr style="${clsBg[v.class]||''}">
+      return`<tr>
         <td style="color:#94a3b8;font-size:11px">${i+1}</td>
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(pn)}</span></td>
-        <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis">${esc(tr2(info.desc||'—',30))}</td>
+        <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tr2(info.desc||'—',30))}</td>
         <td style="font-size:10px;color:#64748b">${esc(tr2(info.cat||'',14))}</td>
         <td style="text-align:center">${clsLabel[v.class]||''}</td>
-        <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(v.totalQty)}</td>
+        <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:12px">${fmt(v.totalQty)}</td>
         <td style="text-align:right;font-size:12px;font-weight:700;color:${v.class==='fast'?'#059669':v.class==='medium'?'#d97706':'#dc2626'}">${v.avgMonthly.toFixed(1)}</td>
         <td style="text-align:right;font-size:11px">${v.activeMonths}/${period}</td>
         <td style="text-align:right;font-size:11px;font-weight:700;color:#059669">₹${fmt(Math.round(val))}</td>
-        <td style="min-width:80px"><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${v.class==='fast'?'#059669':v.class==='medium'?'#d97706':'#dc2626'}"></div></div></td>
+        <td><div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${v.class==='fast'?'#059669':v.class==='medium'?'#d97706':'#dc2626'}"></div></div></td>
       </tr>`;
     }).join('')}
     </tbody>
   </table>
-  ${entries.length>300?`<div style="padding:10px 16px;font-size:11px;color:#94a3b8">Showing 300 of ${entries.length}. Use filter to narrow down.</div>`:''}`;
+  ${entries.length>300?`<div style="padding:10px 16px;font-size:11px;color:#94a3b8">Showing 300 of ${entries.length}. Use filter to narrow.</div>`:''}`;
 }
 
-function mvUploadCSV(){
-  $('MVSFILE')?.click();
+function mvShowUploadModal(){
+  const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  const meta=S_SALES_META;
+  const batchInfo=hasSales&&meta.batches?.length
+    ?`<div style="margin-top:10px;font-size:11px;color:#64748b">Existing uploads: ${meta.batches.map(b=>`<span style="background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 6px;font-size:10px">${b.name}</span>`).join(' ')}</div>`:'';
+  modal(`<div class="md">
+    <div class="mdh"><div class="mdt">📥 Add Sales Data</div><button class="mdc" onclick="closeMd()">✕</button></div>
+    <div class="mdb">
+      <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;line-height:1.7;color:#475569">
+        <strong>How to export from Hero DMS:</strong><br>
+        Parts Sale → Reports → Parts Sale Summary → Export → Save as CSV<br>
+        <span style="color:#94a3b8">File format: UTF-16 LE, Tab-separated</span>
+      </div>
+      ${batchInfo}
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn bpr" style="padding:12px 28px" onclick="closeMd();$('MVSFILE')?.click()">
+          📂 Choose Hero DMS CSV File
+        </button>
+      </div>
+      ${hasSales?`<div style="margin-top:12px;text-align:center">
+        <button class="btn bgh bsm" onclick="if(confirm('Clear ALL sales history?')){closeMd();mvClearData();}">🗑️ Clear All Sales Data</button>
+      </div>`:''}
+    </div>
+  </div>`);
+}
+
+function mvUploadCSV(){ $('MVSFILE')?.click(); }
+
+async function mvClearData(){
+  const r=await api({action:'clearSalesData'});
+  if(r.success){
+    S_SALES_LOADED=false;S_SALES_MAP={};S_SALES_INFO={};S_SALES_META=null;
+    toast('Sales data cleared','s');
+    renderMovingDashboard();
+  } else toast('Clear failed: '+(r.error||''),'d');
 }
 
 async function mvHandleFile(input){
   const f=input.files[0];if(!f)return;
   input.value='';
 
-  // Show progress modal
-  modal(`<div class="md"><div class="mdh"><div class="mdt">⬆️ Uploading Sales Data</div></div>
+  modal(`<div class="md"><div class="mdh"><div class="mdt">⬆️ Importing Sales Data</div></div>
   <div class="mdb" style="text-align:center;padding:30px 20px">
     <div style="font-size:40px;margin-bottom:12px">⏳</div>
     <div id="MVPROG" style="font-size:14px;font-weight:600;color:#0f172a">Reading file…</div>
@@ -3147,41 +3342,36 @@ async function mvHandleFile(input){
   };
 
   try{
-    // Read as ArrayBuffer to handle UTF-16
     const buf=await f.arrayBuffer();
-    setProg('Parsing Hero DMS data…','Decoding CSV columns',20);
+    setProg('Parsing Hero DMS data…','Decoding columns',20);
     await new Promise(r=>setTimeout(r,50));
 
     const parsed=parseHeroDMScsv(buf);
     if(!parsed.rows.length){
-      closeMd();
-      toast('No valid data found. Check file format.','d',5000);
-      return;
+      closeMd();toast('No valid data found. Check file format.','d',5000);return;
     }
 
-    setProg(`Found ${parsed.uniqueParts} parts across ${parsed.months.length} months`,'Saving to Google Sheets…',50);
+    setProg(`Found ${parsed.uniqueParts} parts · ${parsed.months.length} months`,'Saving to Google Sheets (append)…',50);
     await new Promise(r=>setTimeout(r,100));
 
-    // Save to Google Sheets
     const batch=`${parsed.dateFrom}_to_${parsed.dateTo}`;
     const r=await api({action:'saveSalesData', rows:parsed.rows, batch});
     if(!r.success) throw new Error(r.error||'Save failed');
 
-    setProg('Reloading data…','Building analytics…',80);
+    setProg('Reloading from Sheets…','Building analytics…',80);
     await new Promise(r=>setTimeout(r,100));
 
-    // Reload from sheet
     S_SALES_LOADED=false;
     await ensureSalesLoaded();
 
-    setProg('Done!','',100);
+    setProg('Done! ✅','',100);
     await new Promise(r=>setTimeout(r,400));
     closeMd();
-    toast(`✅ ${parsed.rows.length} monthly records saved for ${parsed.uniqueParts} parts`,'s',5000);
+    toast(`✅ ${r.appended||0} new + ${(r.saved||0)-(r.appended||0)} updated rows · Batch: ${batch}`,'s',6000);
     renderMovingDashboard();
   }catch(err){
     closeMd();
-    toast('Upload failed: '+err.message,'d',6000);
+    toast('Import failed: '+err.message,'d',6000);
   }
 }
 
