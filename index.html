@@ -2596,20 +2596,21 @@ function newBin(){modal(`<div class="md"><div class="mdh"><div class="mdt">Add B
 async function svBins(){const names=($('NBN')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);if(!names.length){toast('Enter bin name','w');return;}const desc=$('NBD')?.value||'',zone=$('NBZ')?.value||'';let n=0;for(const b of names){const r=await api({action:'saveBin',bin:b,description:desc,zone});if(r.success){n++;S.bins.push({bin:b,description:desc,zone});}}localStorage.setItem(BK,JSON.stringify(S.bins));toast(`${n} bin(s) added`,'s');closeMd();rSettings();}
 async function rmBin(b){if(!confirm(`Delete bin ${b}?`))return;const r=await api({action:'deleteBin',bin:b});if(r.success){toast('Deleted','s');S.bins=S.bins.filter(x=>x.bin!==b);localStorage.setItem(BK,JSON.stringify(S.bins));rSettings();}else toast(r.error||'Failed','d');}
 
+
 // ═══════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════
 function swTab(id,cid,btn){const c=$(cid);if(!c)return;c.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));$(id)?.classList.add('on');btn?.closest('.tbr')?.querySelectorAll('.tb2').forEach(b=>b.classList.remove('on'));btn?.classList.add('on');}
-function dlCSV(csv,fn){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fn;a.click();}
-
+function dlCSV(csv,fn){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download=fn;a.click();}
 
 // ═══════════════════════════════════════════════════════════
-// QR GENERATOR — Local Parts Category Only
+// QR GENERATOR — Local Parts (Official Hero Format)
 // ═══════════════════════════════════════════════════════════
-let QRGenData={cat:'',filter:'',page:1,sz:120,items:[]};
+let QRGenData={filter:'',page:1,sz:120,items:[]};
 
 async function rQRGen(){
   const pg=$('PG');
+  // Only LOCAL PARTS category items
   const localItems=S.items.filter(i=>(i.category||'').toUpperCase().includes('LOCAL'));
   QRGenData.items=localItems; QRGenData.page=1;
   const cats=[...new Set(S.items.map(i=>i.category||'').filter(c=>c.toLowerCase().includes('local')))];
@@ -2617,35 +2618,38 @@ async function rQRGen(){
 
   pg.innerHTML=`
   <div class="print-header"><h2>🏍️ India Motors — QR Label Sheet</h2><p>Local Parts · ${new Date().toLocaleDateString('en-IN')}</p></div>
-  <div class="ph"><div class="pt">⬡ QR Generator</div><div class="ps">Local Parts — Print &amp; Stick Labels</div></div>
-  <div class="cd" style="margin-bottom:14px">
-    <div class="cdh"><div class="cdt">Filter &amp; Options</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn bgh bsm" onclick="window.print()">🖨️ Print All</button>
-        <button class="btn bpr bsm" onclick="qrDlSheet()">⬇️ Download CSV</button>
-      </div>
+  <div class="ph" style="align-items:center">
+    <div><div class="pt">⬡ QR Code Generator</div><div class="ps">Local Parts Only — Scan-compatible with Hero DMS format</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bgh bsm" onclick="window.print()">🖨️ Print Labels</button>
+      <button class="btn bpr bsm" onclick="qrDlSheet()">⬇️ Export CSV</button>
     </div>
-    <div class="cdb" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-      <div style="flex:1;min-width:160px"><label class="fll">Search Part</label>
-        <input class="fi" id="QRSI" placeholder="Part no or description…" oninput="qrFilter()" autocapitalize="none"></div>
+  </div>
+  <div class="cd" style="margin-bottom:16px">
+    <div class="cdb" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;padding:14px 18px">
+      <div style="flex:1;min-width:160px"><label class="fll">🔍 Search</label>
+        <input class="fi" id="QRSI" placeholder="Part number or description…" oninput="qrFilter()" autocapitalize="none" autocomplete="off"></div>
       <div style="min-width:160px"><label class="fll">Category</label>
         <select class="fi" id="QRCAT" onchange="qrFilter()">
           <option value="">All Local Parts</option>${catOpts}
         </select></div>
-      <div style="min-width:110px"><label class="fll">QR Size</label>
+      <div style="min-width:110px"><label class="fll">Label Size</label>
         <select class="fi" id="QRSZ" onchange="qrFilter()">
-          <option value="80">80px — Tiny</option>
-          <option value="120" selected>120px — Small</option>
-          <option value="160">160px — Medium</option>
-          <option value="200">200px — Large</option>
+          <option value="80">Tiny (80px)</option>
+          <option value="120" selected>Small (120px)</option>
+          <option value="160">Medium (160px)</option>
+          <option value="200">Large (200px)</option>
         </select></div>
     </div>
-    <div style="padding:8px 18px;background:#f8fafc;border-top:1px solid var(--bd);font-size:12px;color:#64748b">
-      <strong id="QRCOUNT">${localItems.length}</strong> Local Parts · QR encodes: Part No + Description + Bin
+    <div style="padding:8px 18px;background:#f8fafc;border-top:1px solid var(--bd);font-size:12px;color:#475569;display:flex;align-items:center;gap:10px">
+      <span>📦 <strong id="QRCOUNT">${localItems.length}</strong> Local Parts</span>
+      <span>·</span>
+      <span style="color:#94a3b8">QR format: <code style="background:#e2e8f0;padding:1px 5px;border-radius:3px;font-size:10px">PARTNO|DESC|BIN</code> — compatible with Hero DMS scanner</span>
     </div>
   </div>
   <div id="QRGRID" class="qr-grid"></div>
-  <div id="QRPAG" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 0"></div>`;
+  <div id="QRPAG" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:16px 0;flex-wrap:wrap"></div>`;
+
   setTimeout(()=>qrRenderPage(),80);
 }
 
@@ -2662,400 +2666,591 @@ function qrFilter(){
   qrRenderPage();
 }
 
-async function qrRenderPage(){
+function qrRenderPage(){
   const grid=$('QRGRID'),pag=$('QRPAG');if(!grid)return;
   const items=QRGenData.items, sz=QRGenData.sz||120, pgsz=24;
   const pages=Math.max(1,Math.ceil(items.length/pgsz));
   const p=Math.max(1,Math.min(QRGenData.page,pages));
   QRGenData.page=p;
   const slice=items.slice((p-1)*pgsz,p*pgsz);
-  if(!items.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8"><div style="font-size:36px">🔍</div><div>No Local Parts found</div></div>';pag.innerHTML='';return;}
-  grid.innerHTML=slice.map((item,i)=>`
-    <div class="qr-card" onclick="qrZoom('${esc(item.partNo)}','${(item.desc||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}','${esc(item.bin||'')}')">
+  if(!items.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:600">No Local Parts found</div><div style="font-size:12px;margin-top:6px">Add items with "LOCAL" in category name</div></div>';
+    pag.innerHTML='';return;
+  }
+  grid.innerHTML=slice.map((item,i)=>{
+    const safeDesc=(item.desc||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    const safeBin=(item.bin||'').replace(/'/g,"\\'");
+    return`<div class="qr-card" onclick="qrZoom('${esc(item.partNo)}','${safeDesc}','${safeBin}')">
       <canvas id="QRC_${i}" width="${sz}" height="${sz}" style="width:${sz}px;height:${sz}px;max-width:100%"></canvas>
       <div class="qr-pn">${esc(item.partNo)}</div>
-      <div class="qr-desc">${esc(tr2(item.desc||'',32))}</div>
+      <div class="qr-desc">${esc(tr2(item.desc||'',34))}</div>
       ${item.bin?`<span class="qr-bin">📍 ${esc(item.bin)}</span>`:''}
-      <div style="font-size:9px;color:#94a3b8;margin-top:4px">MRP ₹${item.mrp||0} · Qty ${item.systemQty||0}</div>
-    </div>`).join('');
+      <div style="font-size:9px;color:#94a3b8;margin-top:4px">MRP ₹${item.mrp||0} · DLC ₹${item.dlc||0}</div>
+    </div>`;
+  }).join('');
+
+  // Load QR images — format: PARTNO only (for scanner compatibility)
+  // Hero DMS scanners read just the part number
   for(let i=0;i<slice.length;i++){
     const item=slice[i];
     const canvas=$(`QRC_${i}`);if(!canvas)continue;
-    const qrText=`${item.partNo}|${item.desc||''}|${item.bin||''}|IndiaMotors`;
-    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrText)}&margin=2&ecc=M`;
+    // QR data = just the part number (same as what Hero DMS prints)
+    const qrData=item.partNo;
+    const qrSz=sz*2;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${qrSz}x${qrSz}&data=${encodeURIComponent(qrData)}&ecc=H&margin=1`;
     const img=new Image();img.crossOrigin='anonymous';
-    img.onload=((c,im)=>()=>{c.getContext('2d').drawImage(im,0,0,c.width,c.height);})(canvas,img);
-    img.onerror=((c,it)=>()=>{const ctx=c.getContext('2d');ctx.fillStyle='#f0f4ff';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#2563eb';ctx.font=`${Math.floor(c.width/9)}px monospace`;ctx.textAlign='center';ctx.fillText(it.partNo.slice(0,10),c.width/2,c.height/2);})(canvas,item);
+    img.onload=((c,im)=>()=>{const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(im,0,0,c.width,c.height);})(canvas,img);
+    img.onerror=((c,it)=>()=>{const ctx=c.getContext('2d');ctx.fillStyle='#f0f4ff';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#2563eb';ctx.font=`bold ${Math.floor(c.width/10)}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(it.partNo.slice(0,12),c.width/2,c.height/2);})(canvas,item);
     img.src=url;
   }
+
+  // Pagination
   if(pages>1){
     let h=`<span class="pi">Page ${p}/${pages} · ${items.length} parts</span>`;
-    h+=`<button class="pb" onclick="qrPg(${p-1})" ${p<=1?'disabled':''}>‹</button>`;
+    h+=`<button class="pb" onclick="qrPg(${p-1})" ${p<=1?'disabled':''}>‹ Prev</button>`;
     for(let i=Math.max(1,p-2);i<=Math.min(pages,p+2);i++)h+=`<button class="pb ${i===p?'on':''}" onclick="qrPg(${i})">${i}</button>`;
-    h+=`<button class="pb" onclick="qrPg(${p+1})" ${p>=pages?'disabled':''}>›</button>`;
+    h+=`<button class="pb" onclick="qrPg(${p+1})" ${p>=pages?'disabled':''}>Next ›</button>`;
     pag.innerHTML=h;
-  } else pag.innerHTML='';
+  }else pag.innerHTML='';
 }
+
 function qrPg(n){QRGenData.page=n;qrRenderPage();}
+
 function qrZoom(pn,desc,bin){
-  const sz=200, qrText=`${pn}|${desc}|${bin}|India Motors`;
-  modal(`<div class="md"><div class="mdh"><div class="mdt" style="font-family:'JetBrains Mono',monospace">${esc(pn)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
-  <div class="mdb" style="text-align:center">
-    <canvas id="QRZC" width="${sz}" height="${sz}" style="border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1)"></canvas>
-    <div style="font-size:11px;color:#64748b;margin-top:8px">${esc(desc)}</div>
-    ${bin?`<div style="margin-top:4px"><span class="bg bgp">📍 ${esc(bin)}</span></div>`:''}
-    <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
-      <button class="btn bpr bsm" onclick="qrDownload('${esc(pn)}')">⬇️ Download PNG</button>
-      <button class="btn bgh bsm" onclick="window.print()">🖨️ Print</button>
+  const sz=220;
+  // QR data = part number only (Hero DMS scanner compatible)
+  const qrData=pn;
+  modal(`<div class="md"><div class="mdh"><div class="mdt" style="font-family:'JetBrains Mono',monospace;font-size:13px">⬡ ${esc(pn)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div class="mdb" style="text-align:center;padding:20px">
+    <canvas id="QRZC" width="${sz}" height="${sz}" style="border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1)"></canvas>
+    <div style="font-size:13px;font-weight:700;color:#0f172a;margin-top:10px">${esc(pn)}</div>
+    <div style="font-size:11px;color:#64748b;margin-top:3px">${esc(desc||'')}</div>
+    ${bin?`<div style="margin-top:6px"><span class="bg bgp">📍 ${esc(bin)}</span></div>`:''}
+    <div style="margin-top:8px;font-size:10px;color:#94a3b8;background:#f8fafc;border-radius:6px;padding:4px 10px;display:inline-block">
+      Scans as: <strong>${esc(pn)}</strong>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center">
+      <button class="btn bpr" onclick="qrDownloadZoom('${esc(pn)}')">⬇️ Download PNG</button>
+      <button class="btn bgh" onclick="window.print()">🖨️ Print</button>
     </div>
   </div></div>`);
   setTimeout(()=>{
     const canvas=$('QRZC');if(!canvas)return;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrData)}&ecc=H&margin=2`;
     const img=new Image();img.crossOrigin='anonymous';
-    img.onload=()=>{canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);};
-    img.src=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrText)}&margin=4&ecc=M`;
+    img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);};
+    img.src=url;
   },200);
 }
-function qrDownload(pn){const canvas=$('QRZC');if(!canvas)return;const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`QR_${pn}.png`;a.click();}
+
+function qrDownloadZoom(pn){
+  const canvas=$('QRZC');if(!canvas)return;
+  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`QR_${pn}.png`;a.click();
+  toast('QR downloaded','s');
+}
+
 function qrDlSheet(){
-  const csv='Part No,Description,Category,Bin,MRP,System Qty\n'+QRGenData.items.map(i=>`"${i.partNo}","${(i.desc||'').replace(/"/g,'""')}","${i.category||''}","${i.bin||''}",${i.mrp||0},${i.systemQty||0}`).join('\n');
-  dlCSV(csv,`local_parts_qr_${today()}.csv`);
+  const items=QRGenData.items;
+  if(!items.length){toast('No items to export','w');return;}
+  const csv='Part No,Description,Category,Bin,MRP,DLC,System Qty\n'
+    +items.map(i=>`"${i.partNo}","${(i.desc||'').replace(/"/g,'""')}","${i.category||''}","${i.bin||''}",${i.mrp||0},${i.dlc||0},${i.systemQty||0}`).join('\n');
+  dlCSV(csv,`local_parts_labels_${today()}.csv`);
+  toast(`${items.length} parts exported`,'s');
 }
 
 // ═══════════════════════════════════════════════════════════
-// SALES DATA — Google Sheets backed (persistent)
+// SALES DATA ENGINE — Google Sheets Persistent Store
 // ═══════════════════════════════════════════════════════════
-// In-memory cache loaded from GSheets on page open
-let S_SALES = [];     // [{partNo,desc,cat,qty,dlc,total,saleDate(Date)}]
-let S_SALES_META = null; // {totalRecords, batches, dateFrom, dateTo}
+// In-memory: S_SALES_MAP[partNo][YYYY-MM] = qty
+// S_SALES_INFO[partNo] = {desc, cat, dlc}
+let S_SALES_MAP  = {};   // aggregated monthly data
+let S_SALES_INFO = {};   // part metadata
+let S_SALES_META = null; // {totalRows, months[], dateFrom, dateTo, uniqueParts}
 let S_SALES_LOADED = false;
 
-async function loadSalesFromSheet(){
-  // Load raw records from Google Sheet sales_history
-  if(!S.online)return;
+async function ensureSalesLoaded(){
+  if(S_SALES_LOADED) return true;
+  if(!S.online){ toast('Offline — cannot load sales data','w'); return false; }
   const r = await api({action:'getSalesData'});
-  if(r.success && r.records){
-    S_SALES = r.records.map(x=>({
-      partNo: x.partNo,
-      desc:   x.desc,
-      cat:    x.cat,
-      qty:    parseFloat(x.qty)||0,
-      dlc:    parseFloat(x.dlc)||0,
-      total:  parseFloat(x.total)||0,
-      date:   x.saleDate ? new Date(x.saleDate) : null
-    })).filter(x=>x.date&&!isNaN(x.date));
-    S_SALES_LOADED = true;
-  }
-  const m = await api({action:'getSalesMeta'});
-  if(m.success) S_SALES_META = m.meta;
+  if(!r.success){ toast('Failed to load sales data: '+(r.error||''),'d'); return false; }
+  buildSalesMap(r.rows||[]);
+  S_SALES_META = r.meta;
+  S_SALES_LOADED = true;
+  return true;
 }
 
-function parseSalesCSV(text){
-  // Parse Hero DMS tab-separated export
-  // Cols: Part#[0] Desc[1] Qty[2] BillType[3] JC#[4] Status[5] WarrantyClaim[6]
-  //       Discount%[7] DiscAmt[8] Price[9=DLC] SR#[10] OpenDate[11] CloseDate[12]
-  //       JCStatus[13] Discount[14] Total[15] Category[16] ...
-  const lines = text.split(/\r?\n/);
-  const records = [];
-  for(let li = 1; li < lines.length; li++){
-    const line = lines[li].trim();
-    if(!line) continue;
-    // Parse tab-separated, strip quotes
-    const cols = line.split('\t').map(c => c.replace(/^"|"$/g,'').trim());
-    if(cols.length < 16) continue;
-    const partNo = cols[0].replace(/\s/g,'').trim();
-    if(!partNo || partNo === 'Part#' || partNo === '-') continue;
-    const qty = parseFloat((cols[2]||'0').replace(/[^\d.-]/g,''))||0;
-    if(qty <= 0) continue; // skip zero qty rows
-    // DLC = col[9], strip Rs. prefix and commas
-    const dlcRaw = (cols[9]||'0').replace(/Rs\.\s*/i,'').replace(/,/g,'').replace(/\s/g,'');
-    const dlc = parseFloat(dlcRaw)||0;
-    // Total = col[15]
-    const totalRaw = (cols[15]||'0').replace(/Rs\.\s*/i,'').replace(/[()]/g,'').replace(/,/g,'').replace(/\s/g,'');
-    const total = parseFloat(totalRaw)||0;
-    const desc = (cols[1]||'').replace(/\s+/g,' ').trim();
-    const cat  = (cols[16]||'').replace(/\s+/g,' ').trim();
-    // Close date = col[12]: DD/MM/YYYY HH:MM:SS AM/PM
-    let dateObj = null;
-    try{
-      const dp = (cols[12]||'').split(' ')[0];
-      if(dp){ const [d,m,y] = dp.split('/'); dateObj = new Date(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`); }
-    }catch{}
-    if(!dateObj||isNaN(dateObj)) continue;
-    records.push({partNo, desc, cat, qty, dlc, total, date: dateObj,
-                  saleDate: dateObj.toISOString().split('T')[0]});
-  }
-  return records;
-}
-
-async function uploadAndSaveSalesCSV(input, target){
-  const f = input.files[0]; if(!f) return;
-  toast('Parsing CSV…','i');
-  const reader = new FileReader();
-  reader.onload = async e => {
-    const records = parseSalesCSV(e.target.result);
-    if(!records.length){ toast('No valid records found. Check file format.','w'); return; }
-    toast(`Parsed ${records.length} records — saving to Google Sheets…`,'i');
-
-    // Determine batch name from date range in data
-    const dates = records.map(r=>r.date).sort((a,b)=>a-b);
-    const fromM = dates[0].toLocaleString('en-IN',{month:'short',year:'2-digit'});
-    const toM   = dates[dates.length-1].toLocaleString('en-IN',{month:'short',year:'2-digit'});
-    const batchName = `${fromM.replace(' ','')}-${toM.replace(' ','')}`;
-
-    // Confirm if data already loaded — ask append or replace
-    let mode = 'append';
-    if(S_SALES_META && S_SALES_META.totalRecords > 0){
-      const existBatches = (S_SALES_META.batches||[]).map(b=>b.name).join(', ');
-      const choice = confirm(
-        `Existing data found in Google Sheets:\nBatches: ${existBatches}\n\n` +
-        `Click OK to REPLACE all existing data with new upload.\n` +
-        `Click Cancel to APPEND (add on top of existing data).`
-      );
-      mode = choice ? 'replace_all' : 'append';
-    }
-
-    // If replace all — clear first
-    if(mode === 'replace_all'){
-      toast('Clearing old data…','i');
-      await api({action:'clearSalesData', clearAll:true});
-    }
-
-    // Save in chunks of 500
-    const CHUNK = 500;
-    let saved = 0;
-    for(let start = 0; start < records.length; start += CHUNK){
-      const chunk = records.slice(start, start+CHUNK);
-      const r = await api({
-        action: 'saveSalesData',
-        records: chunk.map(x=>({partNo:x.partNo,desc:x.desc,cat:x.cat,qty:x.qty,dlc:x.dlc,total:x.total,saleDate:x.saleDate})),
-        batchName,
-        uploadedBy: S.user?.username||'',
-        mode: 'append' // always append here since we cleared above if needed
-      });
-      if(r.success) saved += r.saved||0;
-      toast(`Saving… ${start+CHUNK}/${records.length}`,'i');
-    }
-
-    // Reload from sheet into memory
-    await loadSalesFromSheet();
-    toast(`✅ ${saved} records saved to Google Sheets!`,'s',4000);
-    if(target==='mv') showMovingReport();
-    else if(target==='op') { const el=$('OPRESULT'); if(el){ genOrderPlan(); } else rOrderPlan(); }
-  };
-  reader.readAsText(f,'utf-8');
-}
-
-function computeMovingStats(records, monthsBack){
-  const cutoff = new Date();
-  cutoff.setMonth(cutoff.getMonth() - monthsBack);
-  const filtered = records.filter(r => r.date >= cutoff && r.qty > 0);
-  const map = {};
-  filtered.forEach(r => {
-    const k = r.partNo;
-    if(!map[k]) map[k] = {partNo:k, desc:r.desc, cat:r.cat, totalQty:0, totalVal:0, txns:0, months:new Set()};
-    map[k].totalQty += r.qty;
-    map[k].totalVal += (r.total || r.qty * r.dlc);
-    map[k].txns++;
-    map[k].months.add(`${r.date.getFullYear()}-${r.date.getMonth()}`);
+function buildSalesMap(rows){
+  S_SALES_MAP  = {};
+  S_SALES_INFO = {};
+  rows.forEach(r=>{
+    if(!r.partNo||r.qty<=0) return;
+    if(!S_SALES_MAP[r.partNo])  S_SALES_MAP[r.partNo]={};
+    S_SALES_MAP[r.partNo][r.month] = (S_SALES_MAP[r.partNo][r.month]||0)+r.qty;
+    if(!S_SALES_INFO[r.partNo])
+      S_SALES_INFO[r.partNo]={desc:r.desc,cat:r.cat,dlc:r.dlc};
   });
-  return Object.values(map).map(x=>({...x, months:x.months.size, avgMonthly: x.totalQty/monthsBack}));
 }
 
-function classifyMoving(avgMonthly, months, period){
-  if(avgMonthly <= 0) return 'dead';
-  if(avgMonthly >= 5 || months >= period * 0.7) return 'fast';
-  if(avgMonthly >= 1) return 'medium';
-  return 'slow';
+// Parse UTF-16 LE Hero DMS CSV — returns aggregated monthly rows for GSheets
+function parseHeroDMScsv(buffer){
+  // Decode UTF-16 LE
+  let text='';
+  const bytes=new Uint8Array(buffer);
+  // Check BOM FF FE
+  let start=(bytes[0]===0xFF&&bytes[1]===0xFE)?2:0;
+  const u16=new Uint16Array(buffer, start%2===0?start:0);
+  // Use TextDecoder for proper UTF-16
+  try{
+    const dec=new TextDecoder('utf-16le');
+    text=dec.decode(new Uint8Array(buffer).slice(start));
+  }catch(e){
+    // Fallback: manual decode
+    for(let i=start;i<bytes.length-1;i+=2){
+      text+=String.fromCharCode(bytes[i]|(bytes[i+1]<<8));
+    }
+  }
+  // Remove BOM char if present
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+
+  const lines=text.split(/\r?\n/);
+  if(lines.length<2) return {rows:[],error:'Empty file'};
+
+  // Monthly aggregation: partNo+month → {qty, dlc, desc, cat}
+  const agg={};
+  const partInfo={};
+
+  for(let li=1;li<lines.length;li++){
+    const line=lines[li].trim();
+    if(!line) continue;
+    // Tab-separated, values quoted
+    const cols=line.split('\t').map(c=>c.replace(/^"|"$/g,'').trim());
+    if(cols.length<16) continue;
+    const partNo=cols[0].replace(/\s/g,'');
+    if(!partNo||partNo==='Part#'||partNo==='-') continue;
+    const qty=parseFloat((cols[2]||'').replace(/,/g,''))||0;
+    if(qty<=0) continue;
+    // Price col[9] = DLC rate (ex-GST dealer cost)
+    const dlc=parseFloat((cols[9]||'').replace(/Rs\.\s*/i,'').replace(/,/g,'').replace(/[()]/g,'').trim())||0;
+    // Total col[15]
+    const total=parseFloat((cols[15]||'').replace(/Rs\.\s*/i,'').replace(/,/g,'').replace(/[()]/g,'').trim())||0;
+    const desc=(cols[1]||'').replace(/\s+/g,' ').trim();
+    const cat=(cols[16]||'').replace(/\s+/g,' ').trim();
+    // Close date col[12]: DD/MM/YYYY HH:MM:SS
+    const datePart=(cols[12]||'').split(' ')[0];
+    let month='';
+    if(datePart&&datePart.includes('/')){
+      const [d,m,y]=datePart.split('/');
+      if(y&&m) month=`${y}-${String(m).padStart(2,'0')}`;
+    }
+    if(!month) continue;
+    const key=`${partNo}__${month}`;
+    if(!agg[key]) agg[key]={partNo,desc,cat,month,qty:0,dlc:0};
+    agg[key].qty+=qty;
+    if(!agg[key].dlc&&dlc) agg[key].dlc=dlc;
+    if(!partInfo[partNo]) partInfo[partNo]={desc,cat,dlc};
+  }
+
+  const rows=Object.values(agg);
+  const months=[...new Set(rows.map(r=>r.month))].sort();
+  const uniqueParts=[...new Set(rows.map(r=>r.partNo))];
+
+  return{
+    rows,
+    months,
+    uniqueParts:uniqueParts.length,
+    dateFrom:months[0]||'',
+    dateTo:months[months.length-1]||'',
+    totalQtyRows:rows.reduce((s,r)=>s+r.qty,0)
+  };
 }
 
-// ── MOVING PARTS PAGE ──────────────────────────────────
+// Classify movement based on monthly data
+function classifyPart(monthlyQtys, allMonths){
+  const totalMonths=allMonths.length||6;
+  const totalQty=Object.values(monthlyQtys).reduce((s,q)=>s+q,0);
+  const activeMonths=Object.keys(monthlyQtys).filter(m=>monthlyQtys[m]>0).length;
+  const avgMonthly=totalQty/totalMonths;
+  if(totalQty===0) return{class:'dead',avgMonthly:0,totalQty:0,activeMonths:0};
+  if(avgMonthly>=10||activeMonths>=totalMonths*0.8) return{class:'fast',avgMonthly,totalQty,activeMonths};
+  if(avgMonthly>=2||activeMonths>=totalMonths*0.5) return{class:'medium',avgMonthly,totalQty,activeMonths};
+  if(avgMonthly>0) return{class:'slow',avgMonthly,totalQty,activeMonths};
+  return{class:'dead',avgMonthly:0,totalQty:0,activeMonths:0};
+}
+
+function getSalesStatsForPeriod(monthsBack){
+  const meta=S_SALES_META;
+  if(!meta||!meta.months||!meta.months.length) return{};
+
+  // Get last N months from available data
+  const allMonths=[...meta.months].sort();
+  const useMonths=allMonths.slice(-monthsBack);
+
+  const result={};
+  Object.keys(S_SALES_MAP).forEach(pn=>{
+    const monthly=S_SALES_MAP[pn];
+    const filtered={};
+    useMonths.forEach(m=>{ if(monthly[m]) filtered[m]=monthly[m]; });
+    const cls=classifyPart(filtered, useMonths);
+    result[pn]={...cls, months:useMonths, info:S_SALES_INFO[pn]||{}};
+  });
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MOVING PARTS DASHBOARD
+// ═══════════════════════════════════════════════════════════
 async function rMovingParts(){
-  const pg = $('PG');
-  pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading sales data from Google Sheets…</div>';
+  const pg=$('PG');
+  pg.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8;flex-direction:column;gap:12px">
+    <div style="font-size:40px">⏳</div><div style="font-size:14px;font-weight:600">Loading sales data from Google Sheets…</div>
+  </div>`;
 
-  // Always load fresh from sheet
-  await loadSalesFromSheet();
+  await ensureSalesLoaded();
+  renderMovingDashboard();
+}
 
-  const hasData = S_SALES.length > 0;
-  const meta = S_SALES_META;
+function renderMovingDashboard(){
+  const pg=$('PG');
+  const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  const meta=S_SALES_META;
+
+  // Compute stats for 6M and 3M
+  const stats6=hasSales?getSalesStatsForPeriod(6):{};
+  const stats3=hasSales?getSalesStatsForPeriod(3):{};
+
+  const fast6=Object.entries(stats6).filter(([,v])=>v.class==='fast');
+  const med6=Object.entries(stats6).filter(([,v])=>v.class==='medium');
+  const slow6=Object.entries(stats6).filter(([,v])=>v.class==='slow');
+
+  // Compute total sale value
+  let totalSaleVal=0;
+  if(hasSales){
+    Object.entries(stats6).forEach(([pn,v])=>{
+      totalSaleVal+=v.totalQty*(S_SALES_INFO[pn]?.dlc||0);
+    });
+  }
+
+  // Top fast movers for the trending chart
+  const topFast=fast6.sort((a,b)=>b[1].totalQty-a[1].totalQty).slice(0,10);
 
   pg.innerHTML=`
-  <div class="ph"><div class="pt">📈 Moving Parts Analysis</div><div class="ps">Based on actual sales history from Google Sheets</div></div>
+  <div class="ph" style="align-items:center;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="pt">📈 Moving Parts Dashboard</div>
+      <div class="ps">${hasSales?`${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} to ${meta.dateTo}`:'No sales data loaded'}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
+      <button class="btn bgh bsm" onclick="mvUploadCSV()" id="MVUPLBTN">
+        ${hasSales?'🔄 Update CSV':'⬆️ Upload CSV'}
+      </button>
+      <input type="file" id="MVSFILE" accept=".csv,.txt" style="display:none" onchange="mvHandleFile(this)">
+      <button class="btn bgh bsm" onclick="mvDlReport(6)">⬇️ Export 6M</button>
+      <button class="btn bpr bsm" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
 
-  <div class="cd" style="margin-bottom:14px">
-    <div class="cdh"><div class="cdt">📊 Sales Data Status</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn bgh bsm" onclick="$('MCSV').click()">⬆️ Upload / Update CSV</button>
-        ${hasData?`<button class="btn bda bsm" onclick="clearAllSales()">🗑 Clear All</button>`:''}
+  ${!hasSales?`
+  <!-- No data state -->
+  <div class="cd" style="margin-bottom:16px">
+    <div style="text-align:center;padding:60px 20px">
+      <div style="font-size:56px;margin-bottom:16px">📊</div>
+      <div style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:8px">Upload Parts Sale History</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto">
+        Upload the Hero DMS CSV export (Sep 2025 – Mar 2026). Data saves permanently to Google Sheets — upload once, access always.
+      </div>
+      <button class="btn bpr" style="padding:14px 32px;font-size:14px" onclick="mvUploadCSV()">⬆️ Upload Parts Sale CSV</button>
+    </div>
+  </div>
+  `:`
+  <!-- SUMMARY CARDS -->
+  <div class="sg s4" style="margin-bottom:16px">
+    <div class="st" style="border-left:4px solid #059669" onclick="mvShowTab('fast')">
+      <div class="stl">🔥 Fast Moving</div>
+      <div class="stv" style="color:#059669">${fast6.length}</div>
+      <div class="sts">≥2/month avg · High priority</div>
+      <div class="stb"><div class="stbf" style="width:${Math.min(100,fast6.length/10*100)}%;background:#059669"></div></div>
+    </div>
+    <div class="st" style="border-left:4px solid #d97706" onclick="mvShowTab('medium')">
+      <div class="stl">⚡ Medium Moving</div>
+      <div class="stv" style="color:#d97706">${med6.length}</div>
+      <div class="sts">Occasional demand</div>
+      <div class="stb"><div class="stbf" style="width:${Math.min(100,med6.length/10*100)}%;background:#d97706"></div></div>
+    </div>
+    <div class="st" style="border-left:4px solid #dc2626" onclick="mvShowTab('slow')">
+      <div class="stl">🐌 Slow Moving</div>
+      <div class="stv" style="color:#dc2626">${slow6.length}</div>
+      <div class="sts">Review & reduce stock</div>
+      <div class="stb"><div class="stbf" style="width:${Math.min(100,slow6.length/10*100)}%;background:#dc2626"></div></div>
+    </div>
+    <div class="st" style="border-left:4px solid #2563eb">
+      <div class="stl">💰 6M Sale Value</div>
+      <div class="stv" style="color:#2563eb;font-size:20px">₹${(totalSaleVal/100000).toFixed(1)}L</div>
+      <div class="sts">${Object.keys(stats6).length} parts sold in 6M</div>
+    </div>
+  </div>
+
+  <!-- TOP 10 FAST MOVERS CHART -->
+  <div class="cg" style="margin-bottom:16px">
+    <div class="cd" style="grid-column:1/-1">
+      <div class="cdh"><div class="cdt">🔥 Top 10 Fast Movers — 6 Month</div></div>
+      <div style="padding:16px;overflow-x:auto">
+        ${topFast.map(([pn,v])=>{
+          const maxQty=topFast[0]?.[1]?.totalQty||1;
+          const pct=Math.round((v.totalQty/maxQty)*100);
+          const item=findItem(pn);
+          return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;min-width:400px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(pn)}">${esc(pn)}</div>
+            <div style="flex:1;height:22px;background:#f1f5f9;border-radius:4px;overflow:hidden;position:relative">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2563eb,#059669);border-radius:4px;transition:width .5s"></div>
+              <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#0f172a">${fmt(v.totalQty)} units</span>
+            </div>
+            <div style="font-size:10px;color:#64748b;width:70px;text-align:right">${v.avgMonthly.toFixed(1)}/mo</div>
+          </div>`;
+        }).join('')}
       </div>
     </div>
-    <input type="file" id="MCSV" accept=".csv,.txt" style="display:none" onchange="uploadAndSaveSalesCSV(this,'mv')">
-    <div class="cdb">
-      ${hasData && meta ? `
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-          <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:var(--rs);padding:12px;text-align:center">
-            <div style="font-size:22px;font-weight:800;color:#059669">${(meta.totalRecords||0).toLocaleString('en-IN')}</div>
-            <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;margin-top:4px">Total Records</div>
-          </div>
-          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--rs);padding:12px;text-align:center">
-            <div style="font-size:14px;font-weight:700;color:#2563eb">${meta.dateFrom||'—'}</div>
-            <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;margin-top:4px">From Date</div>
-          </div>
-          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--rs);padding:12px;text-align:center">
-            <div style="font-size:14px;font-weight:700;color:#2563eb">${meta.dateTo||'—'}</div>
-            <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;margin-top:4px">To Date</div>
-          </div>
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:#64748b">
-          Batches: ${(meta.batches||[]).map(b=>`<span class="bg bgg">${b.name} (${b.count})</span>`).join(' ')}
-        </div>` :
-        `<div class="al alw">⚠️ No sales data found. Upload Parts Sale CSV from Hero DMS to get started.</div>
-         <div class="dz" style="margin-top:12px;cursor:pointer" onclick="$('MCSV').click()">
-           <div style="font-size:36px">📊</div>
-           <div style="font-weight:700;color:#475569">Upload Parts Sale CSV (Sep 2025 – Mar 2026)</div>
-           <div style="font-size:11px;color:#94a3b8;margin-top:4px">Data will be saved to Google Sheets permanently</div>
-         </div>`}
+  </div>
+
+  <!-- TABS -->
+  <div class="tbr" id="MVTABS" style="margin-bottom:0">
+    <button class="tb2 on" id="MVTAB_all" onclick="mvShowTab('all')">📋 All Parts (${Object.keys(stats6).length})</button>
+    <button class="tb2" id="MVTAB_fast" onclick="mvShowTab('fast')">🔥 Fast (${fast6.length})</button>
+    <button class="tb2" id="MVTAB_medium" onclick="mvShowTab('medium')">⚡ Medium (${med6.length})</button>
+    <button class="tb2" id="MVTAB_slow" onclick="mvShowTab('slow')">🐌 Slow (${slow6.length})</button>
+    <button class="tb2" id="MVTAB_3m" onclick="mvShowTab('3m')">📅 3-Month</button>
+  </div>
+
+  <div class="cd" id="MVTBLCARD">
+    <div class="cdh">
+      <div class="cdt" id="MVTBLTITLE">All Parts — 6 Month Analysis</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="fi" id="MVFILTER" placeholder="Filter…" oninput="mvFilterTable()" style="width:160px;padding:5px 10px;font-size:12px" autocomplete="off" autocapitalize="none">
+        <button class="btn bgh bsm" id="MVEXPORT" onclick="mvDlReport(6)">⬇️ Export</button>
+      </div>
+    </div>
+    <div class="tw" id="MVTBLWRAP">
+      <!-- table rendered by mvShowTab -->
     </div>
   </div>
-  ${hasData ? mvReportHTML() : ''}`;
+  `}`;
+
+  if(hasSales) setTimeout(()=>mvShowTab('all'),100);
 }
 
-async function clearAllSales(){
-  if(!confirm('Delete ALL sales history from Google Sheets?\nThis cannot be undone.')) return;
-  const r = await api({action:'clearSalesData', clearAll:true});
-  if(r.success){ S_SALES=[]; S_SALES_META=null; S_SALES_LOADED=false; toast('Sales data cleared','s'); rMovingParts(); }
-  else toast(r.error||'Failed','d');
+let _mvCurrentStats=null,_mvCurrentFilter='all';
+
+function mvShowTab(filter){
+  _mvCurrentFilter=filter;
+  // Update tab buttons
+  ['all','fast','medium','slow','3m'].forEach(t=>{
+    const btn=$(`MVTAB_${t}`);if(btn){btn.classList.toggle('on',t===filter);}
+  });
+
+  const stats6=getSalesStatsForPeriod(6);
+  const stats3=getSalesStatsForPeriod(3);
+  const use=filter==='3m'?stats3:stats6;
+  const period=filter==='3m'?3:6;
+
+  let entries=Object.entries(use);
+  if(filter==='fast')     entries=entries.filter(([,v])=>v.class==='fast');
+  else if(filter==='medium') entries=entries.filter(([,v])=>v.class==='medium');
+  else if(filter==='slow')   entries=entries.filter(([,v])=>v.class==='slow');
+
+  entries.sort((a,b)=>b[1].avgMonthly-a[1].avgMonthly);
+  _mvCurrentStats=entries;
+
+  const title=$('MVTBLTITLE');
+  if(title){const labels={all:'All Parts',fast:'🔥 Fast Moving',medium:'⚡ Medium Moving',slow:'🐌 Slow Moving','3m':'3-Month'};
+    title.textContent=`${labels[filter]||filter} — ${entries.length} parts · ${period}M analysis`;}
+
+  renderMvTable(entries,period);
 }
 
-function showMovingReport(){ rMovingParts(); }
-
-function mvReportHTML(){
-  const stats6 = computeMovingStats(S_SALES, 6);
-  const stats3 = computeMovingStats(S_SALES, 3);
-  const classify6 = stats6.map(x=>({...x, class:classifyMoving(x.avgMonthly, x.months, 6)}));
-  const classify3 = stats3.map(x=>({...x, class:classifyMoving(x.avgMonthly, x.months, 3)}));
-  const fast6  = classify6.filter(x=>x.class==='fast').sort((a,b)=>b.totalQty-a.totalQty);
-  const med6   = classify6.filter(x=>x.class==='medium').sort((a,b)=>b.totalQty-a.totalQty);
-  const slow6  = classify6.filter(x=>x.class==='slow').sort((a,b)=>a.totalQty-b.totalQty);
-
-  const mvTblRows = (arr) => arr.slice(0,200).map((x,i)=>{
-    const cls=x.class==='fast'?'mv-fast':x.class==='medium'?'mv-med':x.class==='slow'?'mv-slow':'mv-dead';
-    const label=x.class==='fast'?'🔥 Fast':x.class==='medium'?'⚡ Med':x.class==='slow'?'🐌 Slow':'💀 Dead';
-    return`<tr>
-      <td style="font-size:11px;color:#94a3b8">${i+1}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(x.partNo)}</td>
-      <td style="font-size:11px">${esc(tr2(x.desc,30))}</td>
-      <td><span class="mv-badge ${cls}">${label}</span></td>
-      <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(x.totalQty)}</td>
-      <td style="text-align:right;font-size:11px;font-weight:700;color:#059669">₹${fmt(Math.round(x.totalVal))}</td>
-      <td style="text-align:right;font-size:11px">${x.avgMonthly.toFixed(1)}/mo</td>
-      <td><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${Math.min(100,(x.avgMonthly/10)*100)}%;background:${x.class==='fast'?'#059669':x.class==='medium'?'#d97706':'#dc2626'}"></div></div></td>
-    </tr>`;
-  }).join('');
-
-  return`
-  <div class="mv-summary-cards">
-    <div class="mv-sc"><div class="mv-sc-v" style="color:#059669">${fast6.length}</div><div class="mv-sc-l">🔥 Fast Moving</div><div style="font-size:10px;color:#94a3b8">≥5/mo or regular</div></div>
-    <div class="mv-sc"><div class="mv-sc-v" style="color:#d97706">${med6.length}</div><div class="mv-sc-l">⚡ Medium Moving</div><div style="font-size:10px;color:#94a3b8">1–5/month</div></div>
-    <div class="mv-sc"><div class="mv-sc-v" style="color:#dc2626">${slow6.length}</div><div class="mv-sc-l">🐌 Slow Moving</div><div style="font-size:10px;color:#94a3b8">&lt;1/month</div></div>
-    <div class="mv-sc"><div class="mv-sc-v" style="font-size:18px;color:#2563eb">${(classify6.reduce((s,x)=>s+x.totalVal,0)/100000).toFixed(1)}L</div><div class="mv-sc-l">💰 6M Sale Value</div></div>
-  </div>
-
-  <div class="mv-tab-bar" id="MVTABS">
-    <div class="mv-tab on" onclick="mvSetTab('MV6M','MVTABS',this)">6-Month <span class="mv-badge mv-fast">${classify6.length}</span></div>
-    <div class="mv-tab" onclick="mvSetTab('MV3M','MVTABS',this)">3-Month <span class="mv-badge mv-med">${classify3.length}</span></div>
-    <div class="mv-tab" onclick="mvSetTab('MVFAST','MVTABS',this)">🔥 Fast <span class="mv-badge mv-fast">${fast6.length}</span></div>
-    <div class="mv-tab" onclick="mvSetTab('MVSLOW','MVTABS',this)">🐌 Slow <span class="mv-badge mv-slow">${slow6.length}</span></div>
-  </div>
-
-  <div id="MV6M" class="mv-panel">
-    <div class="cd"><div class="cdh"><div class="cdt">📊 6-Month Full Report</div><button class="btn bgh bsm" onclick="dlMovingCSV(6)">⬇️ Export</button></div>
-    <div class="mv-tbl-wrap"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Qty</th><th style="text-align:right">Value</th><th style="text-align:right">Avg/Mo</th><th>Activity</th></tr></thead>
-    <tbody>${mvTblRows(classify6.sort((a,b)=>b.totalQty-a.totalQty))}</tbody></table></div></div>
-  </div>
-  <div id="MV3M" class="mv-panel" style="display:none">
-    <div class="cd"><div class="cdh"><div class="cdt">📊 3-Month Report</div><button class="btn bgh bsm" onclick="dlMovingCSV(3)">⬇️ Export</button></div>
-    <div class="mv-tbl-wrap"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Qty</th><th style="text-align:right">Value</th><th style="text-align:right">Avg/Mo</th><th>Activity</th></tr></thead>
-    <tbody>${mvTblRows(classify3.sort((a,b)=>b.totalQty-a.totalQty))}</tbody></table></div></div>
-  </div>
-  <div id="MVFAST" class="mv-panel" style="display:none">
-    <div class="cd"><div class="cdh"><div class="cdt">🔥 Fast Moving Parts — ${fast6.length} parts</div><button class="btn bgh bsm" onclick="dlMovingCSV('fast')">⬇️ Export</button></div>
-    <div class="mv-tbl-wrap"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Qty</th><th style="text-align:right">Value</th><th style="text-align:right">Avg/Mo</th><th>Activity</th></tr></thead>
-    <tbody>${mvTblRows(fast6)}</tbody></table></div></div>
-  </div>
-  <div id="MVSLOW" class="mv-panel" style="display:none">
-    <div class="cd"><div class="cdh"><div class="cdt">🐌 Slow Moving Parts — ${slow6.length} parts</div><button class="btn bgh bsm" onclick="dlMovingCSV('slow')">⬇️ Export</button></div>
-    <div class="mv-tbl-wrap"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Class</th><th style="text-align:right">Qty</th><th style="text-align:right">Value</th><th style="text-align:right">Avg/Mo</th><th>Activity</th></tr></thead>
-    <tbody>${mvTblRows(slow6)}</tbody></table></div></div>
-  </div>`;
+function mvFilterTable(){
+  const q=($('MVFILTER')?.value||'').toLowerCase().trim();
+  if(!_mvCurrentStats) return;
+  const filtered=q?_mvCurrentStats.filter(([pn,v])=>pn.toLowerCase().includes(q)||(v.info?.desc||'').toLowerCase().includes(q)):_mvCurrentStats;
+  const period=_mvCurrentFilter==='3m'?3:6;
+  renderMvTable(filtered,period);
 }
 
-function mvSetTab(id, tabbar, btn){
-  document.querySelectorAll('.mv-panel').forEach(p=>{p.style.display='none';});
-  const el=$(id); if(el) el.style.display='block';
-  document.querySelectorAll(`#${tabbar} .mv-tab`).forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-}
-
-function dlMovingCSV(filter){
-  let arr;
-  if(filter===6||filter===3){ arr=computeMovingStats(S_SALES,filter).map(x=>({...x,class:classifyMoving(x.avgMonthly,x.months,filter)})); }
-  else {
-    arr=computeMovingStats(S_SALES,6).map(x=>({...x,class:classifyMoving(x.avgMonthly,x.months,6)}));
-    if(filter==='fast') arr=arr.filter(x=>x.class==='fast');
-    if(filter==='slow') arr=arr.filter(x=>x.class==='slow');
+function renderMvTable(entries,period){
+  const wrap=$('MVTBLWRAP');if(!wrap)return;
+  if(!entries.length){
+    wrap.innerHTML='<div class="emp" style="padding:40px"><div class="emp-i">📊</div><div class="emp-t">No parts found</div></div>';
+    return;
   }
-  arr.sort((a,b)=>b.totalQty-a.totalQty);
-  const csv=`Part No,Description,Category,Class,Total Qty,Total Value (₹),Avg/Month,Active Months\n`
-    +arr.map(x=>`"${x.partNo}","${(x.desc||'').replace(/"/g,'""')}","${x.cat||''}","${x.class}",${x.totalQty},${Math.round(x.totalVal)},${x.avgMonthly.toFixed(2)},${x.months}`).join('\n');
-  dlCSV(csv,`moving_parts_${filter}_${today()}.csv`);
+  const clsLabel={fast:'<span class="mv-badge mv-fast">🔥 Fast</span>',medium:'<span class="mv-badge mv-med">⚡ Medium</span>',slow:'<span class="mv-badge mv-slow">🐌 Slow</span>',dead:'<span class="mv-badge mv-dead">💀 Dead</span>'};
+  const clsBg={fast:'',medium:'',slow:'background:#fffbeb',dead:'background:#f8fafc'};
+  const maxQty=entries[0]?.[1]?.avgMonthly||1;
+
+  wrap.innerHTML=`<table>
+    <thead><tr>
+      <th style="width:28px">#</th>
+      <th>Part No</th><th>Description</th><th>Category</th>
+      <th style="text-align:center">Status</th>
+      <th style="text-align:right">Total Qty (${period}M)</th>
+      <th style="text-align:right">Avg/Month</th>
+      <th style="text-align:right">Active Months</th>
+      <th style="text-align:right">Est. Value</th>
+      <th>Trend</th>
+    </tr></thead>
+    <tbody>
+    ${entries.slice(0,300).map(([pn,v],i)=>{
+      const info=v.info||S_SALES_INFO[pn]||{};
+      const dlc=parseFloat(info.dlc)||0;
+      const val=v.totalQty*dlc;
+      const pct=Math.min(100,(v.avgMonthly/maxQty)*100);
+      const item=findItem(pn);
+      const stock=item?parseFloat(item.systemQty)||0:0;
+      return`<tr style="${clsBg[v.class]||''}">
+        <td style="color:#94a3b8;font-size:11px">${i+1}</td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(pn)}</span></td>
+        <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis">${esc(tr2(info.desc||'—',30))}</td>
+        <td style="font-size:10px;color:#64748b">${esc(tr2(info.cat||'',14))}</td>
+        <td style="text-align:center">${clsLabel[v.class]||''}</td>
+        <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(v.totalQty)}</td>
+        <td style="text-align:right;font-size:12px;font-weight:700;color:${v.class==='fast'?'#059669':v.class==='medium'?'#d97706':'#dc2626'}">${v.avgMonthly.toFixed(1)}</td>
+        <td style="text-align:right;font-size:11px">${v.activeMonths}/${period}</td>
+        <td style="text-align:right;font-size:11px;font-weight:700;color:#059669">₹${fmt(Math.round(val))}</td>
+        <td style="min-width:80px"><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${v.class==='fast'?'#059669':v.class==='medium'?'#d97706':'#dc2626'}"></div></div></td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>
+  ${entries.length>300?`<div style="padding:10px 16px;font-size:11px;color:#94a3b8">Showing 300 of ${entries.length}. Use filter to narrow down.</div>`:''}`;
+}
+
+function mvUploadCSV(){
+  $('MVSFILE')?.click();
+}
+
+async function mvHandleFile(input){
+  const f=input.files[0];if(!f)return;
+  input.value='';
+
+  // Show progress modal
+  modal(`<div class="md"><div class="mdh"><div class="mdt">⬆️ Uploading Sales Data</div></div>
+  <div class="mdb" style="text-align:center;padding:30px 20px">
+    <div style="font-size:40px;margin-bottom:12px">⏳</div>
+    <div id="MVPROG" style="font-size:14px;font-weight:600;color:#0f172a">Reading file…</div>
+    <div id="MVPROG2" style="font-size:12px;color:#64748b;margin-top:6px"></div>
+    <div style="margin-top:16px;height:6px;background:#f1f5f9;border-radius:6px;overflow:hidden">
+      <div id="MVPROGBAR" style="height:100%;width:0%;background:linear-gradient(90deg,#2563eb,#059669);border-radius:6px;transition:width .3s"></div>
+    </div>
+  </div></div>`);
+
+  const setProg=(txt,sub,pct)=>{
+    const e=$('MVPROG'),s=$('MVPROG2'),b=$('MVPROGBAR');
+    if(e)e.textContent=txt;if(s)s.textContent=sub||'';
+    if(b)b.style.width=(pct||0)+'%';
+  };
+
+  try{
+    // Read as ArrayBuffer to handle UTF-16
+    const buf=await f.arrayBuffer();
+    setProg('Parsing Hero DMS data…','Decoding CSV columns',20);
+    await new Promise(r=>setTimeout(r,50));
+
+    const parsed=parseHeroDMScsv(buf);
+    if(!parsed.rows.length){
+      closeMd();
+      toast('No valid data found. Check file format.','d',5000);
+      return;
+    }
+
+    setProg(`Found ${parsed.uniqueParts} parts across ${parsed.months.length} months`,'Saving to Google Sheets…',50);
+    await new Promise(r=>setTimeout(r,100));
+
+    // Save to Google Sheets
+    const batch=`${parsed.dateFrom}_to_${parsed.dateTo}`;
+    const r=await api({action:'saveSalesData', rows:parsed.rows, batch});
+    if(!r.success) throw new Error(r.error||'Save failed');
+
+    setProg('Reloading data…','Building analytics…',80);
+    await new Promise(r=>setTimeout(r,100));
+
+    // Reload from sheet
+    S_SALES_LOADED=false;
+    await ensureSalesLoaded();
+
+    setProg('Done!','',100);
+    await new Promise(r=>setTimeout(r,400));
+    closeMd();
+    toast(`✅ ${parsed.rows.length} monthly records saved for ${parsed.uniqueParts} parts`,'s',5000);
+    renderMovingDashboard();
+  }catch(err){
+    closeMd();
+    toast('Upload failed: '+err.message,'d',6000);
+  }
+}
+
+function mvDlReport(period){
+  const stats=getSalesStatsForPeriod(period);
+  const entries=Object.entries(stats).sort((a,b)=>b[1].avgMonthly-a[1].avgMonthly);
+  const clsLabel={fast:'Fast',medium:'Medium',slow:'Slow',dead:'Dead'};
+  const csv=`India Motors — Moving Parts Report · ${period} Month · Generated: ${today()}\nPart No,Description,Category,Status,Total Qty,Avg/Month,Active Months,Est Value (₹)\n`
+    +entries.map(([pn,v])=>{
+      const dlc=parseFloat(v.info?.dlc)||0;
+      return `"${pn}","${(v.info?.desc||'').replace(/"/g,'""')}","${v.info?.cat||''}","${clsLabel[v.class]||v.class}",${v.totalQty},${v.avgMonthly.toFixed(2)},${v.activeMonths},${Math.round(v.totalQty*dlc)}`;
+    }).join('\n');
+  dlCSV(csv,`moving_parts_${period}M_${today()}.csv`);
+  toast(`${entries.length} parts exported`,'s');
 }
 
 // ═══════════════════════════════════════════════════════════
-// ORDER PLANNING — Smart, Budget-Capped, Sales-Driven
+// ORDER PLANNING DASHBOARD — Smart Budget-Capped
 // ═══════════════════════════════════════════════════════════
-let ORDER_PORTAL = []; // optional portal order for comparison
+let ORDER_PORTAL=[];
+let _opPlan=null, _opSkipped=null, _opParams=null;
 
 async function rOrderPlan(){
-  const pg = $('PG');
-  pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
-  await loadSalesFromSheet();
+  const pg=$('PG');
+  pg.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8;flex-direction:column;gap:12px">
+    <div style="font-size:40px">⏳</div><div>Loading…</div>
+  </div>`;
+  await ensureSalesLoaded();
+  renderOrderPlanPage();
+}
 
-  const hasData = S_SALES.length > 0;
-  const meta = S_SALES_META;
-
-  // Populate category checkboxes
-  const cats = [...new Set(S.items.map(i=>i.category||'').filter(Boolean))];
+function renderOrderPlanPage(){
+  const pg=$('PG');
+  const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  const meta=S_SALES_META;
+  const cats=[...new Set(S.items.map(i=>i.category||'').filter(Boolean))];
 
   pg.innerHTML=`
-  <div class="ph"><div class="pt">🛒 Order Planning</div><div class="ps">Smart order based on real sales history · HMCL limit ₹7.25L/month</div></div>
-
-  <!-- Sales Data Status -->
-  <div class="cd" style="margin-bottom:14px">
-    <div class="cdh"><div class="cdt">📊 Sales History</div>
-      <button class="btn bgh bsm" onclick="$('OPCSV').click()">⬆️ Upload / Update CSV</button>
-    </div>
-    <input type="file" id="OPCSV" accept=".csv,.txt" style="display:none" onchange="uploadAndSaveSalesCSV(this,'op')">
-    <div class="cdb">
-      ${hasData && meta ? `<div class="snpc" style="margin:0">
-        ✅ <strong>${(meta.totalRecords||0).toLocaleString()}</strong> sales records loaded · 
-        Period: <strong>${meta.dateFrom||'—'}</strong> to <strong>${meta.dateTo||'—'}</strong> · 
-        Batches: ${(meta.batches||[]).map(b=>`<span class="bg bgg">${esc(b.name)}</span>`).join(' ')}
-      </div>` :
-      `<div class="al alw" style="margin:0">⚠️ No sales data. <a href="#" onclick="$('OPCSV').click();return false">Upload CSV first</a> — data saves permanently to Google Sheets.</div>`}
+  <div class="ph" style="align-items:center;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="pt">🛒 Order Planning</div>
+      <div class="ps">Smart order based on real sales · HMCL budget ₹7.25L/month</div>
     </div>
   </div>
 
-  <!-- Portal Order (Optional) -->
+  <!-- Sales status bar -->
   <div class="cd" style="margin-bottom:14px">
-    <div class="cdh"><div class="cdt">📋 Portal Order (Optional — for comparison)</div>
-      <button class="btn bgh bsm" onclick="$('OPORD').click()">⬆️ Upload Portal CSV</button>
-    </div>
-    <input type="file" id="OPORD" accept=".csv" style="display:none" onchange="loadPortalOrder(this)">
-    <div class="cdb" style="font-size:12px;color:#64748b">
-      ${ORDER_PORTAL.length ? `✅ <strong>${ORDER_PORTAL.length}</strong> portal order lines loaded` :
-        'Format: Part No, Order Qty, Unit Price — CSV with header row'}
+    <div class="cdb" style="padding:12px 18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div>
+          ${hasSales?
+            `<div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#059669"></div>
+              <span style="font-size:13px;font-weight:700;color:#059669">Sales data loaded</span>
+              <span style="font-size:12px;color:#64748b">${meta.totalRows.toLocaleString()} records · ${meta.dateFrom} to ${meta.dateTo} · ${meta.uniqueParts} parts</span>
+            </div>`:
+            `<div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#dc2626"></div>
+              <span style="font-size:13px;font-weight:700;color:#dc2626">No sales data</span>
+              <span style="font-size:12px;color:#64748b">Go to Moving Parts and upload CSV first</span>
+            </div>`
+          }
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn bgh bsm" onclick="go('movingparts')">📈 Upload Sales CSV</button>
+          ${ORDER_PORTAL.length?`<button class="btn bgh bsm" style="color:#059669" onclick="$('OPORD').click()">✅ Portal: ${ORDER_PORTAL.length} lines</button>`:'<button class="btn bgh bsm" onclick="$(&quot;OPORD&quot;).click()">📋 Upload Portal Order</button>'}
+          <input type="file" id="OPORD" accept=".csv" style="display:none" onchange="loadPortalOrder(this)">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3063,272 +3258,315 @@ async function rOrderPlan(){
   <div class="cd" style="margin-bottom:14px">
     <div class="cdh"><div class="cdt">⚙️ Order Parameters</div></div>
     <div class="cdb">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
-        <div class="fl"><label class="fll">Cover Period (weeks)</label><input class="fi" id="OPCOV" type="number" value="4" min="1" max="26"></div>
-        <div class="fl"><label class="fll">Safety Stock (weeks)</label><input class="fi" id="OPSAF" type="number" value="2" min="0" max="12"></div>
-        <div class="fl"><label class="fll">Lead Time (days)</label><input class="fi" id="OPLT" type="number" value="7" min="1" max="30"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:14px">
         <div class="fl">
-          <label class="fll">HMCL Budget Cap (₹)</label>
-          <input class="fi" id="OPBUD" type="number" value="725000" min="0">
+          <label class="fll">📅 Cover Period (weeks)</label>
+          <input class="fi" id="OPCOV" type="number" value="4" min="1" max="26">
+          <div style="font-size:10px;color:#94a3b8;margin-top:3px">How many weeks stock to maintain</div>
+        </div>
+        <div class="fl">
+          <label class="fll">🛡 Safety Stock (weeks)</label>
+          <input class="fi" id="OPSAF" type="number" value="2" min="0" max="12">
+          <div style="font-size:10px;color:#94a3b8;margin-top:3px">Buffer for supply delays</div>
+        </div>
+        <div class="fl">
+          <label class="fll">🚛 Lead Time (days)</label>
+          <input class="fi" id="OPLT" type="number" value="7" min="1" max="30">
+          <div style="font-size:10px;color:#94a3b8;margin-top:3px">Delivery time from HMCL</div>
+        </div>
+        <div class="fl">
+          <label class="fll">💰 HMCL Budget Cap (₹)</label>
+          <input class="fi" id="OPBUD" type="number" value="725000" min="1">
+          <div style="font-size:10px;color:#94a3b8;margin-top:3px">Max ₹7.25L HMCL monthly limit</div>
         </div>
       </div>
-      <div style="margin-top:12px">
-        <label class="fll">Include Categories</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="OPCATS">
-          ${cats.map(c=>`<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:#f8fafc;border:1.5px solid var(--bd);border-radius:7px;padding:5px 10px;transition:.15s" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor=''"><input type="checkbox" checked value="${esc(c)}" style="accent-color:#2563eb"> ${esc(c)}</label>`).join('')}
+      <div style="margin-bottom:12px">
+        <label class="fll" style="margin-bottom:8px;display:block">📦 Include Categories</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="OPCATS">
+          ${cats.map(c=>`<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:#f8fafc;border:1.5px solid var(--bd);border-radius:8px;padding:6px 12px">
+            <input type="checkbox" checked value="${esc(c)}" style="accent-color:#2563eb;width:14px;height:14px"> ${esc(c)}
+          </label>`).join('')}
         </div>
       </div>
-      <div style="margin-top:8px">
-        <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
-          <input type="checkbox" id="OPZERO" style="accent-color:#dc2626"> 
-          <span>Include zero-stock parts with sales history (critical restock)</span>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="OPZERO" style="accent-color:#dc2626;width:14px;height:14px">
+          <span>Include zero-stock parts if they have sales history (critical restock)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="OPMOQ" checked style="accent-color:#2563eb;width:14px;height:14px">
+          <span>Round up to MOQ</span>
         </label>
       </div>
     </div>
   </div>
 
-  <div style="text-align:center;margin-bottom:18px">
-    <button class="btn bpr" style="padding:14px 36px;font-size:15px;border-radius:12px" onclick="genOrderPlan()" ${!hasData?'disabled':''}>
-      🚀 Generate Smart Order Plan
+  <div style="text-align:center;margin-bottom:20px">
+    <button class="btn bpr" style="padding:15px 40px;font-size:15px;border-radius:12px;box-shadow:0 4px 20px rgba(37,99,235,.3)" onclick="genOrderPlan()" ${!hasSales?'disabled title="Upload sales data first"':''}>
+      🚀 Generate Order Plan
     </button>
-    ${!hasData?'<div style="font-size:11px;color:#dc2626;margin-top:6px">Upload sales CSV first</div>':''}
+    ${!hasSales?'<div style="font-size:12px;color:#dc2626;margin-top:8px">⚠️ Upload sales data first from Moving Parts page</div>':''}
   </div>
 
   <div id="OPRESULT"></div>`;
 }
 
 function loadPortalOrder(input){
-  const f = input.files[0]; if(!f) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split(/\r?\n/).filter(Boolean);
-    ORDER_PORTAL = lines.slice(1).map(l=>l.split(',').map(v=>v.trim().replace(/"/g,''))).filter(r=>r[0]).map(r=>({
-      partNo: (r[0]||'').trim().toUpperCase(),
-      orderQty: parseFloat(r[1])||0,
-      unitPrice: parseFloat(r[2])||0
+  const f=input.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split(/\r?\n/).filter(Boolean);
+    ORDER_PORTAL=lines.slice(1).map(l=>l.split(',').map(v=>v.trim().replace(/^"|"$/g,''))).filter(r=>r[0]).map(r=>({
+      partNo:(r[0]||'').trim().toUpperCase(),
+      orderQty:parseFloat(r[1])||0,
+      unitPrice:parseFloat(r[2])||0
     }));
     toast(`✅ ${ORDER_PORTAL.length} portal order lines loaded`,'s');
-    rOrderPlan();
+    renderOrderPlanPage();
   };
   reader.readAsText(f);
 }
 
 function genOrderPlan(){
-  if(!S_SALES.length){ toast('Upload sales data first','w'); return; }
+  if(!S_SALES_META||!S_SALES_META.totalRows){toast('Upload sales data first','w');return;}
 
-  const coverWeeks   = parseFloat($('OPCOV')?.value)||4;
-  const safetyWeeks  = parseFloat($('OPSAF')?.value)||2;
-  const leadDays     = parseFloat($('OPLT')?.value)||7;
-  const budgetCap    = parseFloat($('OPBUD')?.value)||725000;
-  const includeZero  = $('OPZERO')?.checked||false;
+  const coverWeeks  = Math.max(1,parseFloat($('OPCOV')?.value)||4);
+  const safetyWeeks = Math.max(0,parseFloat($('OPSAF')?.value)||2);
+  const leadDays    = Math.max(1,parseFloat($('OPLT')?.value)||7);
+  const budgetCap   = Math.max(1,parseFloat($('OPBUD')?.value)||725000);
+  const inclZero    = $('OPZERO')?.checked||false;
+  const useMonthly  = $('OPMOQ')?.checked!==false;
+  const selCats     = new Set([...(document.querySelectorAll('#OPCATS input:checked')||[])].map(cb=>cb.value));
 
-  const totalMonths  = (coverWeeks + safetyWeeks) / 4.33;
-  const leadMonths   = leadDays / 30;
+  const totalCoverMonths = (coverWeeks+safetyWeeks)/4.33;
+  const leadMonths       = leadDays/30;
 
-  // Selected categories
-  const selCats = new Set([...(document.querySelectorAll('#OPCATS input:checked')||[])].map(cb=>cb.value));
+  // Get 6M sales stats
+  const stats6=getSalesStatsForPeriod(6);
+  const hasPortal=ORDER_PORTAL.length>0;
 
-  // Build sales map from 6-month history
-  const stats6 = computeMovingStats(S_SALES, 6);
-  const salesMap = {}; // partNo → {avgMonthly, totalQty, months}
-  stats6.forEach(x => salesMap[x.partNo] = x);
+  const plan=[];
 
-  // ── KEY RULE: Only plan order if there IS sales history ──
-  // Zero sales in 6 months → DO NOT ORDER (no matter what stock is)
-  const plan = [];
+  S.items.forEach(item=>{
+    if(selCats.size&&!selCats.has(item.category||'')) return;
 
-  S.items.forEach(item => {
-    if(!selCats.has(item.category||'')) return;
+    const pn=item.partNo;
+    const v=stats6[pn];
+    const avgMonthly=v?v.avgMonthly:0;
 
-    const sales = salesMap[item.partNo];
-    const avgMonthly = sales ? sales.avgMonthly : 0;
+    // ★ KEY RULE: If zero sales in 6 months → DO NOT ORDER (no exceptions)
+    if(avgMonthly<=0) return;
 
-    // RULE 1: No sales in 6 months → skip completely
-    if(avgMonthly <= 0) return;
+    const currentStock=Math.max(0,parseFloat(item.systemQty)||0);
+    const dlc=Math.max(0,parseFloat(item.dlc)||parseFloat(item.mrp)||0);
+    const moq=Math.max(1,parseInt(item.moq)||1);
 
-    const currentStock = parseFloat(item.systemQty)||0;
-    const dlc = parseFloat(item.dlc)||parseFloat(item.mrp)||0;
-    const moq = Math.max(1, parseInt(item.moq)||1);
+    // Reorder point = demand during lead time + safety buffer
+    const rop=avgMonthly*(leadMonths+(safetyWeeks/4.33));
+    // Required stock for cover period
+    const required=avgMonthly*totalCoverMonths;
+    // Order qty = required − current stock
+    let qty=required-currentStock;
 
-    // Reorder Point = demand during lead time + safety stock
-    const rop = avgMonthly * (leadMonths + safetyWeeks/4.33);
-
-    // Required qty = demand for cover+safety period − current stock
-    const required = avgMonthly * totalMonths;
-    let suggestQty = Math.max(0, required - currentStock);
-
-    // RULE 2: Zero stock + has sales = Critical (override if includeZero is off)
-    if(currentStock === 0 && !includeZero && suggestQty === 0) suggestQty = moq;
+    // If stock is 0 and inclZero, ensure at least MOQ
+    if(currentStock===0&&inclZero&&qty<moq) qty=moq;
+    if(qty<=0) return;
 
     // Round up to MOQ
-    if(suggestQty > 0 && suggestQty % moq !== 0) suggestQty = Math.ceil(suggestQty / moq) * moq;
-    if(suggestQty <= 0) return; // no order needed
+    if(useMonthly) qty=Math.ceil(qty/moq)*moq;
+    else qty=Math.ceil(qty);
 
-    // Priority
-    let priority = 'medium';
-    if(currentStock === 0) priority = 'critical';
-    else if(currentStock <= rop) priority = 'high';
-
-    // Stock coverage in days
-    const stockDays = avgMonthly > 0 ? Math.round((currentStock / avgMonthly) * 30) : 999;
-
-    // Portal comparison
-    const portal = ORDER_PORTAL.find(o => o.partNo === item.partNo.trim().toUpperCase());
+    const priority=currentStock===0?'critical':currentStock<=rop?'high':'medium';
+    const stockDays=avgMonthly>0?Math.round((currentStock/avgMonthly)*30):999;
+    const portal=hasPortal?ORDER_PORTAL.find(o=>o.partNo===pn.toUpperCase()):null;
 
     plan.push({
-      partNo: item.partNo, desc: item.desc, category: item.category, bin: item.bin,
-      currentStock, avgMonthly, dlc, moq, rop: Math.round(rop*10)/10,
-      suggestQty, portalQty: portal?.orderQty||0, portalPrice: portal?.unitPrice||0,
-      totalCost: suggestQty * dlc, priority, stockDays,
-      salesMonths: sales?.months||0, totalSales6M: sales?.totalQty||0
+      partNo:pn, desc:item.desc||'', cat:item.category||'', bin:item.bin||'',
+      currentStock, avgMonthly, rop:Math.round(rop*10)/10,
+      dlc, moq, qty, totalCost:qty*dlc,
+      priority, stockDays,
+      salesTotal:v.totalQty, salesMonths:v.activeMonths,
+      portalQty:portal?.orderQty||0,
+      reduced:false
     });
   });
 
-  // Sort: critical → high → medium, then by avg monthly desc
-  const pO = {critical:0, high:1, medium:2};
-  plan.sort((a,b) => (pO[a.priority]-pO[b.priority]) || (b.avgMonthly-a.avgMonthly));
+  // Sort: critical → high → medium, then by avgMonthly desc
+  const pRank={critical:0,high:1,medium:2};
+  plan.sort((a,b)=>(pRank[a.priority]-pRank[b.priority])||b.avgMonthly-a.avgMonthly);
 
-  // ── BUDGET CAP — Greedy fill by priority ──
-  let budgetUsed = 0;
-  let budgetHit = false;
-  const finalPlan = [];
-  const skipped = [];
+  // ★ Budget cap — greedy allocation with partial fill
+  let budgetUsed=0;
+  const finalPlan=[];
+  const skipped=[];
 
   for(const item of plan){
-    if(budgetUsed + item.totalCost <= budgetCap){
-      finalPlan.push({...item, withinBudget: true});
-      budgetUsed += item.totalCost;
-    } else {
-      // Try to fit with reduced qty (fill remaining budget)
-      const remaining = budgetCap - budgetUsed;
-      if(remaining > item.dlc && item.dlc > 0){
-        const reducedQty = Math.floor(remaining / item.dlc / item.moq) * item.moq;
-        if(reducedQty > 0){
-          finalPlan.push({...item, suggestQty: reducedQty, totalCost: reducedQty*item.dlc, withinBudget:true, reduced:true});
-          budgetUsed += reducedQty * item.dlc;
-        } else {
-          skipped.push(item); budgetHit = true;
-        }
+    const remaining=budgetCap-budgetUsed;
+    if(item.totalCost<=remaining){
+      finalPlan.push({...item,budgetOk:true});
+      budgetUsed+=item.totalCost;
+    } else if(remaining>=item.dlc&&item.dlc>0){
+      // Partial — fit as many MOQ blocks as budget allows
+      const maxQty=Math.floor(remaining/item.dlc/item.moq)*item.moq;
+      if(maxQty>0){
+        finalPlan.push({...item,qty:maxQty,totalCost:maxQty*item.dlc,budgetOk:true,reduced:true});
+        budgetUsed+=maxQty*item.dlc;
       } else {
-        skipped.push(item); budgetHit = true;
+        skipped.push(item);
       }
+    } else {
+      skipped.push(item);
     }
   }
 
-  const critCount = finalPlan.filter(x=>x.priority==='critical').length;
-  const highCount = finalPlan.filter(x=>x.priority==='high').length;
-  const medCount  = finalPlan.filter(x=>x.priority==='medium').length;
-  const hasPortal = ORDER_PORTAL.length > 0;
+  _opPlan=finalPlan; _opSkipped=skipped;
+  _opParams={coverWeeks,safetyWeeks,leadDays,budgetCap,hasPortal};
 
-  const prLabel = {critical:'🚨 Critical',high:'⚠️ High',medium:'✅ Order'};
-  const prStyle = {critical:'color:#dc2626;font-weight:800',high:'color:#d97706;font-weight:700',medium:'color:#059669;font-weight:600'};
-  const prRowBg = {critical:'#fff1f2',high:'#fffbeb',medium:'#f0fdf4'};
+  renderOrderPlanResult(finalPlan,skipped,budgetUsed,budgetCap,hasPortal);
+}
 
-  const tblRows = (arr) => arr.map((x,i)=>{
-    const diff = hasPortal && x.portalQty ? x.portalQty - x.suggestQty : null;
-    const sdCls = x.stockDays<14?'color:#dc2626;font-weight:800':x.stockDays<30?'color:#d97706;font-weight:700':'color:#059669';
-    return`<tr style="background:${prRowBg[x.priority]}">
-      <td style="font-size:10px;color:#94a3b8">${i+1}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(x.partNo)}</td>
-      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis">${esc(tr2(x.desc,26))}</td>
-      <td><span class="bg bgp" style="font-size:9px">${esc(x.bin||'—')}</span></td>
+function renderOrderPlanResult(plan,skipped,budgetUsed,budgetCap,hasPortal){
+  const res=$('OPRESULT');if(!res)return;
+  const crit=plan.filter(x=>x.priority==='critical').length;
+  const high=plan.filter(x=>x.priority==='high').length;
+  const med=plan.filter(x=>x.priority==='medium').length;
+  const budgetPct=Math.min(100,(budgetUsed/budgetCap)*100);
+  const budgetColor=budgetPct>90?'#dc2626':budgetPct>70?'#d97706':'#059669';
+
+  const prLbl={critical:'🚨 Critical',high:'⚠️ High',medium:'✅ Order'};
+  const prCls={critical:'color:#dc2626;font-weight:800',high:'color:#d97706;font-weight:700',medium:'color:#059669;font-weight:600'};
+  const prBg={critical:'#fff1f2',high:'#fffbeb',medium:'#f0fdf4'};
+
+  const tblBody=plan.map((x,i)=>{
+    const diff=hasPortal&&x.portalQty?x.portalQty-x.qty:null;
+    const sdCls=x.stockDays<7?'color:#dc2626;font-weight:800':x.stockDays<21?'color:#d97706;font-weight:700':'color:#059669';
+    return`<tr style="background:${prBg[x.priority]||''}">
+      <td style="color:#94a3b8;font-size:11px">${i+1}</td>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(x.partNo)}</span></td>
+      <td style="font-size:11px;max-width:160px">${esc(tr2(x.desc,25))}</td>
+      <td style="font-size:10px"><span class="bg bgp" style="font-size:9px">${esc(x.bin||'—')}</span></td>
       <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(x.currentStock)}</td>
-      <td style="text-align:right;font-size:11px;${sdCls}">${x.stockDays===999?'∞':x.stockDays+'d'}</td>
+      <td style="text-align:right;font-size:11px;${sdCls}">${x.stockDays>=999?'∞':x.stockDays+'d'}</td>
       <td style="text-align:right;font-size:11px">${x.avgMonthly.toFixed(1)}</td>
-      <td style="text-align:right">${x.reduced?`<span class="op-qty-box" style="background:#fffbeb;border-color:#fde68a;color:#d97706" title="Reduced due to budget">${x.suggestQty}⚡</span>`:`<span class="op-qty-box">${x.suggestQty}</span>`}</td>
-      ${hasPortal?`<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${x.portalQty||'—'}</td>
-      <td style="text-align:right;font-weight:700;color:${diff===null?'#94a3b8':diff>0?'#059669':'#dc2626'}">${diff!==null&&x.portalQty?(diff>0?'+':'')+diff:'—'}</td>`:''}
+      <td style="text-align:right">
+        ${x.reduced?
+          `<span style="display:inline-block;background:#fffbeb;border:1.5px solid #fde68a;color:#d97706;border-radius:6px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px" title="Reduced due to budget cap">${x.qty}⚡</span>`:
+          `<span style="display:inline-block;background:#eff6ff;border:1.5px solid #bfdbfe;color:#2563eb;border-radius:6px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px">${x.qty}</span>`}
+      </td>
+      ${hasPortal?`
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${x.portalQty||'—'}</td>
+      <td style="text-align:right;font-weight:700;color:${diff===null?'#94a3b8':diff>0?'#059669':diff<0?'#dc2626':'#94a3b8'}">${diff!==null&&x.portalQty?(diff>0?'+':'')+diff:'—'}</td>`:''}
       <td style="text-align:right;font-size:11px">₹${fmt(x.dlc)}</td>
       <td style="text-align:right;font-size:11px;font-weight:700">₹${fmt(Math.round(x.totalCost))}</td>
-      <td><span style="${prStyle[x.priority]}">${prLabel[x.priority]}</span></td>
+      <td><span style="${prCls[x.priority]}">${prLbl[x.priority]}</span></td>
     </tr>`;
   }).join('');
 
-  const res = $('OPRESULT'); if(!res) return;
-  window._orderPlan = finalPlan; window._skippedPlan = skipped;
-  window._orderParams = {coverWeeks,safetyWeeks,leadDays,budgetCap,hasPortal};
-
   res.innerHTML=`
-  <!-- Summary Cards -->
-  <div class="mv-summary-cards" style="margin-bottom:16px">
-    <div class="mv-sc"><div class="mv-sc-v" style="color:#dc2626">${critCount}</div><div class="mv-sc-l">🚨 Critical</div><div style="font-size:10px;color:#94a3b8">Zero stock + has sales</div></div>
-    <div class="mv-sc"><div class="mv-sc-v" style="color:#d97706">${highCount}</div><div class="mv-sc-l">⚠️ High Priority</div><div style="font-size:10px;color:#94a3b8">Below reorder point</div></div>
-    <div class="mv-sc"><div class="mv-sc-v" style="color:#059669">${medCount}</div><div class="mv-sc-l">✅ Medium</div><div style="font-size:10px;color:#94a3b8">Cover stock needed</div></div>
-    <div class="mv-sc">
-      <div class="mv-sc-v" style="color:#2563eb;font-size:18px">₹${(budgetUsed/100000).toFixed(2)}L</div>
-      <div class="mv-sc-l">💰 Order Value</div>
-      <div style="font-size:10px;color:${budgetHit?'#dc2626':'#94a3b8'}">of ₹${(budgetCap/100000).toFixed(2)}L cap${budgetHit?' ⚠️ capped':' ✅'}</div>
+  <!-- KPI Cards -->
+  <div class="sg s4" style="margin-bottom:16px">
+    <div class="st" style="border-left:4px solid #dc2626">
+      <div class="stl">🚨 Critical</div>
+      <div class="stv" style="color:#dc2626">${crit}</div>
+      <div class="sts">Zero stock + has sales</div>
+    </div>
+    <div class="st" style="border-left:4px solid #d97706">
+      <div class="stl">⚠️ High Priority</div>
+      <div class="stv" style="color:#d97706">${high}</div>
+      <div class="sts">Below reorder point</div>
+    </div>
+    <div class="st" style="border-left:4px solid #059669">
+      <div class="stl">✅ Medium</div>
+      <div class="stv" style="color:#059669">${med}</div>
+      <div class="sts">Replenishment needed</div>
+    </div>
+    <div class="st" style="border-left:4px solid #2563eb">
+      <div class="stl">💰 Order Value</div>
+      <div class="stv" style="color:#2563eb;font-size:18px">₹${(budgetUsed/100000).toFixed(2)}L</div>
+      <div class="sts">of ₹${(budgetCap/100000).toFixed(2)}L cap</div>
     </div>
   </div>
 
-  <!-- Budget bar -->
-  <div class="cd" style="margin-bottom:14px">
-    <div class="cdb" style="padding:12px 18px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;font-weight:700">
-        <span>Budget Used: ₹${fmt(Math.round(budgetUsed))}</span>
-        <span style="color:#64748b">Cap: ₹${fmt(budgetCap)}</span>
+  <!-- Budget Bar -->
+  <div class="cd" style="margin-bottom:16px">
+    <div class="cdb" style="padding:14px 18px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;font-weight:700">
+        <span>💰 Budget Used: <span style="color:${budgetColor}">₹${fmt(Math.round(budgetUsed))}</span></span>
+        <span style="color:#64748b">Cap: ₹${fmt(budgetCap)} &nbsp;|&nbsp; Remaining: ₹${fmt(Math.round(budgetCap-budgetUsed))}</span>
       </div>
-      <div style="height:10px;background:#f1f5f9;border-radius:10px;overflow:hidden">
-        <div style="height:100%;border-radius:10px;width:${Math.min(100,(budgetUsed/budgetCap)*100)}%;background:${budgetUsed/budgetCap>0.9?'#dc2626':budgetUsed/budgetCap>0.7?'#d97706':'#059669'};transition:width .5s"></div>
+      <div style="height:12px;background:#f1f5f9;border-radius:12px;overflow:hidden">
+        <div style="height:100%;width:${budgetPct.toFixed(1)}%;background:${budgetColor};border-radius:12px;transition:width .6s;position:relative">
+        </div>
       </div>
-      ${budgetHit?`<div style="margin-top:8px;font-size:11px;color:#dc2626;font-weight:600">⚠️ Budget cap reached — ${skipped.length} parts skipped. Increase budget or split into 2 orders.</div>`:''}
-      <div style="margin-top:8px;font-size:11px;color:#64748b">
-        📌 Rule: Parts with <strong>zero 6-month sales → NOT included</strong> even if stock is low. Order based on actual consumption only.
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#94a3b8">
+        <span>₹0</span><span>₹${(budgetCap/2/100000).toFixed(2)}L</span><span>₹${(budgetCap/100000).toFixed(2)}L</span>
+      </div>
+      <div style="margin-top:10px;padding:10px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1e40af">
+        📌 <strong>Rule Applied:</strong> Parts with zero sales in last 6 months are excluded — order is based purely on consumption history.
+        ${skipped.length?`<br>⚡ ${skipped.length} parts skipped due to budget limit — plan for next month's order.`:''}
       </div>
     </div>
   </div>
 
   <!-- Main Order Table -->
   <div class="cd" style="margin-bottom:14px">
-    <div class="cdh"><div class="cdt">📋 Final Order Plan — ${finalPlan.length} parts</div>
+    <div class="cdh">
+      <div class="cdt">📋 Order Plan — ${plan.length} Parts</div>
       <div style="display:flex;gap:8px">
-        <button class="btn bgh bsm" onclick="dlOrderPlan()">⬇️ Export CSV</button>
+        <button class="btn bgh bsm" onclick="opDlPlan()">⬇️ Export CSV</button>
         <button class="btn bpr bsm" onclick="window.print()">🖨️ Print</button>
       </div>
     </div>
-    <div style="padding:6px 16px;background:#f8fafc;border-bottom:1px solid var(--bd);font-size:11px;color:#64748b">
-      Cover ${coverWeeks}W + Safety ${safetyWeeks}W · Lead ${leadDays} days · Budget ₹${(budgetCap/100000).toFixed(2)}L
+    <div style="padding:8px 16px;background:#f8fafc;border-bottom:1px solid var(--bd);font-size:11px;color:#64748b">
+      Parameters: Cover ${_opParams.coverWeeks}W + Safety ${_opParams.safetyWeeks}W · Lead ${_opParams.leadDays}d · Budget ₹${(_opParams.budgetCap/100000).toFixed(2)}L
+      ${hasPortal?` · <span style="color:#059669;font-weight:700">Portal order loaded (${ORDER_PORTAL.length} lines)</span>`:''}
     </div>
-    <div class="mv-tbl-wrap"><table>
+    <div class="tw"><table>
       <thead><tr>
         <th>#</th><th>Part No</th><th>Description</th><th>Bin</th>
-        <th style="text-align:right">Stock</th><th style="text-align:right">Cover</th><th style="text-align:right">Avg/Mo</th>
+        <th style="text-align:right">Stock</th>
+        <th style="text-align:right">Cover</th>
+        <th style="text-align:right">Avg/Mo</th>
         <th style="text-align:right">Order Qty</th>
         ${hasPortal?'<th style="text-align:right">Portal</th><th style="text-align:right">Diff</th>':''}
-        <th style="text-align:right">DLC ₹</th><th style="text-align:right">Est Cost</th><th>Priority</th>
+        <th style="text-align:right">DLC ₹</th>
+        <th style="text-align:right">Est. Cost</th>
+        <th>Priority</th>
       </tr></thead>
-      <tbody>${tblRows(finalPlan)}</tbody>
+      <tbody>${tblBody}</tbody>
       <tfoot><tr style="background:#f0f4f8;font-weight:800">
-        <td colspan="${hasPortal?10:8}" style="text-align:right;padding:10px 12px">Total Order Value:</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:#2563eb;font-size:14px">₹${fmt(Math.round(budgetUsed))}</td>
+        <td colspan="${hasPortal?10:8}" style="text-align:right;padding:12px 14px;font-size:13px">Total Order Value:</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:#2563eb;font-size:15px">₹${fmt(Math.round(budgetUsed))}</td>
         <td></td>
       </tr></tfoot>
     </table></div>
   </div>
 
-  <!-- Skipped due to budget -->
+  <!-- Skipped Table -->
   ${skipped.length?`
   <div class="cd">
-    <div class="cdh"><div class="cdt">⏭ Skipped — Budget Limit Reached (${skipped.length} parts)</div>
-      <button class="btn bgh bsm" onclick="dlSkipped()">⬇️ Export Skipped</button>
+    <div class="cdh">
+      <div class="cdt" style="color:#dc2626">⏭ Budget Limit — ${skipped.length} Parts Deferred</div>
+      <button class="btn bda bsm" onclick="opDlSkipped()">⬇️ Export Deferred</button>
     </div>
-    <div style="padding:8px 16px;background:#fef2f2;border-bottom:1px solid #fecaca;font-size:11px;color:#dc2626;font-weight:600">
-      These parts need ordering but budget is exhausted. Plan for next month's order.
+    <div style="padding:8px 16px;background:#fef2f2;border-bottom:1px solid #fecaca;font-size:12px;color:#dc2626;font-weight:600">
+      These parts need ordering but budget of ₹${(budgetCap/100000).toFixed(2)}L is exhausted. Plan for next month.
+      Total deferred value: ₹${fmt(Math.round(skipped.reduce((s,x)=>s+x.totalCost,0)))}
     </div>
-    <div class="mv-tbl-wrap"><table>
-      <thead><tr><th>#</th><th>Part No</th><th>Description</th><th style="text-align:right">Stock</th><th style="text-align:right">Avg/Mo</th><th style="text-align:right">Need Qty</th><th style="text-align:right">Est Cost</th><th>Priority</th></tr></thead>
-      <tbody>${skipped.map((x,i)=>`<tr style="background:${i%2?'#fff':'#fef9f9'}">
-        <td style="font-size:10px;color:#94a3b8">${i+1}</td>
-        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#dc2626">${esc(x.partNo)}</td>
-        <td style="font-size:11px">${esc(tr2(x.desc,28))}</td>
+    <div class="tw"><table>
+      <thead><tr><th>#</th><th>Part No</th><th>Description</th><th style="text-align:right">Stock</th><th style="text-align:right">Avg/Mo</th><th style="text-align:right">Need Qty</th><th style="text-align:right">Est. Cost</th><th>Priority</th></tr></thead>
+      <tbody>${skipped.map((x,i)=>`<tr>
+        <td style="color:#94a3b8;font-size:11px">${i+1}</td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#dc2626">${esc(x.partNo)}</span></td>
+        <td style="font-size:11px">${esc(tr2(x.desc,26))}</td>
         <td style="text-align:right;font-weight:700">${fmt(x.currentStock)}</td>
         <td style="text-align:right;font-size:11px">${x.avgMonthly.toFixed(1)}</td>
-        <td style="text-align:right"><span class="op-qty-box" style="background:#fef2f2;border-color:#fecaca;color:#dc2626">${x.suggestQty}</span></td>
+        <td style="text-align:right"><span style="display:inline-block;background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;border-radius:6px;padding:2px 8px;font-weight:800;font-family:'JetBrains Mono',monospace">${x.qty}</span></td>
         <td style="text-align:right;font-size:11px;font-weight:700">₹${fmt(Math.round(x.totalCost))}</td>
-        <td><span style="${prStyle[x.priority]}">${prLabel[x.priority]}</span></td>
+        <td><span style="${prCls[x.priority]}">${prLbl[x.priority]}</span></td>
       </tr>`).join('')}
       <tfoot><tr style="background:#fef2f2;font-weight:800">
-        <td colspan="6" style="text-align:right">Skipped Total:</td>
+        <td colspan="6" style="text-align:right;padding:10px 14px">Deferred Total:</td>
         <td style="text-align:right;color:#dc2626">₹${fmt(Math.round(skipped.reduce((s,x)=>s+x.totalCost,0)))}</td><td></td>
       </tr></tfoot>
       </tbody>
@@ -3336,20 +3574,22 @@ function genOrderPlan(){
   </div>`:''} `;
 }
 
-function dlOrderPlan(){
-  const plan = window._orderPlan||[];
-  const p = window._orderParams||{};
-  const csv=`India Motors — Order Plan · Generated: ${today()} · Cover:${p.coverWeeks}W Safety:${p.safetyWeeks}W Lead:${p.leadDays}d Budget:₹${p.budgetCap}\n`
-    +`Part No,Description,Category,Bin,Current Stock,Stock Days,Avg/Month (6M),Suggest Qty,${p.hasPortal?'Portal Qty,Diff,':''}DLC Rate (₹),Est Cost (₹),Priority\n`
-    +plan.map(x=>`"${x.partNo}","${(x.desc||'').replace(/"/g,'""')}","${x.category||''}","${x.bin||''}",${x.currentStock},${x.stockDays===999?999:x.stockDays},${x.avgMonthly.toFixed(2)},${x.suggestQty},${p.hasPortal?(x.portalQty||0)+','+(x.portalQty-x.suggestQty)+',':''}${x.dlc},${Math.round(x.totalCost)},"${x.priority}"`).join('\n');
+function opDlPlan(){
+  if(!_opPlan) return;
+  const p=_opParams||{};
+  const csv=`India Motors — Smart Order Plan\nGenerated: ${today()} | Cover: ${p.coverWeeks}W | Safety: ${p.safetyWeeks}W | Lead: ${p.leadDays}d | Budget: ₹${p.budgetCap}\n`
+    +`Part No,Description,Category,Bin,Current Stock,Stock Cover(days),Avg/Month(6M),Order Qty,${p.hasPortal?'Portal Qty,Diff,':''}DLC Rate,Est Cost,Priority\n`
+    +_opPlan.map(x=>`"${x.partNo}","${(x.desc||'').replace(/"/g,'""')}","${x.cat||''}","${x.bin||''}",${x.currentStock},${x.stockDays>=999?999:x.stockDays},${x.avgMonthly.toFixed(2)},${x.qty},${p.hasPortal?(x.portalQty||0)+','+(x.portalQty-x.qty)+',':''}${x.dlc},${Math.round(x.totalCost)},"${x.priority}"`).join('\n');
   dlCSV(csv,`order_plan_${today()}.csv`);
+  toast(`${_opPlan.length} parts exported`,'s');
 }
 
-function dlSkipped(){
-  const plan = window._skippedPlan||[];
-  const csv=`Part No,Description,Category,Bin,Current Stock,Avg/Month,Need Qty,Est Cost,Priority\n`
-    +plan.map(x=>`"${x.partNo}","${(x.desc||'').replace(/"/g,'""')}","${x.category||''}","${x.bin||''}",${x.currentStock},${x.avgMonthly.toFixed(2)},${x.suggestQty},${Math.round(x.totalCost)},"${x.priority}"`).join('\n');
-  dlCSV(csv,`skipped_parts_${today()}.csv`);
+function opDlSkipped(){
+  if(!_opSkipped||!_opSkipped.length) return;
+  const csv=`Part No,Description,Category,Current Stock,Avg/Month,Need Qty,Est Cost,Priority\n`
+    +_opSkipped.map(x=>`"${x.partNo}","${(x.desc||'').replace(/"/g,'""')}","${x.cat||''}",${x.currentStock},${x.avgMonthly.toFixed(2)},${x.qty},${Math.round(x.totalCost)},"${x.priority}"`).join('\n');
+  dlCSV(csv,`deferred_order_${today()}.csv`);
+  toast(`${_opSkipped.length} deferred parts exported`,'s');
 }
 
 
