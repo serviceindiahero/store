@@ -768,6 +768,7 @@ function buildNav(){
             {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Order Planning',i:'🛒',p:'orderplan'},{sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},
             {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
           :[{l:'Item Master',i:'🗃️',p:'itemmaster'}])
+  ];
   nav.innerHTML=ls.map(l=>l.sec?`<div class="ns">${l.sec}</div>`
     :`<div class="ni" data-p="${l.p}" onclick="go('${l.p}')"><span class="ic">${l.i}</span>${l.l}</div>`).join('');
 }
