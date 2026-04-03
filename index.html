@@ -621,15 +621,20 @@ const greet=()=>{const h=new Date().getHours();return h<12?'Good Morning':h<17?'
 // ═══════════════════════════════════════════════════════════
 async function callAPI(data) {
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(()=>controller.abort(), 15000); // 15 sec max
     const r = await fetch(API, {
       method: 'POST',
       redirect: 'follow',
+      signal: controller.signal,
       body: JSON.stringify(data)
     });
+    clearTimeout(timer);
     const txt = await r.text();
     try { return JSON.parse(txt); }
     catch(e) { return {success:false, error:'Bad JSON: '+txt.slice(0,120)}; }
   } catch(e) {
+    if(e.name==='AbortError') return {success:false, error:'Server timeout (>15s). Check API URL in Settings.'};
     return {success:false, error:e.message};
   }
 }
@@ -739,7 +744,8 @@ async function bootApp(){
   $('APP').classList.add('on');
   setUserUI();buildNav();syncUI();
   logTrail('LOGIN',S.user?.username||'','','','','Login successful');
-  await Promise.all([syncItems(),syncBins(),loadAuditSess()]);
+  // ★ FIX: use allSettled so one failing sync doesn't block the whole app from loading
+  await Promise.allSettled([syncItems(),syncBins(),loadAuditSess()]);
   // Set initial history state
   history.replaceState({page:'dashboard'}, '', '#dashboard');
   go('dashboard');
@@ -786,19 +792,36 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
-function go(p, fromPopState){
+async function go(p, fromPopState){
   if(!S.user)return;
   if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','orderplan','qrgen','audittrail','invanalysis'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
   stopCam();closeSB();setNav(p);
+  S.page=p; // ★ FIX: track current page so wedge focus and other page checks work
   // Push to browser history so back button works
   if(!fromPopState){
     history.pushState({page:p}, '', '#'+p);
   }
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
-  ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
+  const fn=({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
     variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,foc:rFOC,
     movingparts:rMovingParts,orderplan:rOrderPlan,qrgen:rQRGen,audittrail:rAuditTrail,invanalysis:rInvAnalysis,
-    itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF)();
+    itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF);
+  // ★ FIX: wrap in try/catch so any API error never leaves the page stuck on "Loading…"
+  try {
+    await fn();
+  } catch(err) {
+    console.error('Page render error ['+p+']:', err);
+    $('PG').innerHTML=`<div class="emp">
+      <div class="emp-i">⚠️</div>
+      <div class="emp-t">Could not load this section</div>
+      <div class="emp-s" style="color:#dc2626;font-size:12px;margin-top:6px">${esc(err.message||'Unknown error')}</div>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
+        <button class="btn bpr bsm" onclick="go('${p}')">🔄 Retry</button>
+        <button class="btn bgh bsm" onclick="go('dashboard')">🏠 Dashboard</button>
+      </div>
+    </div>`;
+    toast('Error loading page — check API connection','d',5000);
+  }
 }
 function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
 
@@ -1083,11 +1106,28 @@ function onQR(raw){
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════
 async function rDash(){
-  const[sr,counts,allCounts]=await Promise.all([
-    api({action:'getStats'}),
-    fetchCounts(today(),S.user.role==='master_auditor'?null:S.user.username),
-    fetchCounts() // all counts for financial calc
-  ]);
+  let sr={stats:{}},counts=[],allCounts=[];
+  try {
+    // ★ FIX: fetch stats and counts together but only ONE getCounts call
+    const [statsResult, countsResult] = await Promise.allSettled([
+      api({action:'getStats'}),
+      fetchCounts() // fetches ALL counts, sets S.allCounts and S.counts
+    ]);
+    if(statsResult.status==='fulfilled') sr=statsResult.value;
+    if(countsResult.status==='fulfilled') {
+      // S.allCounts and S.counts are now set by fetchCounts()
+      allCounts = S.allCounts || [];
+      // filter today's counts for the right user
+      const todayStr = today();
+      const isMaster = S.user.role==='master_auditor';
+      counts = allCounts.filter(c=>c.date===todayStr && (isMaster||c.auditor===S.user.username));
+    }
+  } catch(e) {
+    // silent — render with whatever we have (cached data)
+    console.warn('rDash partial error:', e);
+    allCounts = S.allCounts || S.counts || [];
+    counts = (S.counts||[]);
+  }
   const st=sr.stats||{};
   // Compute DLC-based financial summary from ALL counts vs items
   const allMap={};
@@ -2611,7 +2651,7 @@ let QRGenData={filter:'',page:1,sz:120,items:[]};
 
 // ── HMCL QR FORMAT BUILDER ──────────────────────────────────
 // Official format: D/DEALER/BATCH/PARTNO/QTY(6d)/PRICE(10.2f)/PLANT/SEQ/G/000/00
-const HMCL_DEALER = '12172'; // India Motors dealer code — update to your actual HMCL dealer code
+const HMCL_DEALER = 'INDMTR0000000000'; // India Motors dealer code — update to your actual HMCL dealer code
 const HMCL_PLANT  = 'AAG';              // Default HMCL plant code
 
 function buildHMCLqr(item, qty){
@@ -2800,13 +2840,19 @@ let S_SALES_LOADED = false;
 
 async function ensureSalesLoaded(){
   if(S_SALES_LOADED) return true;
-  if(!S.online){ toast('Offline — cannot load sales data','w'); return false; }
-  const r = await api({action:'getSalesData'});
-  if(!r.success){ toast('Failed to load sales data: '+(r.error||''),'d'); return false; }
-  buildSalesMap(r.rows||[]);
-  S_SALES_META = r.meta;
-  S_SALES_LOADED = true;
-  return true;
+  if(!S.online) return false; // offline — just return false, page renders without sales data
+  try {
+    const r = await api({action:'getSalesData'});
+    if(r.success){
+      buildSalesMap(r.rows||[]);
+      S_SALES_META = r.meta;
+      S_SALES_LOADED = true;
+      return true;
+    }
+    return false;
+  } catch(e) {
+    return false; // network error — page still renders without sales data
+  }
 }
 
 function buildSalesMap(rows){
@@ -2931,12 +2977,13 @@ function getSalesStatsForPeriod(monthsBack){
 // ═══════════════════════════════════════════════════════════
 async function rMovingParts(){
   const pg=$('PG');
-  pg.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8;flex-direction:column;gap:12px">
-    <div style="font-size:40px">⏳</div><div style="font-size:14px;font-weight:600">Loading sales data from Google Sheets…</div>
-  </div>`;
-
-  await ensureSalesLoaded();
+  // Render page immediately — don't wait for API
   renderMovingDashboard();
+  // If sales not yet loaded, load in background and refresh
+  if(!S_SALES_LOADED){
+    const ok=await ensureSalesLoaded();
+    if(ok) renderMovingDashboard(); // re-render with real data
+  }
 }
 
 function renderMovingDashboard(){
@@ -3245,11 +3292,13 @@ let _opPlan=null, _opSkipped=null, _opParams=null;
 
 async function rOrderPlan(){
   const pg=$('PG');
-  pg.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8;flex-direction:column;gap:12px">
-    <div style="font-size:40px">⏳</div><div>Loading…</div>
-  </div>`;
-  await ensureSalesLoaded();
+  // Render immediately — don't wait for API
   renderOrderPlanPage();
+  // Load sales in background if needed
+  if(!S_SALES_LOADED){
+    const ok=await ensureSalesLoaded();
+    if(ok) renderOrderPlanPage(); // refresh with real data
+  }
 }
 
 function renderOrderPlanPage(){
@@ -3857,6 +3906,318 @@ function dlTrail(){
     +trail.map(t=>`"${t.date||''}","${(t.time||'').slice(0,5)}","${t.userName||t.user||''}","${t.action}","${t.partNo||''}","${(t.desc||'').replace(/"/g,'""')}","${String(t.oldVal||'').replace(/"/g,'""')}","${String(t.newVal||'').replace(/"/g,'""')}","${t.resolved?'Resolved':t.flagged?'Flagged':'Normal'}","${(t.extra||t.resolvedNote||'').replace(/"/g,'""')}"`).join('\n');
   dlCSV(csv,`audit_trail_${today()}.csv`);
   toast(`${trail.length} entries exported`,'s');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FULL INVENTORY ANALYSIS — ALL DMS items vs Sales History
+// ═══════════════════════════════════════════════════════════
+async function rInvAnalysis(){
+  const pg=$('PG');
+  // Render immediately with whatever data we have
+  renderInvAnalysis();
+  // Load sales in background if needed
+  if(!S_SALES_LOADED){
+    const ok=await ensureSalesLoaded();
+    if(ok) renderInvAnalysis(); // refresh with real data
+  }
+}
+
+function renderInvAnalysis(){
+  const pg=$('PG');
+  const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  const meta=S_SALES_META;
+
+  // Build sales stats for all available months
+  const allMonths=hasSales?(meta.months||[]).sort():[];
+  const totalMonths=allMonths.length||1;
+
+  // For every item in S.items (full DMS master), compute:
+  const rows=S.items.map(item=>{
+    const pn=item.partNo;
+    const currentStock=parseFloat(item.systemQty)||0;
+    const dlc=parseFloat(item.dlc)||parseFloat(item.mrp)||0;
+    const mrp=parseFloat(item.mrp)||0;
+    const stockValue=currentStock*dlc;
+
+    // Sales data from history
+    const monthlyMap=S_SALES_MAP[pn]||{};
+    const totalSalesQty=Object.values(monthlyMap).reduce((s,q)=>s+q,0);
+    const activeMonths=Object.keys(monthlyMap).filter(m=>monthlyMap[m]>0).length;
+    const avgMonthly=totalSalesQty/totalMonths;
+
+    // Coverage: how many months of stock do we have?
+    const stockCoverMonths=avgMonthly>0?currentStock/avgMonthly:null;
+    const stockCoverDays=avgMonthly>0?Math.round((currentStock/avgMonthly)*30):null;
+
+    // Classification
+    let status,statusColor,statusBg,priority;
+    if(!hasSales||totalSalesQty===0){
+      if(currentStock===0){ status='No Stock · No Sales'; statusColor='#94a3b8'; statusBg='#f8fafc'; priority=6; }
+      else { status='Dead Stock'; statusColor='#7c3aed'; statusBg='#f5f3ff'; priority=5; }
+    } else if(currentStock===0){
+      status='🚨 ZERO STOCK'; statusColor='#dc2626'; statusBg='#fef2f2'; priority=0;
+    } else if(stockCoverDays!==null&&stockCoverDays<14){
+      status='⚠️ Critical Low'; statusColor='#dc2626'; statusBg='#fff1f2'; priority=1;
+    } else if(stockCoverDays!==null&&stockCoverDays<30){
+      status='⚡ Low Stock'; statusColor='#d97706'; statusBg='#fffbeb'; priority=2;
+    } else if(avgMonthly>=5){
+      status='🔥 Fast Moving'; statusColor='#059669'; statusBg=''; priority=3;
+    } else if(avgMonthly>=1){
+      status='📦 Normal'; statusColor='#2563eb'; statusBg=''; priority=3;
+    } else {
+      status='🐌 Slow Moving'; statusColor='#d97706'; statusBg='#fffbeb'; priority=4;
+    }
+
+    // Excess stock flag
+    const isExcess=stockCoverMonths!==null&&stockCoverMonths>6;
+
+    return{
+      partNo:pn, desc:item.desc||'', cat:item.category||'', bin:item.bin||'',
+      currentStock, dlc, mrp, stockValue,
+      totalSalesQty, avgMonthly, activeMonths, stockCoverDays, stockCoverMonths,
+      status, statusColor, statusBg, priority, isExcess
+    };
+  });
+
+  // Sort by priority then by stock value desc
+  rows.sort((a,b)=>a.priority-b.priority||b.stockValue-a.stockValue);
+
+  // Summary stats
+  const totalItems=rows.length;
+  const zeroStock=rows.filter(r=>r.currentStock===0&&r.totalSalesQty>0).length;
+  const deadStock=rows.filter(r=>r.totalSalesQty===0&&r.currentStock>0).length;
+  const noStockNoSale=rows.filter(r=>r.currentStock===0&&r.totalSalesQty===0).length;
+  const criticalLow=rows.filter(r=>r.status==='⚠️ Critical Low'||r.status==='⚡ Low Stock').length;
+  const excessStock=rows.filter(r=>r.isExcess).length;
+  const totalStockVal=rows.reduce((s,r)=>s+r.stockValue,0);
+  const deadStockVal=rows.filter(r=>r.totalSalesQty===0&&r.currentStock>0).reduce((s,r)=>s+r.stockValue,0);
+  const fastMoving=rows.filter(r=>r.avgMonthly>=5).length;
+
+  pg.innerHTML=`
+  <div class="ph" style="align-items:center;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="pt">🏭 Full Inventory Analysis</div>
+      <div class="ps">All ${totalItems} DMS items · ${hasSales?`Sales data: ${meta.dateFrom} to ${meta.dateTo} (${totalMonths} months)`:'No sales data — showing stock only'}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${!hasSales?`<button class="btn bda bsm" onclick="go('movingparts')">⬆️ Upload Sales CSV</button>`:''}
+      <button class="btn bgh bsm" onclick="iaExport()">⬇️ Export Full Report</button>
+      <button class="btn bpr bsm" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY ROW -->
+  <div class="sg" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+    <div class="st" style="border-left:4px solid #0f172a">
+      <div class="stl">📦 Total Items</div>
+      <div class="stv">${totalItems}</div>
+      <div class="sts">In DMS master</div>
+    </div>
+    <div class="st" style="border-left:4px solid #2563eb">
+      <div class="stl">💰 Stock Value</div>
+      <div class="stv" style="color:#2563eb;font-size:18px">₹${(totalStockVal/100000).toFixed(1)}L</div>
+      <div class="sts">At DLC rate</div>
+    </div>
+    <div class="st" style="border-left:4px solid #7c3aed" onclick="iaFilter('dead')">
+      <div class="stl">💀 Dead Stock</div>
+      <div class="stv" style="color:#7c3aed">${deadStock}</div>
+      <div class="sts">₹${(deadStockVal/100000).toFixed(1)}L locked · click</div>
+    </div>
+    <div class="st" style="border-left:4px solid #dc2626" onclick="iaFilter('critical')">
+      <div class="stl">🚨 Zero Stock</div>
+      <div class="stv" style="color:#dc2626">${zeroStock}</div>
+      <div class="sts">Has sales · click</div>
+    </div>
+  </div>
+
+  <div class="sg" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+    <div class="st" style="border-left:4px solid #d97706" onclick="iaFilter('low')">
+      <div class="stl">⚡ Low Stock</div>
+      <div class="stv" style="color:#d97706">${criticalLow}</div>
+      <div class="sts">&lt;30 days cover · click</div>
+    </div>
+    <div class="st" style="border-left:4px solid #059669" onclick="iaFilter('fast')">
+      <div class="stl">🔥 Fast Moving</div>
+      <div class="stv" style="color:#059669">${fastMoving}</div>
+      <div class="sts">≥5 units/month</div>
+    </div>
+    <div class="st" style="border-left:4px solid #0891b2" onclick="iaFilter('excess')">
+      <div class="stl">📈 Excess Stock</div>
+      <div class="stv" style="color:#0891b2">${excessStock}</div>
+      <div class="sts">&gt;6 months cover · click</div>
+    </div>
+    <div class="st" style="border-left:4px solid #94a3b8" onclick="iaFilter('nosale')">
+      <div class="stl">⬜ No Stock+No Sale</div>
+      <div class="stv" style="color:#94a3b8">${noStockNoSale}</div>
+      <div class="sts">Consider removing · click</div>
+    </div>
+  </div>
+
+  <!-- DEAD STOCK ALERT -->
+  ${deadStock>0?`
+  <div style="background:linear-gradient(135deg,#f5f3ff,#faf5ff);border:1.5px solid #c4b5fd;border-radius:var(--r);padding:16px 20px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#7c3aed">💀 Dead Stock Alert — ₹${(deadStockVal/100000).toFixed(2)}L Locked</div>
+        <div style="font-size:12px;color:#6d28d9;margin-top:4px">${deadStock} parts with ZERO sales in ${totalMonths} months — consider returning to HMCL or discounting</div>
+      </div>
+      <button class="btn bsm" style="background:#7c3aed;color:#fff;border:none" onclick="iaFilter('dead')">View Dead Stock →</button>
+    </div>
+  </div>`:``}
+
+  <!-- FILTER TABS -->
+  <div class="tbr" id="IATABS" style="margin-bottom:0">
+    <button class="tb2 on" id="IATAB_all"      onclick="iaFilter('all')">All Items (${totalItems})</button>
+    <button class="tb2"    id="IATAB_critical"  onclick="iaFilter('critical')">🚨 Zero Stock (${zeroStock})</button>
+    <button class="tb2"    id="IATAB_low"       onclick="iaFilter('low')">⚡ Low (${criticalLow})</button>
+    <button class="tb2"    id="IATAB_dead"      onclick="iaFilter('dead')">💀 Dead (${deadStock})</button>
+    <button class="tb2"    id="IATAB_excess"    onclick="iaFilter('excess')">📈 Excess (${excessStock})</button>
+    <button class="tb2"    id="IATAB_fast"      onclick="iaFilter('fast')">🔥 Fast (${fastMoving})</button>
+    <button class="tb2"    id="IATAB_nosale"    onclick="iaFilter('nosale')">⬜ No Sale (${noStockNoSale})</button>
+  </div>
+
+  <div class="cd" id="IACARD">
+    <div class="cdh">
+      <div class="cdt" id="IATITLE">All ${totalItems} Items</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="fi" id="IAFILT" placeholder="Search part/desc…" oninput="iaSearch()" style="width:160px;padding:5px 10px;font-size:12px" autocomplete="off" autocapitalize="none">
+        <select class="fi" id="IACAT" onchange="iaCatFilter()" style="width:130px;padding:5px 8px;font-size:12px">
+          <option value="">All Categories</option>
+          ${[...new Set(S.items.map(i=>i.category||'').filter(Boolean))].sort().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="tw" id="IATBL"></div>
+  </div>`;
+
+  // Store rows for filtering
+  window._iaAllRows=rows;
+  setTimeout(()=>iaFilter('all'),80);
+}
+
+let _iaCurrentFilter='all';
+
+function iaFilter(type){
+  _iaCurrentFilter=type;
+  const rows=window._iaAllRows||[];
+  ['all','critical','low','dead','excess','fast','nosale'].forEach(t=>{
+    const btn=$(`IATAB_${t}`);if(btn)btn.classList.toggle('on',t===type);
+  });
+  let filtered=rows;
+  const titleMap={
+    all:'All Items',
+    critical:'🚨 Zero Stock — Has Sales (Order Immediately)',
+    low:'⚡ Low Stock — Under 30 Days Cover',
+    dead:'💀 Dead Stock — Zero Sales, Stock Exists',
+    excess:'📈 Excess Stock — Over 6 Months Cover',
+    fast:'🔥 Fast Moving Parts',
+    nosale:'⬜ No Stock & No Sales'
+  };
+  if(type==='critical') filtered=rows.filter(r=>r.currentStock===0&&r.totalSalesQty>0);
+  else if(type==='low')  filtered=rows.filter(r=>r.stockCoverDays!==null&&r.stockCoverDays<30&&r.currentStock>0);
+  else if(type==='dead') filtered=rows.filter(r=>r.totalSalesQty===0&&r.currentStock>0);
+  else if(type==='excess')filtered=rows.filter(r=>r.isExcess);
+  else if(type==='fast') filtered=rows.filter(r=>r.avgMonthly>=5);
+  else if(type==='nosale')filtered=rows.filter(r=>r.currentStock===0&&r.totalSalesQty===0);
+  const title=$('IATITLE');if(title)title.textContent=`${titleMap[type]||type} — ${filtered.length} items`;
+  iaRenderTable(filtered);
+}
+
+function iaSearch(){
+  const q=($('IAFILT')?.value||'').trim().toLowerCase();
+  const cat=$('IACAT')?.value||'';
+  let rows=window._iaAllRows||[];
+  if(q) rows=rows.filter(r=>r.partNo.toLowerCase().includes(q)||(r.desc||'').toLowerCase().includes(q));
+  if(cat) rows=rows.filter(r=>r.cat===cat);
+  const title=$('IATITLE');if(title)title.textContent=`Search results — ${rows.length} items`;
+  iaRenderTable(rows);
+}
+
+function iaCatFilter(){
+  const cat=$('IACAT')?.value||'';
+  const q=($('IAFILT')?.value||'').trim().toLowerCase();
+  let rows=window._iaAllRows||[];
+  if(cat) rows=rows.filter(r=>r.cat===cat);
+  if(q) rows=rows.filter(r=>r.partNo.toLowerCase().includes(q)||(r.desc||'').toLowerCase().includes(q));
+  const title=$('IATITLE');if(title)title.textContent=`${cat||'All'} — ${rows.length} items`;
+  iaRenderTable(rows);
+}
+
+function iaRenderTable(rows){
+  const wrap=$('IATBL');if(!wrap)return;
+  if(!rows.length){
+    wrap.innerHTML='<div class="emp" style="padding:40px"><div class="emp-i">📊</div><div class="emp-t">No items found</div></div>';
+    return;
+  }
+  const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  wrap.innerHTML=`<table>
+    <thead><tr>
+      <th>#</th>
+      <th>Part No</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th>Bin</th>
+      <th style="text-align:right">DMS Stock</th>
+      <th style="text-align:right">Stock Value</th>
+      ${hasSales?`
+      <th style="text-align:right">Total Sales</th>
+      <th style="text-align:right">Avg/Month</th>
+      <th style="text-align:right">Stock Cover</th>
+      `:''}
+      <th style="text-align:center">Status</th>
+      <th style="text-align:right">MRP ₹</th>
+      <th style="text-align:right">DLC ₹</th>
+    </tr></thead>
+    <tbody>
+    ${rows.slice(0,500).map((r,i)=>{
+      const coverTxt=r.stockCoverDays===null?'—':r.stockCoverDays>=999?'∞':r.stockCoverDays+'d';
+      const coverColor=r.stockCoverDays===null?'#94a3b8':r.stockCoverDays<14?'#dc2626':r.stockCoverDays<30?'#d97706':r.stockCoverDays>180?'#0891b2':'#059669';
+      return`<tr style="background:${r.statusBg||''}">
+        <td style="color:#94a3b8;font-size:11px">${i+1}</td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(r.partNo)}</span></td>
+        <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${esc(r.desc)}">${esc(tr2(r.desc,24))}</td>
+        <td style="font-size:10px;color:#64748b">${esc(tr2(r.cat,14))}</td>
+        <td><span class="bg bgp" style="font-size:9px">${esc(r.bin||'—')}</span></td>
+        <td style="text-align:right;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:13px;color:${r.currentStock===0?'#dc2626':'#0f172a'}">${fmt(r.currentStock)}</td>
+        <td style="text-align:right;font-size:11px;font-weight:700;color:#2563eb">₹${fmt(Math.round(r.stockValue))}</td>
+        ${hasSales?`
+        <td style="text-align:right;font-size:11px;color:#059669;font-weight:600">${r.totalSalesQty>0?fmt(r.totalSalesQty):'<span style="color:#94a3b8">0</span>'}</td>
+        <td style="text-align:right;font-size:11px">${r.avgMonthly>0?r.avgMonthly.toFixed(1)+'<span style="color:#94a3b8;font-size:9px">/mo</span>':'<span style="color:#94a3b8">—</span>'}</td>
+        <td style="text-align:right;font-size:12px;font-weight:700;color:${coverColor}">${coverTxt}</td>
+        `:''}
+        <td style="text-align:center;white-space:nowrap">
+          <span style="font-size:10px;font-weight:700;color:${r.statusColor}">${r.status}</span>
+          ${r.isExcess?'<span style="font-size:9px;display:block;color:#0891b2">Excess &gt;6M</span>':''}
+        </td>
+        <td style="text-align:right;font-size:11px">₹${fmt(r.mrp)}</td>
+        <td style="text-align:right;font-size:11px">₹${fmt(r.dlc)}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+    <tfoot>
+      <tr style="background:#f0f4f8;font-weight:800">
+        <td colspan="${hasSales?7:6}" style="text-align:right;padding:10px 14px;font-size:12px">
+          Total Stock Value (${rows.length} items):
+        </td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:#2563eb;font-size:14px">
+          ₹${fmt(Math.round(rows.reduce((s,r)=>s+r.stockValue,0)))}
+        </td>
+        ${hasSales?`<td colspan="4"></td>`:'<td colspan="2"></td>'}
+      </tr>
+    </tfoot>
+  </table>
+  ${rows.length>500?`<div style="padding:10px 16px;font-size:11px;color:#94a3b8;border-top:1px solid var(--bd)">Showing 500 of ${rows.length}. Use search/filter to narrow down.</div>`:''}`;
+}
+
+function iaExport(){
+  const rows=window._iaAllRows||[];
+  const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  const hdr=`Part No,Description,Category,Bin,DMS Stock,Stock Value (₹),MRP,DLC${hasSales?',Total Sales,Avg/Month,Stock Cover (days),Status,Excess Flag':''}`;
+  const csv=`India Motors — Full Inventory Analysis · ${today()} · ${rows.length} items\n${hdr}\n`
+    +rows.map(r=>`"${r.partNo}","${(r.desc||'').replace(/"/g,'""')}","${r.cat||''}","${r.bin||''}",${r.currentStock},${Math.round(r.stockValue)},${r.mrp},${r.dlc}${hasSales?`,${r.totalSalesQty},${r.avgMonthly.toFixed(2)},${r.stockCoverDays===null?'':r.stockCoverDays>=999?999:r.stockCoverDays},"${r.status}","${r.isExcess?'YES':''}"`:''}`)
+    .join('\n');
+  dlCSV(csv,`full_inventory_analysis_${today()}.csv`);
+  toast(`${rows.length} items exported`,'s');
 }
 
 // Hook logTrail into key existing functions (patch at boot)
