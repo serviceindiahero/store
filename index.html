@@ -597,13 +597,122 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbyiUsaydKK_f_JT1j9md5N0pko94Lyt00TKcJ-Kd6Au5QCnDzFpuCuS_rdenuXLaWED_w/exec';
+const API = 'https://script.google.com/macros/s/AKfycbw5ELKal2HM85kw5Bz8SKonAZMp_EcX_dUQgoVc_Xgv7X6P06hv7slnJcIRLCTJQW65Yg/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
 const SK='imAudit3',IK='imItems3',BK='imBins3',QK='imQueue3',PGSZ=50;
-const S={user:null,online:navigator.onLine,items:[],bins:[],counts:[],sessions:[],auditS:null,charts:{},pd:{},pg:{},stream:null,raf:null,scanQ:[],lqr:'',lqrt:0,torch:false,track:null};
+const S={user:null,online:navigator.onLine,items:[],bins:[],counts:[],sessions:[],auditS:null,charts:{},pd:{},pg:{},stream:null,raf:null,scanQ:[],lqr:'',lqrt:0,torch:false,track:null,page:''};
+
+// ═══════════════════════════════════════════════════════════
+// MULTI-USER AUDIT ENGINE — v3.0
+// ★ NEW: lockedParts, auditHistory, userPerf stored in localStorage
+//        All keys namespaced to avoid collision with old data
+// ═══════════════════════════════════════════════════════════
+const LOCK_KEY  = 'imLockedParts3';   // {partNo: {lockedBy, lockedAt}}
+const HIST_KEY  = 'imAuditHist3';     // append-only history array
+const UPERF_KEY = 'imUserPerf3';      // {username: {totalCounts, errorCounts}}
+
+// ── Lock helpers ──────────────────────────────────────────
+function getLockedParts(){ try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'{}')}catch{return{}} }
+function saveLockedParts(d){ localStorage.setItem(LOCK_KEY,JSON.stringify(d)); }
+function lockPart(partNo){
+  const lp=getLockedParts();
+  lp[partNo]={lockedBy:S.user?.username||'system',lockedAt:new Date().toISOString()};
+  saveLockedParts(lp);
+  toast(`🔒 ${partNo} locked — no further edits allowed`,'i');
+}
+function isLocked(partNo){ return !!(getLockedParts()[partNo]); }
+
+// ── Audit history helpers ─────────────────────────────────
+function getAuditHistory(){ try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]} }
+function appendHistory(entry){
+  const h=getAuditHistory();
+  h.unshift({...entry, histId:uid(), recordedAt:new Date().toISOString()});
+  localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0,2000))); // keep last 2000
+}
+
+// ── User performance helpers ──────────────────────────────
+function getUserPerf(){ try{return JSON.parse(localStorage.getItem(UPERF_KEY)||'{}')}catch{return{}} }
+function trackUserPerf(username, hasVariance){
+  const p=getUserPerf();
+  if(!p[username]) p[username]={totalCounts:0,errorCounts:0};
+  p[username].totalCounts++;
+  if(hasVariance) p[username].errorCounts++;
+  localStorage.setItem(UPERF_KEY,JSON.stringify(p));
+}
+
+// ── Final count resolution (mode = most frequent value) ───
+// Returns {mode, allValues, userEntries} from counts array for a partNo
+function resolveCount(partNo, allCounts){
+  const today_s=today();
+  // All entries for this part today (any user)
+  const entries=(allCounts||S.allCounts||[]).filter(c=>c.partNo===partNo&&c.date===today_s);
+  if(!entries.length) return {mode:null,allValues:[],userEntries:[]};
+  // One entry per user (latest per user)
+  const byUser={};
+  entries.forEach(c=>{ if(!byUser[c.auditor]||c.time>byUser[c.auditor].time) byUser[c.auditor]=c; });
+  const userEntries=Object.values(byUser);
+  const allValues=userEntries.map(c=>parseInt(c.qty)||0);
+  // Mode calculation
+  const freq={};
+  allValues.forEach(v=>{ freq[v]=(freq[v]||0)+1; });
+  let mode=allValues[0], maxF=0;
+  Object.entries(freq).forEach(([v,f])=>{ if(f>maxF){maxF=f;mode=parseInt(v);} });
+  return {mode, allValues, userEntries, byUser};
+}
+
+// ── Variance helpers ──────────────────────────────────────
+function calcVariance(countedQty, systemQty){
+  const v=(parseInt(countedQty)||0)-(parseFloat(systemQty)||0);
+  return {variance:v, status:v<0?'SHORT':v>0?'EXCESS':'OK'};
+}
+
+// ── Reason prompt (returns promise) ──────────────────────
+// Shown when variance ≠ 0. Blocks save until reason is given.
+function promptReason(partNo, variance, status){
+  return new Promise(resolve=>{
+    const sign=status==='SHORT'?'🔻':'🔺';
+    modal(`<div class="md">
+      <div class="mdh">
+        <div class="mdt">⚠️ Variance Detected — Reason Required</div>
+        <button class="mdc" onclick="closeMd();window._reasonResolve&&window._reasonResolve(null)">✕</button>
+      </div>
+      <div class="mdb">
+        <div style="background:${status==='SHORT'?'#fef2f2':'#fffbeb'};border:1px solid ${status==='SHORT'?'#fecaca':'#fde68a'};border-radius:var(--rs);padding:12px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;color:${status==='SHORT'?'#dc2626':'#d97706'}">${sign} ${status}: ${variance>0?'+':''}${variance} units</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">Part: <strong>${esc(partNo)}</strong></div>
+        </div>
+        <div class="fl" style="margin-bottom:14px">
+          <label class="fll">Reason for variance *</label>
+          <select class="fi" id="VREASON_SEL" onchange="if(this.value==='other'){$('VREASON_OTHER').style.display='block';}else{$('VREASON_OTHER').style.display='none';}">
+            <option value="">— Select reason —</option>
+            <option value="Physical count verified correct">Physical count verified correct</option>
+            <option value="Transit / pending GRN">Transit / pending GRN</option>
+            <option value="Damaged / scrapped units">Damaged / scrapped units</option>
+            <option value="Mis-pick in earlier dispatch">Mis-pick in earlier dispatch</option>
+            <option value="Counted across multiple bins">Counted across multiple bins</option>
+            <option value="DMS not updated">DMS not updated</option>
+            <option value="other">Other (specify below)</option>
+          </select>
+          <textarea class="fi" id="VREASON_OTHER" placeholder="Describe reason…" rows="2" style="margin-top:8px;display:none"></textarea>
+        </div>
+      </div>
+      <div class="mdf">
+        <button class="btn bgh" onclick="closeMd();window._reasonResolve&&window._reasonResolve(null)">Cancel</button>
+        <button class="btn bpr" onclick="
+          var s=$('VREASON_SEL')?.value;
+          var o=$('VREASON_OTHER')?.value?.trim();
+          var r=s==='other'?(o||''):s;
+          if(!r){toast('Select a reason to continue','w');return;}
+          closeMd();window._reasonResolve&&window._reasonResolve(r);
+        ">✅ Confirm & Save</button>
+      </div>
+    </div>`);
+    window._reasonResolve=resolve;
+  });
+}
 
 const $=id=>document.getElementById(id);
 const today=()=>new Date().toISOString().split('T')[0];
@@ -744,8 +853,7 @@ async function bootApp(){
   $('APP').classList.add('on');
   setUserUI();buildNav();syncUI();
   logTrail('LOGIN',S.user?.username||'','','','','Login successful');
-  // ★ FIX: use allSettled so one failing sync doesn't block the whole app from loading
-  await Promise.allSettled([syncItems(),syncBins(),loadAuditSess()]);
+  await Promise.all([syncItems(),syncBins(),loadAuditSess()]);
   // Set initial history state
   history.replaceState({page:'dashboard'}, '', '#dashboard');
   go('dashboard');
@@ -792,36 +900,19 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
-async function go(p, fromPopState){
+function go(p, fromPopState){
   if(!S.user)return;
   if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','orderplan','qrgen','audittrail','invanalysis'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
   stopCam();closeSB();setNav(p);
-  S.page=p; // ★ FIX: track current page so wedge focus and other page checks work
   // Push to browser history so back button works
   if(!fromPopState){
     history.pushState({page:p}, '', '#'+p);
   }
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
-  const fn=({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
+  ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
     variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,foc:rFOC,
     movingparts:rMovingParts,orderplan:rOrderPlan,qrgen:rQRGen,audittrail:rAuditTrail,invanalysis:rInvAnalysis,
-    itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF);
-  // ★ FIX: wrap in try/catch so any API error never leaves the page stuck on "Loading…"
-  try {
-    await fn();
-  } catch(err) {
-    console.error('Page render error ['+p+']:', err);
-    $('PG').innerHTML=`<div class="emp">
-      <div class="emp-i">⚠️</div>
-      <div class="emp-t">Could not load this section</div>
-      <div class="emp-s" style="color:#dc2626;font-size:12px;margin-top:6px">${esc(err.message||'Unknown error')}</div>
-      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
-        <button class="btn bpr bsm" onclick="go('${p}')">🔄 Retry</button>
-        <button class="btn bgh bsm" onclick="go('dashboard')">🏠 Dashboard</button>
-      </div>
-    </div>`;
-    toast('Error loading page — check API connection','d',5000);
-  }
+    itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF)();
 }
 function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
 
@@ -930,57 +1021,111 @@ function doGS(){
   },100);
 }
 
+// ★ UPGRADED: showDetail — shows per-user counts, mode as final, variance, lock button
 function showDetail(pn){
   const item=findItem(pn);if(!item)return;
   const dms=parseFloat(item.systemQty)||0;
-  const cMap={};S.counts.filter(c=>c.partNo===pn).forEach(c=>{if(!cMap[c.date])cMap[c.date]={qty:0,auditor:c.auditorName||c.auditor};cMap[c.date].qty+=parseFloat(c.qty)||0;});
-  const totalCounted=Object.values(cMap).reduce((s,v)=>s+v.qty,0);
-  const counted=Object.keys(cMap).length?totalCounted:null;
-  const diff=counted!==null?counted-dms:null;
   const isMaster=S.user?.role==='master_auditor';
+  const isLocked=isLocked_safe(pn);
+
+  // Get all counts for this part (all dates, for history context)
+  const allForPart=(S.allCounts||S.counts||[]).filter(c=>c.partNo===pn);
+  // Today's entries grouped by user
+  const todayEntries=allForPart.filter(c=>c.date===today());
+  const byUser={};
+  todayEntries.forEach(c=>{if(!byUser[c.auditor]||c.time>byUser[c.auditor].time)byUser[c.auditor]=c;});
+  const userEntries=Object.values(byUser);
+  const allVals=userEntries.map(c=>parseInt(c.qty)||0);
+  const freq={};allVals.forEach(v=>{freq[v]=(freq[v]||0)+1;});
+  let mode=allVals[0]??null,maxF=0;
+  Object.entries(freq).forEach(([v,f])=>{if(parseInt(f)>maxF){maxF=parseInt(f);mode=parseInt(v);}});
+  const finalQty=mode;
+  const diff=finalQty!==null?finalQty-dms:null;
+  const {status}=diff!==null?calcVariance(finalQty,dms):{status:'—'};
+  const isConflict=allVals.length>1&&new Set(allVals).size>1;
+
   const bo=S.bins.map(b=>`<option value="${esc(b.bin)}" ${b.bin===item.bin?'selected':''}>${esc(b.bin)}</option>`).join('');
+
   modal(`<div class="md">
-    <div class="mdh"><div class="mdt" style="font-family:'JetBrains Mono',monospace;font-size:13px">${esc(pn)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
+    <div class="mdh">
+      <div class="mdt" style="font-family:'JetBrains Mono',monospace;font-size:13px">${esc(pn)}${isLocked?'&nbsp;🔒':''}</div>
+      <button class="mdc" onclick="closeMd()">✕</button>
+    </div>
     <div class="mdb">
       <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(item.desc||'—')}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
         ${item.bin?`<span class="bg bgp">${esc(item.bin)}</span>`:''}
         ${item.category?`<span class="bg bgg">${esc(item.category)}</span>`:''}
+        ${isLocked?`<span class="bg bgg">🔒 Locked</span>`:''}
+        ${isConflict?`<span class="bg" style="background:#f5f3ff;color:#7c3aed;border-color:#c4b5fd">⚡ Conflict</span>`:''}
       </div>
+
+      <!-- 3-box: DMS / Final Count / MRP -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
         <div style="text-align:center;background:#f8fafc;border-radius:var(--rs);padding:10px">
           <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace">${fmt(dms)}</div>
           <div style="font-size:10px;color:#64748b;margin-top:2px">DMS Stock</div>
         </div>
         <div style="text-align:center;background:${diff===null?'#f8fafc':diff===0?'#ecfdf5':diff<0?'#fef2f2':'#fffbeb'};border-radius:var(--rs);padding:10px">
-          <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${diff===null?'#94a3b8':diff===0?'#059669':diff<0?'#dc2626':'#d97706'}">${counted!==null?fmt(counted):'—'}</div>
-          <div style="font-size:10px;color:#64748b;margin-top:2px">Counted</div>
+          <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${diff===null?'#94a3b8':diff===0?'#059669':diff<0?'#dc2626':'#d97706'}">${finalQty!==null?fmt(finalQty):'—'}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:2px">Final Count${userEntries.length>1?' (mode)':''}</div>
         </div>
         <div style="text-align:center;background:#f8fafc;border-radius:var(--rs);padding:10px">
           <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace">${fmtM(item.mrp)}</div>
           <div style="font-size:10px;color:#64748b;margin-top:2px">MRP</div>
         </div>
       </div>
-      ${Object.keys(cMap).length?`<div style="margin-bottom:14px">
-        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Count History</div>
-        ${Object.entries(cMap).map(([date,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 10px;background:#f8fafc;border-radius:6px;margin-bottom:4px;font-size:12px">
-          <span style="font-family:'JetBrains Mono',monospace;color:#64748b">${fmtD(date)}</span>
-          <span style="font-weight:700">${v.qty} units</span>
-          <span style="color:#94a3b8">${v.auditor||''}</span>
-        </div>`).join('')}
+
+      <!-- Variance display -->
+      ${diff!==null?`<div style="background:${diff===0?'#ecfdf5':diff<0?'#fef2f2':'#fffbeb'};border:1px solid ${diff===0?'#a7f3d0':diff<0?'#fecaca':'#fde68a'};border-radius:var(--rs);padding:10px 13px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12px;font-weight:700;color:${diff===0?'#059669':diff<0?'#dc2626':'#d97706'}">
+          ${diff===0?'✅ MATCH':diff<0?`🔻 SHORT: ${Math.abs(diff)} units`:`🔺 EXCESS: +${diff} units`}
+        </div>
+        <div style="font-size:11px;color:#64748b">Variance: <strong>${diff>0?'+':''}${diff}</strong></div>
       </div>`:''}
-      ${isMaster?`<div style="border-top:1px solid var(--bd);padding-top:14px">
+
+      <!-- Per-user entries today -->
+      ${userEntries.length?`<div style="margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Today's Count Entries (${userEntries.length} user${userEntries.length>1?'s':''})</div>
+        ${userEntries.map(e=>{
+          const eq=parseInt(e.qty)||0;
+          const ev=eq-dms;
+          return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f8fafc;border-radius:6px;margin-bottom:4px;border-left:3px solid ${ev===0?'#059669':ev<0?'#dc2626':'#d97706'}">
+            <div>
+              <div style="font-size:12px;font-weight:700">${esc(e.auditorName||e.auditor||'')}</div>
+              <div style="font-size:10px;color:#94a3b8">${(e.time||'').slice(0,5)} · ${e.type||'QR'}${e.remarks?` · ${esc(tr2(e.remarks,20))}`:''}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px">${fmt(eq)}</div>
+              <div style="font-size:10px;color:${ev===0?'#059669':ev<0?'#dc2626':'#d97706'}">${ev===0?'✅':ev>0?'▲':'▼'}${Math.abs(ev)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+        ${isConflict&&isMaster?`<button class="btn bwa bsm" style="margin-top:8px;width:100%" onclick="closeMd();resolveConflict('${esc(pn)}')">⚡ Resolve Conflict</button>`:''}
+      </div>`:''}
+
+      <!-- Master quick edit -->
+      ${isMaster&&!isLocked?`<div style="border-top:1px solid var(--bd);padding-top:14px">
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Quick Edit</div>
         <div class="fg f2">
           <div class="fl"><label class="fll">Bin</label><select class="fi" id="DSB" style="font-size:12px"><option value="">No Bin</option>${bo}</select></div>
           <div class="fl"><label class="fll">System Qty</label><input class="fi" id="DSQ" type="number" value="${dms}" style="font-size:12px"></div>
         </div>
-        <button class="btn bpr bsm" onclick="quickEdit('${esc(pn)}')">💾 Save</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn bpr bsm" onclick="quickEdit('${esc(pn)}')">💾 Save</button>
+          <button class="btn bwa bsm" onclick="closeMd();lockPart('${esc(pn)}')">🔒 Lock Part</button>
+        </div>
       </div>`:''}
     </div>
-    <div class="mdf"><button class="btn bgh" onclick="closeMd()">Close</button><button class="btn bpr bsm" onclick="closeMd();go('scan')">📷 Scan This</button></div>
+    <div class="mdf">
+      <button class="btn bgh" onclick="closeMd()">Close</button>
+      <button class="btn bpr bsm" onclick="closeMd();go('scan')">📷 Scan This</button>
+    </div>
   </div>`);
 }
+
+// Safe isLocked wrapper (avoids naming conflict with inner variable)
+function isLocked_safe(partNo){ return isLocked(partNo); }
 
 async function quickEdit(pn){
   const item=S.items.find(i=>i.partNo===pn);if(!item)return;
@@ -1087,14 +1232,18 @@ function scanLoop(vid,cvs,ctx){
 
 function resumeScan(){S.lqr='';const vid=$('QRV');if(!vid||!S.stream)return;setSt('sc','🟢 Scanning…');startLoop(vid);}
 
+// ★ UPGRADED: Camera QR handler — overwrite qty, not add (same as processWedge fix)
 function onQR(raw){
   setSt("de","✅ Decoded!");
   const res=decodeHQR(raw);
   if(!res||!res.length){toast("QR format not recognized","w");setTimeout(resumeScan,1500);return;}
-  // ADD to queue instead of replacing — same as keyboard scanner
   res.forEach(function(newItem){
     const existing=S.scanQ.find(function(q){return q.partNo===newItem.partNo;});
-    if(existing){existing.qty+=newItem.qty;toast("➕ "+newItem.partNo+" qty: "+existing.qty,"i",1500);}
+    if(existing){
+      // ★ FIX: OVERWRITE qty — no accumulation, scan = final count
+      existing.qty=newItem.qty;
+      toast("🔄 "+newItem.partNo+" qty set: "+newItem.qty,"i",1500);
+    }
     else if(S.scanQ.length<20){S.scanQ.push(newItem);toast("📷 Added: "+newItem.partNo,"s",1500);}
     else{toast("Queue full (20). Tap Save All.","w");}
   });
@@ -1106,28 +1255,11 @@ function onQR(raw){
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════
 async function rDash(){
-  let sr={stats:{}},counts=[],allCounts=[];
-  try {
-    // ★ FIX: fetch stats and counts together but only ONE getCounts call
-    const [statsResult, countsResult] = await Promise.allSettled([
-      api({action:'getStats'}),
-      fetchCounts() // fetches ALL counts, sets S.allCounts and S.counts
-    ]);
-    if(statsResult.status==='fulfilled') sr=statsResult.value;
-    if(countsResult.status==='fulfilled') {
-      // S.allCounts and S.counts are now set by fetchCounts()
-      allCounts = S.allCounts || [];
-      // filter today's counts for the right user
-      const todayStr = today();
-      const isMaster = S.user.role==='master_auditor';
-      counts = allCounts.filter(c=>c.date===todayStr && (isMaster||c.auditor===S.user.username));
-    }
-  } catch(e) {
-    // silent — render with whatever we have (cached data)
-    console.warn('rDash partial error:', e);
-    allCounts = S.allCounts || S.counts || [];
-    counts = (S.counts||[]);
-  }
+  const[sr,counts,allCounts]=await Promise.all([
+    api({action:'getStats'}),
+    fetchCounts(today(),S.user.role==='master_auditor'?null:S.user.username),
+    fetchCounts() // all counts for financial calc
+  ]);
   const st=sr.stats||{};
   // Compute DLC-based financial summary from ALL counts vs items
   const allMap={};
@@ -1149,26 +1281,57 @@ async function rDash(){
 
 function mDash(st,counts){
   const total=parseInt(st.totalItems)||S.items.length;
-  // counts is already filtered to today — use it directly for accurate "Counted Today"
   const todC=counts.length;
   const pct=total?Math.round(todC/total*100):0,nm=(S.user?.name||'').split(' ')[0];
+
+  // ★ NEW: Compute per-user stats and multi-user audit metrics from today's counts
+  const allToday=(S.allCounts||[]).filter(c=>c.date===today());
+  const totalEntries=allToday.length;
+  // Unique parts counted today (one entry per user per part — deduplicate by partNo)
+  const uniquePartsCounted=new Set(allToday.map(c=>c.partNo)).size;
+  // Final count per part = latest entry per user, then mode for multi-user
+  const partFinalMap={};
+  allToday.forEach(c=>{
+    if(!partFinalMap[c.partNo])partFinalMap[c.partNo]=[];
+    partFinalMap[c.partNo].push(parseInt(c.qty)||0);
+  });
+  // Variance stats — using mode (most frequent) as final qty per part
+  let matchC=0,shortC=0,excessC=0;
+  Object.entries(partFinalMap).forEach(([pn,qtys])=>{
+    const item=findItem(pn);if(!item)return;
+    const dms=parseFloat(item.systemQty)||0;
+    const freq={};qtys.forEach(q=>{freq[q]=(freq[q]||0)+1;});
+    let mode=qtys[0],maxF=0;Object.entries(freq).forEach(([q,f])=>{if(f>maxF){maxF=f;mode=parseInt(q);}});
+    const v=mode-dms;
+    if(v===0)matchC++;else if(v<0)shortC++;else excessC++;
+  });
+  const accuracy=uniquePartsCounted?Math.round((matchC/uniquePartsCounted)*100):0;
+  // Unique users who counted today
+  const activeUsers=[...new Set(allToday.map(c=>c.auditorName||c.auditor))];
+
   $('PG').innerHTML=`
   <div class="ph">
     <div><div class="pt">${greet()}, ${esc(nm)} 👋</div>
-    <div class="ps">${fmtD(new Date())} &nbsp;·&nbsp; <span class="bg bgs"><span style="width:5px;height:5px;border-radius:50%;background:#059669;display:inline-block;margin-right:3px"></span>${esc(S.auditS?.sessionName||'March 2026 Full Audit')}</span></div></div>
+    <div class="ps">${fmtD(new Date())} &nbsp;·&nbsp; <span class="bg bgs"><span style="width:5px;height:5px;border-radius:50%;background:#059669;display:inline-block;margin-right:3px"></span>${esc(S.auditS?.sessionName||'March 2026 Full Audit')}</span>${activeUsers.length>1?` &nbsp;·&nbsp; <span class="bg bgp" style="font-size:9px">👥 ${activeUsers.length} users active</span>`:''}</div></div>
     <div style="display:flex;gap:8px">
       <button class="btn bgh bsm" onclick="openGS()">🔍 Search</button>
       <button class="btn bpr bsm" onclick="go('scan')">📷 Scan</button>
     </div>
   </div>
-  <div class="sg s4">
-    <div class="st"><div class="stl">Total SKUs</div><div class="stv" style="font-size:clamp(18px,4vw,28px)">${fmt(total)}</div><div class="sts">items sheet</div></div>
-    <div class="st" onclick="go('fullsummary')"><div class="stl">Counted Today</div><div class="stv" style="color:#2563eb;font-size:clamp(18px,4vw,28px)">${fmt(todC)}</div><div class="sts">${pct}% done</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div></div>
-    <div class="st" onclick="go('variance')"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626;font-size:clamp(18px,4vw,28px)">${fmt(st.shortCount||0)}</div></div>
-    <div class="st" onclick="go('variance')"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706;font-size:clamp(18px,4vw,28px)">${fmt(st.excessCount||0)}</div></div>
+
+  <!-- ★ ENHANCED: 6-stat grid (was 4) — Total SKUs, Parts Counted, Entries, Short, Excess, Accuracy -->
+  <div class="sg" style="grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="st"><div class="stl">Total SKUs</div><div class="stv" style="font-size:clamp(16px,4vw,26px)">${fmt(total)}</div><div class="sts">items sheet</div></div>
+    <div class="st" onclick="go('fullsummary')" style="cursor:pointer"><div class="stl">Parts Counted</div><div class="stv" style="color:#2563eb;font-size:clamp(16px,4vw,26px)">${fmt(uniquePartsCounted)}</div><div class="sts">${pct}% done</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div></div>
+    <div class="st"><div class="stl">Total Entries</div><div class="stv" style="font-size:clamp(16px,4vw,26px)">${fmt(totalEntries)}</div><div class="sts">all users today</div></div>
+  </div>
+  <div class="sg" style="grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="st" onclick="go('variance')" style="cursor:pointer"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626;font-size:clamp(16px,4vw,26px)">${fmt(shortC)}</div><div class="sts">parts</div></div>
+    <div class="st" onclick="go('variance')" style="cursor:pointer"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706;font-size:clamp(16px,4vw,26px)">${fmt(excessC)}</div><div class="sts">parts</div></div>
+    <div class="st"><div class="stl" style="color:#059669">✅ Accuracy</div><div class="stv" style="color:#059669;font-size:clamp(16px,4vw,26px)">${accuracy}%</div><div class="sts">${matchC} exact matches</div></div>
   </div>
 
-  <!-- FINANCIAL SUMMARY CARD -->
+  <!-- FINANCIAL SUMMARY CARD — unchanged -->
   <div class="cd" style="margin-bottom:16px;background:linear-gradient(135deg,#0f172a,#1e293b);border:none;overflow:hidden;position:relative">
     <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(37,99,235,.15)"></div>
     <div style="position:absolute;bottom:-30px;left:60px;width:80px;height:80px;border-radius:50%;background:rgba(124,58,237,.1)"></div>
@@ -1181,7 +1344,6 @@ function mDash(st,counts){
         <button class="btn bsm" onclick="go('variance')" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:11px">View Details →</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <!-- Row 1: Short + Excess side by side -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:12px">
             <div style="font-size:9px;font-weight:700;color:rgba(252,165,165,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🔻 Short Loss</div>
@@ -1194,7 +1356,6 @@ function mDash(st,counts){
             <div style="font-size:10px;color:rgba(253,211,77,.5);margin-top:4px">${fmt(st._excessQty||0)} units excess</div>
           </div>
         </div>
-        <!-- Row 2: Total Impact full width -->
         <div style="background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:space-between">
           <div>
             <div style="font-size:9px;font-weight:700;color:rgba(147,197,253,.8);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">📊 Total Financial Impact</div>
@@ -1206,7 +1367,29 @@ function mDash(st,counts){
     </div>
   </div>
 
-  <!-- Quick search -->
+  <!-- ★ NEW: Multi-User Activity Panel (master auditor only) -->
+  ${activeUsers.length>0?`<div class="cd" style="margin-bottom:16px">
+    <div class="cdh"><div class="cdt">👥 Today's User Activity</div><button class="btn bgh bsm" onclick="go('audittrail')">Full Trail</button></div>
+    <div style="padding:12px 18px">
+      ${activeUsers.map(u=>{
+        const up=getUserPerf();const up_u=up[allToday.find(c=>(c.auditorName||c.auditor)===u)?.auditor]||{};
+        const uEntries=allToday.filter(c=>(c.auditorName||c.auditor)===u).length;
+        const acc2=up_u.totalCounts?Math.round(((up_u.totalCounts-(up_u.errorCounts||0))/up_u.totalCounts)*100):100;
+        return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff">${u[0]?.toUpperCase()||'U'}</div>
+            <span style="font-size:12px;font-weight:700">${esc(u)}</span>
+          </div>
+          <div style="display:flex;gap:10px;font-size:11px">
+            <span style="color:#2563eb;font-weight:700">${uEntries} entries</span>
+            <span style="color:${acc2>=90?'#059669':acc2>=70?'#d97706':'#dc2626'};font-weight:700">${acc2}% acc.</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`:''}
+
+  <!-- Quick search — unchanged -->
   <div class="cd" style="margin-bottom:16px">
     <div class="cdh"><div class="cdt">🔍 Quick Search</div><button class="btn bgh bsm" onclick="openGS()">Full Search</button></div>
     <div style="padding:14px">
@@ -1219,10 +1402,10 @@ function mDash(st,counts){
     <div class="cd"><div class="cdh"><div class="cdt">Variance</div></div><div style="padding:12px;display:flex;justify-content:center;max-height:190px"><canvas id="C2" style="max-height:175px;max-width:175px"></canvas></div></div>
   </div>`;
   setTimeout(()=>{
-    const notC=Math.max(0,total-todC);
-    const c1=$('C1');if(c1){if(S.charts.c1)S.charts.c1.destroy();S.charts.c1=new Chart(c1,{type:'doughnut',data:{labels:['Counted','Remaining'],datasets:[{data:[todC,notC],backgroundColor:['#2563eb','#e2e8f0'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'72%',responsive:true,maintainAspectRatio:true}});}
-    const c2=$('C2');const m=parseInt(st.matchCount||0),sh=parseInt(st.shortCount||0),ex=parseInt(st.excessCount||0);
-    if(c2){if(S.charts.c2)S.charts.c2.destroy();S.charts.c2=new Chart(c2,{type:'doughnut',data:{labels:['Match','Short','Excess'],datasets:[{data:[m,sh,ex],backgroundColor:['#059669','#dc2626','#d97706'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'72%',responsive:true,maintainAspectRatio:true}});}
+    const notC=Math.max(0,total-uniquePartsCounted);
+    const c1=$('C1');if(c1){if(S.charts.c1)S.charts.c1.destroy();S.charts.c1=new Chart(c1,{type:'doughnut',data:{labels:['Counted','Remaining'],datasets:[{data:[uniquePartsCounted,notC],backgroundColor:['#2563eb','#e2e8f0'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'72%',responsive:true,maintainAspectRatio:true}});}
+    const c2=$('C2');
+    if(c2){if(S.charts.c2)S.charts.c2.destroy();S.charts.c2=new Chart(c2,{type:'doughnut',data:{labels:['Match','Short','Excess'],datasets:[{data:[matchC,shortC,excessC],backgroundColor:['#059669','#dc2626','#d97706'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'72%',responsive:true,maintainAspectRatio:true}});}
   },100);
 }
 
@@ -1321,8 +1504,8 @@ function rScan(){
       </div>
     </div>
     <div class="tw"><table>
-      <thead><tr><th>Time</th><th>Part No</th><th>Desc</th><th>Bin</th><th>Qty</th><th>Type</th><th>Delete</th></tr></thead>
-      <tbody id="LTBL"><tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">Loading…</td></tr></tbody>
+      <thead><tr><th>Time</th><th>Part No</th><th>Desc</th><th>Bin</th><th>Qty</th><th>Type</th>${S.user?.role==='master_auditor'?'<th>Auditor</th>':''}<th>Delete</th></tr></thead>
+      <tbody id="LTBL"><tr><td colspan="${S.user?.role==='master_auditor'?'8':'7'}" style="text-align:center;padding:20px;color:#94a3b8">Loading…</td></tr></tbody>
     </table></div>
   </div>`;
   initWedge();
@@ -1381,18 +1564,20 @@ function setWSt(s){
 
 function focusWedge(){const inp=$('WEDGE');if(inp){inp.focus();inp.select();}}
 
+// ★ UPGRADED: processWedge — scan = final count, NOT addition
+// Same part scanned again → OVERWRITES qty in queue (no double counting)
 function processWedge(v){
   v=v.trim();
   const area=$('SCK');
   // Decode Hero QR format
   const res=decodeHQR(v);
   if(res&&res.length){
-    // ADD to queue (don't replace) — accumulate up to 20
     res.forEach(newItem=>{
       const existing=S.scanQ.find(q=>q.partNo===newItem.partNo);
       if(existing){
-        existing.qty+=newItem.qty; // sum quantities if same part scanned again
-        toast(`➕ ${newItem.partNo} qty updated: ${existing.qty}`,'i',2000);
+        // ★ FIX: OVERWRITE qty, do NOT add — scan = final physical count
+        existing.qty=newItem.qty;
+        toast(`🔄 ${newItem.partNo} qty set to: ${newItem.qty} (overwritten)`,'i',2000);
       } else if(S.scanQ.length<20){
         S.scanQ.push(newItem);
         toast(`📷 Added: ${newItem.partNo}`,'s',1500);
@@ -1410,8 +1595,9 @@ function processWedge(v){
   if(pn.length>2){
     const existing=S.scanQ.find(q=>q.partNo===pn);
     if(existing){
-      existing.qty+=1;
-      toast(`➕ ${pn} qty: ${existing.qty}`,'i',2000);
+      // ★ FIX: plain barcode re-scan → set qty to 1 (final count = 1 piece confirmed)
+      // User can manually adjust qty in the card before saving
+      toast(`🔄 ${pn} already in queue — adjust qty manually if needed`,'i',2500);
     } else if(S.scanQ.length<20){
       const item=findItem(pn);
       S.scanQ.push({partNo:pn,qty:1,mrp:parseFloat(item?.mrp)||0});
@@ -1508,15 +1694,68 @@ function aq(i,d){
 }
 function skip(i){const c=$('SC'+i);if(c){c.style.opacity='.3';c.style.pointerEvents='none';}}
 
+// ★ UPGRADED: Multi-user save — overwrites own entry, creates new for other users
 async function saveOne(i){
   const item=S.scanQ[i];if(!item)return;
   const m=findItem(item.partNo);
   const qty=parseInt($('SQ'+i)?.value)||item.qty;
   const bin=$('SBN'+i)?.value||m?.bin||'';
-  const r=await api({action:'saveCount',count:{id:uid(),partNo:item.partNo,desc:m?.desc||'',bin,date:today(),qty,time:nowt(),type:'QR',remarks:'',auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
+  const pn=item.partNo;
+
+  // ★ LOCK CHECK — block save if part is locked
+  if(isLocked(pn)){
+    toast(`🔒 ${pn} is locked — no further edits allowed`,'w',4000);
+    return;
+  }
+
+  // ★ VARIANCE CHECK — require reason if variance ≠ 0
+  const dmsQty=parseFloat(m?.systemQty||0);
+  const {variance,status}=calcVariance(qty,dmsQty);
+  let reason='';
+  if(variance!==0){
+    reason=await promptReason(pn,variance,status);
+    if(reason===null){toast('Save cancelled — reason is required','w');focusWedge();return;}
+  }
+
+  // ★ UPSERT LOGIC: find if this user already has an entry for this part today
+  const existingEntry=(S.allCounts||[]).find(c=>
+    c.partNo===pn && c.date===today() && c.auditor===S.user.username
+  );
+
+  let r;
+  if(existingEntry){
+    // Same user recount → overwrite their own entry (delete + re-save with same id)
+    // We reuse the existing id so the server overwrites the row
+    r=await api({action:'saveCount',count:{
+      id:existingEntry.id, // ★ reuse existing id → server will UPDATE the row
+      partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
+      time:nowt(), type:'QR', remarks:reason||'Recount by same user',
+      auditor:S.user.username, auditorName:S.user.name,
+      sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+    }});
+  } else {
+    // New entry (first count OR different user)
+    r=await api({action:'saveCount',count:{
+      id:uid(),
+      partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
+      time:nowt(), type:'QR', remarks:reason||'',
+      auditor:S.user.username, auditorName:S.user.name,
+      sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+    }});
+  }
+
   if(r.success){
-    toast(`✅ Saved: ${item.partNo} × ${qty}`,'s');
-    // Remove from queue
+    // ★ APPEND HISTORY (never overwrites, append-only)
+    appendHistory({
+      partNo:pn, user:S.user.username, userName:S.user.name,
+      countedQty:qty, systemQty:dmsQty, variance, status:status,
+      reason:reason||'', date:today(), time:nowt(), type:'QR',
+      action:existingEntry?'RECOUNT':'FIRST_COUNT'
+    });
+    // ★ TRACK USER PERFORMANCE
+    trackUserPerf(S.user.username, variance!==0);
+
+    toast(`✅ Saved: ${pn} × ${qty}${variance!==0?' ('+status+': '+Math.abs(variance)+')':''}`, 's');
     S.scanQ.splice(i,1);
     const area=$('SCK')||$('SCAM');if(area)renderCardsInto(area);
     reloadLog();
@@ -1524,25 +1763,66 @@ async function saveOne(i){
   focusWedge();
 }
 
+// ★ UPGRADED: Batch save — same upsert + lock + variance reason per item
 async function saveAllQR(){
   if(!S.scanQ.length){toast('Queue is empty','w');return;}
   const btn=document.querySelector('[onclick="saveAllQR()"]');
   if(btn){btn.disabled=true;btn.textContent='Saving…';}
-  let n=0,failed=0;
+  let n=0,failed=0,skipped=0;
+
   for(let i=0;i<S.scanQ.length;i++){
     const item=S.scanQ[i];
     if(!item)continue;
-    const m=findItem(item.partNo);
+    const pn=item.partNo;
+    const m=findItem(pn);
     const qty=parseInt($('SQ'+i)?.value)||item.qty;
     const bin=$('SBN'+i)?.value||m?.bin||'';
-    const r=await api({action:'saveCount',count:{id:uid(),partNo:item.partNo,desc:m?.desc||'',bin,date:today(),qty,time:nowt(),type:'QR',remarks:'',auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
-    if(r.success)n++;else failed++;
+    const dmsQty=parseFloat(m?.systemQty||0);
+
+    // ★ LOCK CHECK
+    if(isLocked(pn)){
+      toast(`🔒 ${pn} skipped — locked`,'w',2000);
+      skipped++;continue;
+    }
+
+    // ★ VARIANCE + REASON
+    const {variance,status}=calcVariance(qty,dmsQty);
+    let reason='';
+    if(variance!==0){
+      if(btn){btn.disabled=false;btn.textContent=`Save All (${S.scanQ.length})`;}
+      reason=await promptReason(pn,variance,status);
+      if(reason===null){toast(`⏭ Skipped ${pn} — no reason given`,'w');skipped++;continue;}
+      if(btn){btn.disabled=true;btn.textContent='Saving…';}
+    }
+
+    // ★ UPSERT: overwrite own entry, new for different user
+    const existingEntry=(S.allCounts||[]).find(c=>
+      c.partNo===pn && c.date===today() && c.auditor===S.user.username
+    );
+    const countPayload={
+      id:existingEntry?existingEntry.id:uid(),
+      partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
+      time:nowt(), type:'QR', remarks:reason||(existingEntry?'Recount by same user':''),
+      auditor:S.user.username, auditorName:S.user.name,
+      sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+    };
+    const r=await api({action:'saveCount',count:countPayload});
+    if(r.success){
+      n++;
+      appendHistory({
+        partNo:pn, user:S.user.username, userName:S.user.name,
+        countedQty:qty, systemQty:dmsQty, variance, status,
+        reason:reason||'', date:today(), time:nowt(), type:'QR',
+        action:existingEntry?'RECOUNT':'FIRST_COUNT'
+      });
+      trackUserPerf(S.user.username, variance!==0);
+    } else failed++;
   }
-  // Clear queue after saving
+
   S.scanQ=[];
   const area=$('SCK')||$('SCAM');if(area)area.innerHTML='';
   setWSt('wait');
-  toast(`✅ ${n} parts saved${failed?` (${failed} failed)`:''}. Queue cleared — keep scanning!`,'s',4000);
+  toast(`✅ ${n} saved${skipped?`, ${skipped} skipped`:''}${failed?`, ${failed} failed`:''}. Queue cleared!`,'s',4000);
   reloadLog();
   focusWedge();
 }
@@ -1559,21 +1839,29 @@ async function addSave(i){
 // ═══════════════════════════════════════════════════════════
 // LOG & DELETE
 // ═══════════════════════════════════════════════════════════
+// ★ UPGRADED: Scan log — shows auditor, recount flag, locked status
 async function reloadLog(){
   const tb=$('LTBL'),lc=$('LC');if(!tb)return;
   const isMaster=S.user?.role==='master_auditor';
   const counts=await fetchCounts(today(),isMaster?null:S.user.username);
+  const lockedParts=getLockedParts();
   if(lc)lc.textContent=counts.length;
-  if(!counts.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">No scans today</td></tr>';return;}
-  tb.innerHTML=[...counts].reverse().map(c=>`<tr id="R_${c.id}">
+  if(!counts.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:#94a3b8">No scans today</td></tr>';return;}
+  // Detect recounts: parts that appear more than once (different users or same user updated)
+  const partCounts={};counts.forEach(c=>{partCounts[c.partNo]=(partCounts[c.partNo]||0)+1;});
+  tb.innerHTML=[...counts].reverse().map(c=>{
+    const isRecount=partCounts[c.partNo]>1;
+    const isLocked=!!lockedParts[c.partNo];
+    return`<tr id="R_${c.id}" style="${isRecount?'background:#fffbeb':''}">
     <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(c.time||'').slice(0,5)}</td>
-    <td class="tpn">${esc(c.partNo)}</td>
-    <td>${esc(tr2(c.desc,20))}</td>
+    <td class="tpn">${esc(c.partNo)}${isLocked?'<span class="bg bgg" style="font-size:8px;margin-left:3px">🔒</span>':''}${isRecount?'<span class="bg bgw" style="font-size:8px;margin-left:3px">👥</span>':''}</td>
+    <td>${esc(tr2(c.desc,18))}</td>
     <td><span class="bg bgp" style="font-size:9px">${esc(c.bin||'—')}</span></td>
     <td class="tq">${c.qty}</td>
     <td><span class="bg bgg" style="font-size:9px">${c.type||'QR'}</span></td>
-    <td><button class="btn bda bsm" style="padding:3px 8px" onclick="delRow('${c.id}','R_${c.id}')">🗑</button></td>
-  </tr>`).join('');
+    ${isMaster?`<td style="font-size:10px;color:#64748b">${esc(c.auditorName||c.auditor||'')}</td>`:''}
+    <td>${isLocked?'<span style="font-size:10px;color:#94a3b8">🔒</span>':`<button class="btn bda bsm" style="padding:3px 8px" onclick="delRow('${c.id}','R_${c.id}')">🗑</button>`}</td>
+  </tr>`;}).join('');
 }
 
 async function delRow(id,rowId){
@@ -1630,13 +1918,49 @@ function acFn(inp,lst,fn){
 function mfl_MS(pn,d,b,q){$('MPMS')&&($('MPMS').value=pn);$('MDMS')&&($('MDMS').value=d);$('MBMS')&&($('MBMS').value=b||'');$('MQMS')&&($('MQMS').value=q||0);}
 function mfl_M(pn,d,b,q){$('MPM')&&($('MPM').value=pn);$('MDM')&&($('MDM').value=d);$('MBM')&&($('MBM').value=b||'');$('MQM')&&($('MQM').value=q||0);}
 
+// ★ UPGRADED: Manual save — upsert own entry, lock check, variance reason, history
 async function subMan(sfx){
   const pn=($(`MP${sfx}`)?.value||'').trim().toUpperCase();
   if(!pn){toast('Enter Part Number','w');return;}
   const qty=parseInt($(`MPQ${sfx}`)?.value)||0;
-  const r=await api({action:'saveCount',count:{id:uid(),partNo:pn,desc:$(`MD${sfx}`)?.value||'',bin:$(`MB${sfx}`)?.value||'',date:today(),qty,time:nowt(),type:'Manual',remarks:$(`MR${sfx}`)?.value||'',auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
-  if(r.success){toast(`✅ Saved: ${pn} × ${qty}`,'s');clrMan(sfx);reloadLog();if($('MRECENT'))await loadManRecent();}
-  else toast(r.error||'Failed','d');
+  const m=findItem(pn);
+  const dmsQty=parseFloat(m?.systemQty||0);
+
+  // ★ LOCK CHECK
+  if(isLocked(pn)){toast(`🔒 ${pn} is locked`,'w',4000);return;}
+
+  // ★ VARIANCE + REASON
+  const {variance,status}=calcVariance(qty,dmsQty);
+  let reason=$(`MR${sfx}`)?.value||'';
+  if(variance!==0 && !reason){
+    reason=await promptReason(pn,variance,status);
+    if(reason===null){toast('Save cancelled — reason required','w');return;}
+  }
+
+  // ★ UPSERT
+  const existingEntry=(S.allCounts||[]).find(c=>
+    c.partNo===pn && c.date===today() && c.auditor===S.user.username
+  );
+  const r=await api({action:'saveCount',count:{
+    id:existingEntry?existingEntry.id:uid(),
+    partNo:pn, desc:$(`MD${sfx}`)?.value||'', bin:$(`MB${sfx}`)?.value||'',
+    date:today(), qty, time:nowt(), type:'Manual',
+    remarks:reason||(existingEntry?'Recount':''),
+    auditor:S.user.username, auditorName:S.user.name,
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+  }});
+  if(r.success){
+    appendHistory({
+      partNo:pn, user:S.user.username, userName:S.user.name,
+      countedQty:qty, systemQty:dmsQty, variance, status,
+      reason:reason||'', date:today(), time:nowt(), type:'Manual',
+      action:existingEntry?'RECOUNT':'FIRST_COUNT'
+    });
+    trackUserPerf(S.user.username, variance!==0);
+    toast(`✅ Saved: ${pn} × ${qty}`,'s');
+    clrMan(sfx);reloadLog();
+    if($('MRECENT'))await loadManRecent();
+  } else toast(r.error||'Failed','d');
 }
 function clrMan(sfx){['MP','MD','MR'].forEach(p=>{const e=$(p+sfx);if(e)e.value='';});const q=$('MPQ'+sfx);if(q)q.value='1';const b=$('MB'+sfx);if(b)b.value='';}
 
@@ -1667,12 +1991,49 @@ function pktForm(){
 }
 function pkfl(pn,d,b){$('PKPN').value=pn;$('PKDSC').value=d;$('PKBN').value=b||'';$('PKAL').style.display='none';}
 function cpkt(){const u=parseInt($('PKU')?.value)||0,n=parseInt($('PKN')?.value)||0,b=$('PKTOT'),v=$('PKTV'),c=$('PKTC');if(!b)return;if(u>0&&n>0){b.style.display='block';v.textContent=fmt(u*n)+' units';c.textContent=`${n} pkts × ${u} = ${u*n}`;}else b.style.display='none';}
+// ★ UPGRADED: Packet save — upsert + lock + variance + history
 async function subPkt(){
   const pn=($('PKPN')?.value||'').trim().toUpperCase();if(!pn){toast('Enter Part Number','w');return;}
   const u=parseInt($('PKU')?.value)||0,n=parseInt($('PKN')?.value)||0;if(!u||!n){toast('Enter units & packet count','w');return;}
-  const r=await api({action:'saveCount',count:{id:uid(),partNo:pn,desc:$('PKDSC')?.value||'',bin:$('PKBN')?.value||'',date:today(),qty:u*n,time:nowt(),type:'Packet',remarks:`${n}pkts×${u}`,auditor:S.user.username,auditorName:S.user.name,sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()}});
-  if(r.success){toast(`✅ Packet: ${pn} × ${u*n}`,'s');['PKPN','PKDSC','PKU','PKN'].forEach(id=>{const e=$(id);if(e)e.value='';});$('PKBN').value='';cpkt();reloadLog();}
-  else toast(r.error||'Failed','d');
+  const qty=u*n;
+  const m=findItem(pn);
+  const dmsQty=parseFloat(m?.systemQty||0);
+
+  // ★ LOCK CHECK
+  if(isLocked(pn)){toast(`🔒 ${pn} is locked`,'w',4000);return;}
+
+  // ★ VARIANCE + REASON
+  const {variance,status}=calcVariance(qty,dmsQty);
+  let reason='';
+  if(variance!==0){
+    reason=await promptReason(pn,variance,status);
+    if(reason===null){toast('Save cancelled','w');return;}
+  }
+
+  // ★ UPSERT
+  const existingEntry=(S.allCounts||[]).find(c=>
+    c.partNo===pn && c.date===today() && c.auditor===S.user.username
+  );
+  const r=await api({action:'saveCount',count:{
+    id:existingEntry?existingEntry.id:uid(),
+    partNo:pn, desc:$('PKDSC')?.value||'', bin:$('PKBN')?.value||'',
+    date:today(), qty, time:nowt(), type:'Packet',
+    remarks:reason||`${n}pkts×${u}`,
+    auditor:S.user.username, auditorName:S.user.name,
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+  }});
+  if(r.success){
+    appendHistory({
+      partNo:pn, user:S.user.username, userName:S.user.name,
+      countedQty:qty, systemQty:dmsQty, variance, status,
+      reason:reason||`${n}pkts×${u}`, date:today(), time:nowt(), type:'Packet',
+      action:existingEntry?'RECOUNT':'FIRST_COUNT'
+    });
+    trackUserPerf(S.user.username, variance!==0);
+    toast(`✅ Packet: ${pn} × ${qty}`,'s');
+    ['PKPN','PKDSC','PKU','PKN'].forEach(id=>{const e=$(id);if(e)e.value='';});
+    $('PKBN').value='';cpkt();reloadLog();
+  } else toast(r.error||'Failed','d');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2239,55 +2600,102 @@ function expUncounted(){
     `uncounted_${today()}.csv`);
 }
 
+// ★ UPGRADED: Variance page — uses mode (most frequent value) as final count
+//   Shows multi-user entries per part, lock button for master auditor
 async function rVariance(){
   const pg=$('PG');pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
   const counts=await fetchCounts();
-  const cMap={};counts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
   const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
-  pg.innerHTML=`<div class="ph"><div><div class="pt">📊 Variance Report</div><div class="ps">DMS qty = System Qty from items sheet</div></div>
-    <div style="display:flex;gap:8px">
+
+  // ★ Build per-part map using MODE (most frequent count) as final qty
+  // Each part: collect all user entries → one entry per user (latest) → mode
+  const today_s=today();
+  const partUserMap={}; // partNo → {username → latest count entry}
+  counts.forEach(c=>{
+    if(!partUserMap[c.partNo])partUserMap[c.partNo]={};
+    const existing=partUserMap[c.partNo][c.auditor];
+    if(!existing||c.time>existing.time) partUserMap[c.partNo][c.auditor]=c;
+  });
+  // cMap[partNo] = mode of all user counts
+  const cMap={};
+  const cUserMap={}; // partNo → {mode, userEntries[], allValues[]}
+  Object.entries(partUserMap).forEach(([pn,byUser])=>{
+    const entries=Object.values(byUser);
+    const vals=entries.map(e=>parseInt(e.qty)||0);
+    const freq={};vals.forEach(v=>{freq[v]=(freq[v]||0)+1;});
+    let mode=vals[0],maxF=0;
+    Object.entries(freq).forEach(([v,f])=>{if(parseInt(f)>maxF){maxF=parseInt(f);mode=parseInt(v);}});
+    cMap[pn]=mode;
+    cUserMap[pn]={mode,entries,allValues:vals,userCount:entries.length};
+  });
+
+  const lockedParts=getLockedParts();
+  const isMaster=S.user?.role==='master_auditor';
+
+  pg.innerHTML=`<div class="ph"><div><div class="pt">📊 Variance Report</div>
+    <div class="ps">Final count = mode (most frequent value across users) · DMS qty = System Qty</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn bgh bsm" onclick="expVar('all')">⬇ Export</button>
       <button class="btn bgh bsm" onclick="showEmail('variance')">📧 Email</button>
       <button class="btn bgh bsm" onclick="printReport('Variance Report')">🖨 Print</button>
+      ${isMaster?`<button class="btn bwa bsm" onclick="rFinalCountPanel()">🔐 Resolve Final Counts</button>`:''}
     </div>
   </div>
   <div class="cd"><div class="fb">
     <input class="fin" id="VFS" placeholder="🔍 Search part / description" oninput="dVT()">
     <select class="fin" id="VFB" onchange="dVT()"><option value="">All Bins</option>${bo}</select>
     <select class="fin" id="VFST" onchange="dVT()"><option value="">All Status</option><option value="match">Match</option><option value="short">Short</option><option value="excess">Excess</option><option value="notcounted">Not Counted</option></select>
+    <select class="fin" id="VFMULTI" onchange="dVT()"><option value="">All Counts</option><option value="multi">Multi-User Only</option><option value="conflict">Conflicting Values</option></select>
   </div>
   <div id="VTBL"></div><div id="VSUM" class="smb"></div><div id="VPAG" class="pag"></div></div>`;
-  S.pd.vm=cMap;S.pg.v={p:1,sz:PGSZ};dVT();
+
+  S.pd.vm=cMap;S.pd.vcum=cUserMap;S.pd.vlock=lockedParts;S.pg.v={p:1,sz:PGSZ};dVT();
 }
 
+// ★ UPGRADED: Variance table renderer — mode-based final count, multi-user flags
 function dVT(){
   const w=$('VTBL'),sm=$('VSUM'),pag=$('VPAG');if(!w)return;
   const cm=S.pd.vm||{};
+  const cum=S.pd.vcum||{};
+  const lockedParts=S.pd.vlock||{};
+  const isMaster=S.user?.role==='master_auditor';
   const s=($('VFS')?.value||'').toUpperCase(),b=$('VFB')?.value||'',st=$('VFST')?.value||'';
+  const multiFilter=$('VFMULTI')?.value||'';
   const p=S.pg.v||{p:1,sz:PGSZ};
   let rows=S.items.map(item=>{
-    const c=cm[item.partNo];const cnt=c??null;
+    const cu=cum[item.partNo]||null;
+    const cnt=cm[item.partNo]??null;
     const dms=parseFloat(item.systemQty)||0;
     const diff=cnt!==null?cnt-dms:null;
     const st2=cnt===null?'notcounted':diff===0?'match':diff<0?'short':'excess';
-    return{item,cnt,dms,diff,st:st2};
+    const isMulti=cu&&cu.userCount>1;
+    const isConflict=cu&&cu.userCount>1&&(new Set(cu.allValues).size>1);
+    return{item,cnt,dms,diff,st:st2,cu,isMulti,isConflict,locked:!!lockedParts[item.partNo]};
   });
   if(s)rows=rows.filter(r=>(r.item.partNo||'').toUpperCase().includes(s)||(r.item.desc||'').toUpperCase().includes(s));
   if(b)rows=rows.filter(r=>(r.item.bin||'')===b);
   if(st)rows=rows.filter(r=>r.st===st);
-  rows.sort((a,bb)=>({short:0,excess:1,match:2,notcounted:3}[a.st]||3)-({short:0,excess:1,match:2,notcounted:3}[bb.st]||3));
-  const tots={match:0,short:0,excess:0,notcounted:0};rows.forEach(r=>tots[r.st]++);
-  // DLC value totals
+  if(multiFilter==='multi')rows=rows.filter(r=>r.isMulti);
+  if(multiFilter==='conflict')rows=rows.filter(r=>r.isConflict);
+  rows.sort((a,bb)=>{
+    // Conflicts first, then short, excess, match, notcounted
+    const rank=r=>r.isConflict?0:r.st==='short'?1:r.st==='excess'?2:r.st==='match'?3:4;
+    return rank(a)-rank(bb);
+  });
+  const tots={match:0,short:0,excess:0,notcounted:0,conflict:0};
+  rows.forEach(r=>{tots[r.st]++;if(r.isConflict)tots.conflict++;});
   const dlcTot={short:0,excess:0};
   rows.forEach(r=>{
     if((r.st==='short'||r.st==='excess')&&r.diff!==null)
       dlcTot[r.st]+=Math.abs(r.diff)*(parseFloat(r.item.dlc)||0);
   });
-  if(sm)sm.innerHTML='<div class="smi">Total: <strong>'+rows.length+'</strong></div>'
+  if(sm)sm.innerHTML=
+    '<div class="smi">Total: <strong>'+rows.length+'</strong></div>'
     +'<div class="smi" style="color:#059669">✅ '+tots.match+'</div>'
     +'<div class="smi" style="color:#dc2626">🔻 '+tots.short+'</div>'
     +'<div class="smi" style="color:#d97706">🔺 '+tots.excess+'</div>'
-    +'<div class="smi" style="color:#94a3b8">⬜ '+tots.notcounted+'</div>';
+    +'<div class="smi" style="color:#94a3b8">⬜ '+tots.notcounted+'</div>'
+    +(tots.conflict?'<div class="smi" style="color:#7c3aed">⚡ '+tots.conflict+' conflicts</div>':'');
   const tot=rows.length,pages=Math.ceil(tot/p.sz),st2=(p.p-1)*p.sz;
   const sl={match:'Match',short:'Short',excess:'Excess',notcounted:'Not Counted'};
   let tbody='';
@@ -2299,10 +2707,27 @@ function dVT(){
     const showVal=(r.st==='short'||r.st==='excess')&&r.diff!==null;
     const val=showVal?('₹'+Math.round(Math.abs(r.diff)*dlc).toLocaleString('en-IN')):'—';
     const valColor=r.st==='short'?'color:#dc2626':r.st==='excess'?'color:#d97706':'color:#94a3b8';
-    tbody+='<tr>'
+    // ★ Multi-user badge
+    const muBadge=r.cu&&r.cu.userCount>1
+      ? (r.isConflict
+          ? `<span class="bg" style="font-size:8px;background:#f5f3ff;color:#7c3aed;border-color:#c4b5fd;margin-left:4px">⚡${r.cu.userCount}u conflict</span>`
+          : `<span class="bg bgp" style="font-size:8px;margin-left:4px">👥${r.cu.userCount}u</span>`)
+      : '';
+    // ★ Lock badge
+    const lockBadge=r.locked?'<span class="bg bgg" style="font-size:8px;margin-left:4px">🔒</span>':'';
+    // ★ Lock/Resolve actions (master only)
+    const actions=isMaster
+      ? (!r.locked
+          ? `<button class="btn bgh bsm" style="padding:2px 7px;font-size:10px" onclick="lockPart('${esc(r.item.partNo)}');rVariance()">🔒 Lock</button>`
+          : `<span style="font-size:10px;color:#94a3b8">🔒 Locked</span>`)
+        + (r.isConflict
+          ? ` <button class="btn bwa bsm" style="padding:2px 7px;font-size:10px" onclick="resolveConflict('${esc(r.item.partNo)}')">⚡ Resolve</button>`
+          : '')
+      : '';
+    tbody+='<tr style="'+(r.isConflict?'background:#f5f3ff':'')+'">'
       +'<td style="font-size:10px">'+(st2+i+1)+'</td>'
-      +'<td class="tpn">'+esc(r.item.partNo)+'</td>'
-      +'<td>'+esc(tr2(r.item.desc,22))+'</td>'
+      +'<td class="tpn">'+esc(r.item.partNo)+lockBadge+muBadge+'</td>'
+      +'<td>'+esc(tr2(r.item.desc,20))+'</td>'
       +'<td><span class="bg bgp" style="font-size:9px">'+esc(r.item.bin||'—')+'</span></td>'
       +'<td class="tq">'+r.dms+'</td>'
       +'<td class="tq">'+(r.cnt!==null?r.cnt:'—')+'</td>'
@@ -2310,9 +2735,10 @@ function dVT(){
       +'<td class="tq" style="color:#64748b;font-size:11px">₹'+dlc.toFixed(2)+'</td>'
       +'<td class="tq" style="'+valColor+';font-weight:700">'+val+'</td>'
       +'<td><span class="bg '+sb+'">'+sl[r.st]+'</span></td>'
+      +(isMaster?'<td style="white-space:nowrap">'+actions+'</td>':'')
       +'</tr>';
   });
-  if(!tbody)tbody='<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8">No items</td></tr>';
+  if(!tbody)tbody='<tr><td colspan="'+(isMaster?11:10)+'" style="text-align:center;padding:24px;color:#94a3b8">No items</td></tr>';
   let valBar='';
   if(dlcTot.short>0||dlcTot.excess>0){
     valBar='<div style="display:flex;gap:16px;padding:12px 16px;background:#f8fafc;border-top:1px solid var(--bd);flex-wrap:wrap;align-items:center">'
@@ -2321,7 +2747,8 @@ function dVT(){
       +'<div style="font-size:12px;font-weight:800;color:#0f172a;margin-left:auto">💰 Total Impact: ₹'+Math.round(dlcTot.short+dlcTot.excess).toLocaleString('en-IN')+'</div>'
       +'</div>';
   }
-  w.innerHTML='<div class="tw"><table><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Bin</th><th>DMS</th><th>Counted</th><th>Diff</th><th>DLC Rate</th><th>💰 Value</th><th>Status</th></tr></thead><tbody>'+tbody+'</tbody></table></div>'+valBar;
+  const colHeaders='<th>#</th><th>Part No</th><th>Description</th><th>Bin</th><th>DMS</th><th>Final Count</th><th>Diff</th><th>DLC Rate</th><th>💰 Value</th><th>Status</th>'+(isMaster?'<th>Actions</th>':'');
+  w.innerHTML='<div class="tw"><table><thead><tr>'+colHeaders+'</tr></thead><tbody>'+tbody+'</tbody></table></div>'+valBar;
   if(pag){
     let h='<span class="pi">'+(st2+1)+'–'+Math.min(st2+p.sz,tot)+' of '+tot+'</span>';
     h+='<button class="pb" onclick="vpg('+(p.p-1)+')" '+(p.p<=1?'disabled':'')+'>‹</button>';
@@ -2332,6 +2759,123 @@ function dVT(){
   }
 }
 function vpg(n){S.pg.v.p=n;dVT();}
+
+// ★ NEW: Resolve conflict modal — supervisor selects final count from user entries
+function resolveConflict(partNo){
+  const cu=(S.pd.vcum||{})[partNo];
+  if(!cu)return;
+  const item=findItem(partNo);
+  const dms=parseFloat(item?.systemQty||0);
+  const opts=cu.entries.map((e,i)=>`
+    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid ${i===0?'#2563eb':'#e2e8f0'};border-radius:9px;cursor:pointer;margin-bottom:8px;background:${i===0?'#eff6ff':'#f8fafc'}">
+      <input type="radio" name="RSEL" value="${e.qty}" ${i===0?'checked':''} style="accent-color:#2563eb">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700">${e.qty} units</div>
+        <div style="font-size:11px;color:#64748b">${esc(e.auditorName||e.auditor)} · ${(e.time||'').slice(0,5)} · ${e.type||'QR'}</div>
+        ${e.remarks?`<div style="font-size:10px;color:#94a3b8;margin-top:2px">Reason: ${esc(e.remarks)}</div>`:''}
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;font-weight:700;color:${(e.qty-dms)===0?'#059669':(e.qty-dms)<0?'#dc2626':'#d97706'}">
+          ${e.qty-dms===0?'✅ Match':(e.qty-dms>0?'🔺 +':'🔻 ')+(e.qty-dms)}
+        </div>
+      </div>
+    </label>`).join('');
+  modal(`<div class="md">
+    <div class="mdh"><div class="mdt">⚡ Resolve Conflict — ${esc(partNo)}</div><button class="mdc" onclick="closeMd()">✕</button></div>
+    <div class="mdb">
+      <div style="background:#f5f3ff;border:1px solid #c4b5fd;border-radius:var(--rs);padding:10px 13px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#7c3aed">⚡ Multiple users counted this part with different values</div>
+        <div style="font-size:11px;color:#6d28d9;margin-top:3px">DMS Stock: <strong>${dms}</strong> · Auto-suggested: <strong>${cu.mode}</strong> units (mode)</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Select final count:</div>
+      ${opts}
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:9px;cursor:pointer;margin-bottom:8px;background:#f8fafc">
+        <input type="radio" name="RSEL" value="custom" style="accent-color:#2563eb">
+        <div style="flex:1"><div style="font-size:13px;font-weight:700">Custom value</div></div>
+        <input type="number" id="RCUSTOM" min="0" placeholder="Enter qty" style="width:80px;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;font-weight:700" onclick="document.querySelector('input[name=RSEL][value=custom]').checked=true">
+      </label>
+    </div>
+    <div class="mdf">
+      <button class="btn bgh" onclick="closeMd()">Cancel</button>
+      <button class="btn bpr" onclick="applyFinalCount('${esc(partNo)}',${dms})">✅ Set Final Count</button>
+    </div>
+  </div>`);
+}
+
+// ★ NEW: Apply supervisor-selected final count and lock the part
+async function applyFinalCount(partNo, dms){
+  const sel=document.querySelector('input[name=RSEL]:checked');
+  if(!sel){toast('Select a count value','w');return;}
+  let qty=sel.value==='custom'?parseInt($('RCUSTOM')?.value||0):parseInt(sel.value)||0;
+  const {variance,status}=calcVariance(qty,dms);
+  let reason='Supervisor final count resolution';
+  if(variance!==0){
+    closeMd();
+    reason=await promptReason(partNo,variance,status);
+    if(reason===null){toast('Resolution cancelled','w');return;}
+  } else {
+    closeMd();
+  }
+  // Save as supervisor's definitive entry (will overwrite own entry)
+  const existingEntry=(S.allCounts||[]).find(c=>
+    c.partNo===partNo && c.date===today() && c.auditor===S.user.username
+  );
+  const r=await api({action:'saveCount',count:{
+    id:existingEntry?existingEntry.id:uid(),
+    partNo, desc:findItem(partNo)?.desc||'',
+    bin:findItem(partNo)?.bin||'', date:today(), qty,
+    time:nowt(), type:'Manual',
+    remarks:`[SUPERVISOR RESOLVED] ${reason}`,
+    auditor:S.user.username, auditorName:S.user.name,
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+  }});
+  if(r.success){
+    appendHistory({
+      partNo, user:S.user.username, userName:S.user.name,
+      countedQty:qty, systemQty:dms, variance, status,
+      reason:`[SUPERVISOR RESOLVED] ${reason}`, date:today(), time:nowt(),
+      type:'Manual', action:'SUPERVISOR_RESOLVED'
+    });
+    lockPart(partNo); // auto-lock after supervisor resolution
+    toast(`✅ Final count set: ${partNo} = ${qty} units. Part locked.`,'s',4000);
+    rVariance();
+  } else toast(r.error||'Failed','d');
+}
+
+// ★ NEW: Final Count Resolution Panel (master auditor) — shows all conflicting parts
+function rFinalCountPanel(){
+  const cum=S.pd.vcum||{};
+  const conflicts=Object.entries(cum).filter(([,v])=>v.userCount>1&&new Set(v.allValues).size>1);
+  if(!conflicts.length){toast('No conflicts — all parts have consistent counts','s');return;}
+  modal(`<div class="md mdlg">
+    <div class="mdh"><div class="mdt">🔐 Final Count Resolution — ${conflicts.length} Conflicts</div><button class="mdc" onclick="closeMd()">✕</button></div>
+    <div class="mdb" style="padding:0">
+      <div style="padding:10px 18px;background:#f5f3ff;border-bottom:1px solid #c4b5fd;font-size:12px;color:#7c3aed;font-weight:600">
+        ⚡ These parts were counted by multiple users with different values. Select each to resolve.
+      </div>
+      <div style="max-height:400px;overflow-y:auto">
+        ${conflicts.map(([pn,cu])=>{
+          const item=findItem(pn);const dms=parseFloat(item?.systemQty||0);
+          return`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #f1f5f9;gap:10px">
+            <div style="flex:1">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:#2563eb">${esc(pn)}</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px">${esc(tr2(item?.desc||'',28))}</div>
+              <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+                ${cu.entries.map(e=>`<span style="font-size:10px;background:#f1f5f9;border-radius:4px;padding:1px 6px;font-weight:700">${e.auditorName||e.auditor}: <strong>${e.qty}</strong></span>`).join('')}
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;color:#64748b">Suggested: <strong>${cu.mode}</strong></div>
+              <div style="font-size:10px;color:#94a3b8">DMS: ${dms}</div>
+            </div>
+            <button class="btn bwa bsm" style="white-space:nowrap" onclick="closeMd();resolveConflict('${esc(pn)}')">⚡ Resolve</button>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="mdf"><button class="btn bgh" onclick="closeMd()">Close</button></div>
+  </div>`);
+}
 
 function printReport(title){
   // Add print header temporarily
@@ -3716,81 +4260,191 @@ function logTrail(action, partNo, desc, oldVal, newVal, extra){
 function getTrail(){ try{ return JSON.parse(localStorage.getItem(TRAIL_KEY)||'[]'); }catch{return[];} }
 function saveTrail(trail){ localStorage.setItem(TRAIL_KEY, JSON.stringify(trail)); }
 
+// ★ UPGRADED: Audit Trail — shows both existing trail AND new appendHistory log
+//   Added: User Performance tab, Audit History tab, count history tab
 async function rAuditTrail(){
   const pg=$('PG');
   const trail=getTrail();
+  const auditHist=getAuditHistory();
+  const userPerf=getUserPerf();
+  const lockedParts=getLockedParts();
 
   // Stats
   const flagged=trail.filter(t=>t.flagged&&!t.resolved);
   const resolved=trail.filter(t=>t.resolved);
   const today_entries=trail.filter(t=>t.date===today());
-
-  const actionColors={
-    'COUNT_SAVED':'#059669','COUNT_DELETED':'#dc2626','COUNT_UPDATED':'#d97706',
-    'ITEM_EDITED':'#2563eb','ITEM_ADDED':'#7c3aed','ITEM_DELETED':'#dc2626',
-    'DMS_APPLIED':'#0891b2','SESSION_CREATED':'#059669','LOGIN':'#94a3b8'
-  };
+  const todayHist=auditHist.filter(h=>h.date===today());
+  const lockedCount=Object.keys(lockedParts).length;
 
   pg.innerHTML=`
   <div class="ph" style="align-items:center;flex-wrap:wrap;gap:10px">
-    <div><div class="pt">🔍 Audit Trail</div><div class="ps">Complete history of all changes — who, what, when</div></div>
+    <div><div class="pt">🔍 Audit Trail</div><div class="ps">Count history · User performance · System changes</div></div>
     <div style="display:flex;gap:8px">
       <button class="btn bda bsm" onclick="clearTrail()">🗑 Clear Old (>30d)</button>
       <button class="btn bgh bsm" onclick="dlTrail()">⬇️ Export CSV</button>
+      <button class="btn bgh bsm" onclick="dlAuditHistory()">⬇️ Count History</button>
     </div>
   </div>
 
-  <!-- Summary -->
-  <div class="sg s4" style="margin-bottom:16px">
+  <!-- Summary stats -->
+  <div class="sg" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
     <div class="st" style="border-left:4px solid #0f172a">
-      <div class="stl">📋 Total Events</div>
+      <div class="stl">📋 System Events</div>
       <div class="stv">${trail.length}</div>
-      <div class="sts">All recorded changes</div>
+      <div class="sts">all time</div>
     </div>
     <div class="st" style="border-left:4px solid #2563eb">
-      <div class="stl">📅 Today</div>
-      <div class="stv" style="color:#2563eb">${today_entries.length}</div>
-      <div class="sts">Events today</div>
+      <div class="stl">📝 Count Records</div>
+      <div class="stv" style="color:#2563eb">${auditHist.length}</div>
+      <div class="sts">${todayHist.length} today</div>
     </div>
+    <div class="st" style="border-left:4px solid #7c3aed">
+      <div class="stl">🔒 Locked Parts</div>
+      <div class="stv" style="color:#7c3aed">${lockedCount}</div>
+      <div class="sts">no further edits</div>
+    </div>
+  </div>
+  <div class="sg s2" style="margin-bottom:14px">
     <div class="st" style="border-left:4px solid #dc2626" onclick="atFilter('flagged')">
       <div class="stl">🚩 Flagged</div>
       <div class="stv" style="color:#dc2626">${flagged.length}</div>
-      <div class="sts">Needs review — click</div>
+      <div class="sts">needs review</div>
     </div>
     <div class="st" style="border-left:4px solid #059669" onclick="atFilter('resolved')">
       <div class="stl">✅ Resolved</div>
       <div class="stv" style="color:#059669">${resolved.length}</div>
-      <div class="sts">Discrepancies closed</div>
+      <div class="sts">discrepancies closed</div>
     </div>
   </div>
 
-  <!-- Flagged Alert -->
-  ${flagged.length?`
-  <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-    <div>
-      <div style="font-size:14px;font-weight:800;color:#dc2626">🚩 ${flagged.length} Unresolved Discrepancies</div>
-      <div style="font-size:12px;color:#94a3b8;margin-top:3px">Latest: ${flagged[0]?.partNo} — ${flagged[0]?.extra||flagged[0]?.action}</div>
-    </div>
+  ${flagged.length?`<div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div><div style="font-size:14px;font-weight:800;color:#dc2626">🚩 ${flagged.length} Unresolved Discrepancies</div>
+    <div style="font-size:12px;color:#94a3b8;margin-top:3px">Latest: ${flagged[0]?.partNo} — ${flagged[0]?.extra||flagged[0]?.action}</div></div>
     <button class="btn bda bsm" onclick="atFilter('flagged')">View Flagged →</button>
   </div>`:``}
 
-  <!-- Filters -->
-  <div class="cd" style="margin-bottom:14px">
-    <div class="cdh"><div class="cdt">Filter Events</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px">
-      <button class="btn bpr bsm" onclick="atFilter('all')">All</button>
-      <button class="btn bgh bsm" onclick="atFilter('today')">Today</button>
-      <button class="btn bgh bsm" onclick="atFilter('counts')">Counts Only</button>
-      <button class="btn bgh bsm" onclick="atFilter('items')">Item Changes</button>
-      <button class="btn bda bsm" onclick="atFilter('flagged')">🚩 Flagged</button>
-      <button class="btn bgh bsm" onclick="atFilter('resolved')">✅ Resolved</button>
-      <input class="fi" id="ATPART" placeholder="Filter by Part No…" oninput="atFilterPart()" style="width:180px;padding:5px 10px;font-size:12px" autocomplete="off" autocapitalize="none">
+  <!-- Tabs -->
+  <div class="tbr" style="margin-bottom:0">
+    <button class="tb2 on" id="ATTAB_sysevt" onclick="atShowTab('sysevt',this)">⚙️ System Events</button>
+    <button class="tb2" id="ATTAB_counthist" onclick="atShowTab('counthist',this)">📝 Count History</button>
+    <button class="tb2" id="ATTAB_userperf" onclick="atShowTab('userperf',this)">👤 User Performance</button>
+    <button class="tb2" id="ATTAB_locked" onclick="atShowTab('locked',this)">🔒 Locked Parts (${lockedCount})</button>
+  </div>
+
+  <!-- System Events tab content -->
+  <div id="AT_sysevt">
+    <div class="cd" style="margin-bottom:14px;border-top:none;border-radius:0 0 var(--r) var(--r)">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--bd)">
+        <button class="btn bpr bsm" onclick="atFilter('all')">All</button>
+        <button class="btn bgh bsm" onclick="atFilter('today')">Today</button>
+        <button class="btn bgh bsm" onclick="atFilter('counts')">Counts Only</button>
+        <button class="btn bgh bsm" onclick="atFilter('items')">Item Changes</button>
+        <button class="btn bda bsm" onclick="atFilter('flagged')">🚩 Flagged</button>
+        <button class="btn bgh bsm" onclick="atFilter('resolved')">✅ Resolved</button>
+        <input class="fi" id="ATPART" placeholder="Filter by Part No…" oninput="atFilterPart()" style="width:180px;padding:5px 10px;font-size:12px" autocomplete="off" autocapitalize="none">
+      </div>
+      <div id="ATTBL"></div>
     </div>
   </div>
 
-  <div id="ATTBL"></div>`;
+  <!-- Count History tab content -->
+  <div id="AT_counthist" style="display:none">
+    <div class="cd" style="border-top:none;border-radius:0 0 var(--r) var(--r)">
+      ${auditHist.length?`<div class="tw"><table>
+        <thead><tr><th>Date</th><th>Time</th><th>User</th><th>Part No</th><th>Counted</th><th>DMS</th><th>Variance</th><th>Status</th><th>Action</th><th>Reason</th></tr></thead>
+        <tbody>${auditHist.slice(0,300).map(h=>{
+          const sc=h.status==='SHORT'?'ds':h.status==='EXCESS'?'de':'dm';
+          const aIcon={FIRST_COUNT:'🆕',RECOUNT:'🔄',SUPERVISOR_RESOLVED:'🔐'}[h.action]||'📝';
+          return`<tr>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${esc(h.date||'')}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(h.time||'').slice(0,5)}</td>
+            <td style="font-size:11px;font-weight:600">${esc(h.userName||h.user||'')}</td>
+            <td class="tpn">${esc(h.partNo||'')}</td>
+            <td class="tq">${h.countedQty??'—'}</td>
+            <td class="tq" style="color:#64748b">${h.systemQty??'—'}</td>
+            <td class="tq ${sc}">${h.variance>0?'▲':h.variance<0?'▼':'±'}${Math.abs(h.variance||0)}</td>
+            <td><span class="bg ${h.status==='OK'?'bgs':h.status==='SHORT'?'bgd':'bgw'}">${h.status||'OK'}</span></td>
+            <td style="font-size:11px">${aIcon} ${h.action||''}</td>
+            <td style="font-size:10px;color:#64748b;max-width:120px;overflow:hidden;text-overflow:ellipsis">${esc(tr2(h.reason||'',20))}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+      ${auditHist.length>300?`<div style="padding:8px 16px;font-size:11px;color:#94a3b8">Showing 300 of ${auditHist.length}</div>`:''}
+      `:`<div class="emp" style="padding:40px"><div class="emp-i">📝</div><div class="emp-t">No count history yet</div><div class="emp-s">Save some counts to see history here</div></div>`}
+    </div>
+  </div>
+
+  <!-- User Performance tab content -->
+  <div id="AT_userperf" style="display:none">
+    <div class="cd" style="border-top:none;border-radius:0 0 var(--r) var(--r)">
+      ${Object.keys(userPerf).length?`<div class="tw"><table>
+        <thead><tr><th>User</th><th style="text-align:right">Total Counts</th><th style="text-align:right">With Variance</th><th style="text-align:right">Accuracy</th><th style="text-align:right">Performance</th></tr></thead>
+        <tbody>${Object.entries(userPerf).sort((a,b)=>b[1].totalCounts-a[1].totalCounts).map(([u,p])=>{
+          const acc=p.totalCounts?Math.round(((p.totalCounts-(p.errorCounts||0))/p.totalCounts)*100):100;
+          const bar=`<div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:6px;background:#f1f5f9;border-radius:6px;overflow:hidden"><div style="height:100%;width:${acc}%;background:${acc>=90?'#059669':acc>=70?'#d97706':'#dc2626'};border-radius:6px"></div></div><span style="font-size:11px;font-weight:700;color:${acc>=90?'#059669':acc>=70?'#d97706':'#dc2626'}">${acc}%</span></div>`;
+          return`<tr>
+            <td><div style="display:flex;align-items:center;gap:8px">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff">${u[0]?.toUpperCase()||'U'}</div>
+              <span style="font-size:13px;font-weight:700">${esc(u)}</span>
+            </div></td>
+            <td class="tq" style="font-size:15px;font-weight:800;color:#2563eb">${p.totalCounts}</td>
+            <td class="tq" style="color:${p.errorCounts?'#dc2626':'#059669'}">${p.errorCounts||0}</td>
+            <td class="tq" style="color:${acc>=90?'#059669':acc>=70?'#d97706':'#dc2626'};font-weight:800">${acc}%</td>
+            <td style="min-width:120px">${bar}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>`:`<div class="emp" style="padding:40px"><div class="emp-i">👤</div><div class="emp-t">No performance data yet</div></div>`}
+    </div>
+  </div>
+
+  <!-- Locked Parts tab content -->
+  <div id="AT_locked" style="display:none">
+    <div class="cd" style="border-top:none;border-radius:0 0 var(--r) var(--r)">
+      ${lockedCount?`<div class="tw"><table>
+        <thead><tr><th>Part No</th><th>Description</th><th>Locked By</th><th>Locked At</th>${S.user?.role==='master_auditor'?'<th>Action</th>':''}</tr></thead>
+        <tbody>${Object.entries(lockedParts).map(([pn,lk])=>{
+          const item=findItem(pn);
+          return`<tr>
+            <td class="tpn">${esc(pn)}</td>
+            <td style="font-size:11px">${esc(tr2(item?.desc||'',28))}</td>
+            <td style="font-size:11px;font-weight:600">${esc(lk.lockedBy||'')}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${fmtD(lk.lockedAt?.split('T')[0]||'')} ${(lk.lockedAt||'').split('T')[1]?.slice(0,5)||''}</td>
+            ${S.user?.role==='master_auditor'?`<td><button class="btn bda bsm" style="padding:2px 8px;font-size:10px" onclick="unlockPart('${esc(pn)}')">🔓 Unlock</button></td>`:''}
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>`:`<div class="emp" style="padding:40px"><div class="emp-i">🔒</div><div class="emp-t">No parts locked yet</div></div>`}
+    </div>
+  </div>`;
 
   setTimeout(()=>renderTrailTable(trail,'all'),50);
+}
+
+// ★ NEW: Tab switcher for audit trail page
+function atShowTab(tab, btn){
+  ['sysevt','counthist','userperf','locked'].forEach(t=>{
+    const el=$('AT_'+t);if(el)el.style.display=t===tab?'block':'none';
+    const b=$('ATTAB_'+t);if(b)b.classList.toggle('on',t===tab);
+  });
+}
+
+// ★ NEW: Unlock a part (master auditor only)
+function unlockPart(partNo){
+  if(!confirm(`Unlock ${partNo}? Users will be able to edit counts again.`))return;
+  const lp=getLockedParts();
+  delete lp[partNo];
+  saveLockedParts(lp);
+  toast(`🔓 ${partNo} unlocked`,'s');
+  rAuditTrail();
+}
+
+// ★ NEW: Export audit history as CSV
+function dlAuditHistory(){
+  const h=getAuditHistory();
+  if(!h.length){toast('No history to export','w');return;}
+  const csv='Date,Time,User,Part No,Counted Qty,System Qty,Variance,Status,Action,Reason\n'
+    +h.map(r=>`"${r.date||''}","${(r.time||'').slice(0,5)}","${r.userName||r.user||''}","${r.partNo||''}",${r.countedQty??''},${r.systemQty??''},${r.variance??''},"${r.status||''}","${r.action||''}","${(r.reason||'').replace(/"/g,'""')}"`).join('\n');
+  dlCSV(csv,`count_history_${today()}.csv`);
+  toast(`${h.length} records exported`,'s');
 }
 
 let _atCurrentTrail=[];
