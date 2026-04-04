@@ -597,7 +597,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbw5ELKal2HM85kw5Bz8SKonAZMp_EcX_dUQgoVc_Xgv7X6P06hv7slnJcIRLCTJQW65Yg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzprw9D9ORSbSfQtnYiw2ZtiiQsY6ff6BPSeviFyQkU4trCfFKcZ6T1Ybd_7IEfoqPC-w/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -880,7 +880,7 @@ function buildNav(){
     {l:'Manual Entry',i:'✏️',p:'manual'},{l:'Bin Locations',i:'📦',p:'bins'},
     {l:'My Scan Log',i:'📋',p:'scanlog'},
     ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},{l:'Uncounted Parts',i:'⬜',p:'uncounted'},{l:'FOC Dashboard',i:'🎁',p:'foc'},
-            {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Order Planning',i:'🛒',p:'orderplan'},{l:'Inventory Analysis',i:'🏭',p:'invanalysis'},{sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},{l:'Audit Trail',i:'🔍',p:'audittrail'},
+            {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Bill Type Analysis',i:'🧾',p:'billtype'},{l:'Order Planning',i:'🛒',p:'orderplan'},{l:'Inventory Analysis',i:'🏭',p:'invanalysis'},{sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},{l:'Audit Trail',i:'🔍',p:'audittrail'},
             {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
           :[{l:'Item Master',i:'🗃️',p:'itemmaster'}])
   ];
@@ -902,7 +902,7 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 // ═══════════════════════════════════════════════════════════
 function go(p, fromPopState){
   if(!S.user)return;
-  if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','orderplan','qrgen','audittrail','invanalysis'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
+  if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','billtype','orderplan','qrgen','audittrail','invanalysis'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
   stopCam();closeSB();setNav(p);
   // Push to browser history so back button works
   if(!fromPopState){
@@ -911,7 +911,7 @@ function go(p, fromPopState){
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
   ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
     variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,foc:rFOC,
-    movingparts:rMovingParts,orderplan:rOrderPlan,qrgen:rQRGen,audittrail:rAuditTrail,invanalysis:rInvAnalysis,
+    movingparts:rMovingParts,billtype:rBillType,orderplan:rOrderPlan,qrgen:rQRGen,audittrail:rAuditTrail,invanalysis:rInvAnalysis,
     itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF)();
 }
 function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
@@ -3377,9 +3377,10 @@ function qrDlSheet(){
 // ═══════════════════════════════════════════════════════════
 // In-memory: S_SALES_MAP[partNo][YYYY-MM] = qty
 // S_SALES_INFO[partNo] = {desc, cat, dlc}
-let S_SALES_MAP  = {};   // aggregated monthly data
+let S_SALES_MAP  = {};   // aggregated monthly data (Paid+FOC only — for movement)
+let S_SALES_BILL = {};   // per-billable-type: {type: {partNo: {month: qty}}}
 let S_SALES_INFO = {};   // part metadata
-let S_SALES_META = null; // {totalRows, months[], dateFrom, dateTo, uniqueParts}
+let S_SALES_META = null; // {totalRows, months[], dateFrom, dateTo, uniqueParts, billTypes[]}
 let S_SALES_LOADED = false;
 
 async function ensureSalesLoaded(){
@@ -3401,11 +3402,20 @@ async function ensureSalesLoaded(){
 
 function buildSalesMap(rows){
   S_SALES_MAP  = {};
+  S_SALES_BILL = {};
   S_SALES_INFO = {};
   rows.forEach(r=>{
     if(!r.partNo||r.qty<=0) return;
-    if(!S_SALES_MAP[r.partNo])  S_SALES_MAP[r.partNo]={};
-    S_SALES_MAP[r.partNo][r.month] = (S_SALES_MAP[r.partNo][r.month]||0)+r.qty;
+    const bt = r.billableType||'Paid';
+    // Movement map: only Paid + FOC count as real demand
+    if(bt==='Paid'||bt==='FOC'){
+      if(!S_SALES_MAP[r.partNo]) S_SALES_MAP[r.partNo]={};
+      S_SALES_MAP[r.partNo][r.month] = (S_SALES_MAP[r.partNo][r.month]||0)+r.qty;
+    }
+    // Per-billable-type breakdown
+    if(!S_SALES_BILL[bt]) S_SALES_BILL[bt]={};
+    if(!S_SALES_BILL[bt][r.partNo]) S_SALES_BILL[bt][r.partNo]={};
+    S_SALES_BILL[bt][r.partNo][r.month] = (S_SALES_BILL[bt][r.partNo][r.month]||0)+r.qty;
     if(!S_SALES_INFO[r.partNo])
       S_SALES_INFO[r.partNo]={desc:r.desc,cat:r.cat,dlc:r.dlc};
   });
@@ -3449,6 +3459,8 @@ function parseHeroDMScsv(buffer){
     if(!partNo||partNo==='Part#'||partNo==='-') continue;
     const qty=parseFloat((cols[2]||'').replace(/,/g,''))||0;
     if(qty<=0) continue;
+    // Billable Type col[3]: Paid / Warranty / FOC / Recommended Warranty / SPD Warranty
+    const billableType=(cols[3]||'Paid').replace(/\s+/g,' ').trim()||'Paid';
     // Price col[9] = DLC rate (ex-GST dealer cost)
     const dlc=parseFloat((cols[9]||'').replace(/Rs\.\s*/i,'').replace(/,/g,'').replace(/[()]/g,'').trim())||0;
     // Total col[15]
@@ -3463,8 +3475,9 @@ function parseHeroDMScsv(buffer){
       if(y&&m) month=`${y}-${String(m).padStart(2,'0')}`;
     }
     if(!month) continue;
-    const key=`${partNo}__${month}`;
-    if(!agg[key]) agg[key]={partNo,desc,cat,month,qty:0,dlc:0};
+    // Key includes billableType — Paid & Warranty stored as separate rows
+    const key=`${partNo}__${month}__${billableType}`;
+    if(!agg[key]) agg[key]={partNo,desc,cat,month,qty:0,dlc:0,billableType};
     agg[key].qty+=qty;
     if(!agg[key].dlc&&dlc) agg[key].dlc=dlc;
     if(!partInfo[partNo]) partInfo[partNo]={desc,cat,dlc};
@@ -3474,13 +3487,22 @@ function parseHeroDMScsv(buffer){
   const months=[...new Set(rows.map(r=>r.month))].sort();
   const uniqueParts=[...new Set(rows.map(r=>r.partNo))];
 
+  // Billable type summary
+  const billSummary={};
+  rows.forEach(r=>{
+    if(!billSummary[r.billableType]) billSummary[r.billableType]={parts:new Set(),qty:0};
+    billSummary[r.billableType].parts.add(r.partNo);
+    billSummary[r.billableType].qty+=r.qty;
+  });
+
   return{
     rows,
     months,
     uniqueParts:uniqueParts.length,
     dateFrom:months[0]||'',
     dateTo:months[months.length-1]||'',
-    totalQtyRows:rows.reduce((s,r)=>s+r.qty,0)
+    totalQtyRows:rows.reduce((s,r)=>s+r.qty,0),
+    billSummary:Object.fromEntries(Object.entries(billSummary).map(([k,v])=>[k,{parts:v.parts.size,qty:v.qty}]))
   };
 }
 
@@ -3802,11 +3824,13 @@ async function mvHandleFile(input){
     await new Promise(r=>setTimeout(r,500));
     closeMd();
 
-    // Informative toast
+    // Informative toast with billable type breakdown
     if(r.saved===0){
-      toast(`ℹ️ ${r.skipped||0} months already in Google Sheets — nothing new added. Data is up to date.`,'i',6000);
+      toast(`ℹ️ ${r.skipped||0} records already in Google Sheets — nothing new added. Data is up to date.`,'i',6000);
     } else {
-      toast(`✅ Added ${r.saved} new records for ${parsed.uniqueParts} parts · ${r.skipped||0} already existed (kept)`,'s',6000);
+      const bs=parsed.billSummary||{};
+      const btLine=Object.entries(bs).map(([k,v])=>`${k}: ${v.qty} pcs`).join(' · ');
+      toast(`✅ Added ${r.saved} records for ${parsed.uniqueParts} parts\n${btLine}`,'s',8000);
     }
     renderMovingDashboard();
   }catch(err){
@@ -3826,6 +3850,236 @@ function mvDlReport(period){
     }).join('\n');
   dlCSV(csv,`moving_parts_${period}M_${today()}.csv`);
   toast(`${entries.length} parts exported`,'s');
+}
+
+// ═══════════════════════════════════════════════════════════
+// BILL TYPE ANALYSIS DASHBOARD
+// ═══════════════════════════════════════════════════════════
+const BT_COLORS={
+  'Paid':        {bg:'#eff6ff',border:'#2563eb',badge:'#1d4ed8',text:'#1e3a8a'},
+  'Warranty':    {bg:'#fef3c7',border:'#d97706',badge:'#b45309',text:'#78350f'},
+  'FOC':         {bg:'#f0fdf4',border:'#16a34a',badge:'#15803d',text:'#14532d'},
+  'Recommended Warranty':{bg:'#fdf4ff',border:'#9333ea',badge:'#7e22ce',text:'#581c87'},
+  'SPD Warranty':{bg:'#fff1f2',border:'#e11d48',badge:'#be123c',text:'#881337'},
+};
+const BT_ICON={'Paid':'💰','Warranty':'🛡️','FOC':'🎁','Recommended Warranty':'⭐','SPD Warranty':'🔴'};
+
+let _btFilter='ALL'; // active billable type filter for parts table
+
+async function rBillType(){
+  renderBillTypeDash();
+  if(!S_SALES_LOADED){
+    const ok=await ensureSalesLoaded();
+    if(ok) renderBillTypeDash();
+  }
+}
+
+function renderBillTypeDash(){
+  const pg=$('PG');
+  const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  const meta=S_SALES_META;
+
+  // Build summary per bill type from S_SALES_BILL
+  const btTypes=Object.keys(S_SALES_BILL).sort();
+  const btSummary=btTypes.map(bt=>{
+    const partsMap=S_SALES_BILL[bt]||{};
+    const parts=Object.keys(partsMap);
+    let totalQty=0,uniqueJobCards=0;
+    parts.forEach(pn=>Object.values(partsMap[pn]).forEach(q=>totalQty+=q));
+    const info=S_SALES_INFO;
+    return{type:bt,parts:parts.length,qty:totalQty};
+  });
+  const grandQty=btSummary.reduce((s,b)=>s+b.qty,0);
+
+  pg.innerHTML=`
+  <div class="ph" style="align-items:center;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="pt">🧾 Bill Type Analysis</div>
+      <div class="ps">${hasSales?`${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} → ${meta.dateTo}`:'No sales data loaded'}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
+      <button class="btn bgh bsm" onclick="go('movingparts')">📈 Moving Parts</button>
+      <button class="btn bpr bsm" onclick="btExportCSV()">⬇️ Export CSV</button>
+    </div>
+  </div>
+
+  ${!hasSales?`<div class="al alw" style="margin:16px">⚠️ No sales data. Go to <b>Moving Parts</b> and upload the Hero DMS CSV first.</div>`:`
+
+  <!-- SUMMARY CARDS -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:0 16px 16px">
+    ${btSummary.map(b=>{
+      const c=BT_COLORS[b.type]||{bg:'#f8fafc',border:'#94a3b8',badge:'#64748b',text:'#1e293b'};
+      const ic=BT_ICON[b.type]||'📄';
+      const pct=grandQty>0?((b.qty/grandQty)*100).toFixed(1):0;
+      return `<div onclick="btSetFilter('${b.type}')" id="BTC_${b.type.replace(/\s/g,'_')}"
+        style="background:${c.bg};border:2px solid ${c.border};border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;${_btFilter===b.type?'box-shadow:0 0 0 3px '+c.border+';transform:scale(1.03)':''}">
+        <div style="font-size:22px">${ic}</div>
+        <div style="font-size:11px;font-weight:700;color:${c.badge};margin:4px 0 2px">${b.type.toUpperCase()}</div>
+        <div style="font-size:20px;font-weight:900;color:${c.text}">${b.qty.toLocaleString('en-IN')}</div>
+        <div style="font-size:10px;color:#64748b">pcs · ${pct}%</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:2px">${b.parts} parts</div>
+        <div style="margin-top:8px;height:4px;background:#e2e8f0;border-radius:4px">
+          <div style="height:100%;width:${pct}%;background:${c.border};border-radius:4px"></div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div onclick="btSetFilter('ALL')" id="BTC_ALL"
+      style="background:#f8fafc;border:2px solid ${_btFilter==='ALL'?'#0f172a':'#cbd5e1'};border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;${_btFilter==='ALL'?'box-shadow:0 0 0 3px #0f172a':''}">
+      <div style="font-size:22px">📊</div>
+      <div style="font-size:11px;font-weight:700;color:#475569;margin:4px 0 2px">ALL TYPES</div>
+      <div style="font-size:20px;font-weight:900;color:#0f172a">${grandQty.toLocaleString('en-IN')}</div>
+      <div style="font-size:10px;color:#64748b">total pcs</div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:2px">${Object.keys(S_SALES_INFO).length} parts</div>
+    </div>
+  </div>
+
+  <!-- FILTER INFO BAR -->
+  <div style="display:flex;align-items:center;gap:10px;padding:0 16px 12px;flex-wrap:wrap">
+    <div style="font-size:13px;font-weight:700;color:#0f172a">
+      ${_btFilter==='ALL'?'Showing All Bill Types':`Showing: <span style="color:${(BT_COLORS[_btFilter]||{badge:'#333'}).badge}">${BT_ICON[_btFilter]||''} ${_btFilter}</span>`}
+    </div>
+    <input id="BTSRCH" placeholder="🔍 Search part no / description…" oninput="btRenderTable()"
+      style="flex:1;min-width:200px;padding:7px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px">
+    <select id="BTCATF" onchange="btRenderTable()"
+      style="padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px">
+      <option value="">All Categories</option>
+      ${[...new Set(Object.values(S_SALES_INFO).map(i=>i.cat).filter(Boolean))].sort().map(c=>`<option value="${c}">${c}</option>`).join('')}
+    </select>
+    <select id="BTSORT" onchange="btRenderTable()"
+      style="padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px">
+      <option value="qty">↓ Qty (High→Low)</option>
+      <option value="parts">↓ Parts Count</option>
+      <option value="alpha">A→Z Part No</option>
+    </select>
+  </div>
+
+  <!-- PARTS TABLE -->
+  <div id="BTTBL" style="padding:0 16px 24px"></div>
+  `}`;
+
+  if(hasSales) btRenderTable();
+}
+
+function btSetFilter(type){
+  _btFilter=type;
+  renderBillTypeDash();
+}
+
+function btRenderTable(){
+  const tbl=$('BTTBL');
+  if(!tbl) return;
+  const srch=($('BTSRCH')?.value||'').toLowerCase().trim();
+  const catF=$('BTCATF')?.value||'';
+  const sortBy=$('BTSORT')?.value||'qty';
+
+  // Build rows: for each part, collect qty per bill type
+  const partData={}; // partNo -> {desc,cat,dlc, types:{bt:qty}}
+  const typesToShow=_btFilter==='ALL'?Object.keys(S_SALES_BILL):[_btFilter];
+
+  typesToShow.forEach(bt=>{
+    const partsMap=S_SALES_BILL[bt]||{};
+    Object.keys(partsMap).forEach(pn=>{
+      if(!partData[pn]){
+        const info=S_SALES_INFO[pn]||{};
+        partData[pn]={desc:info.desc||'',cat:info.cat||'',dlc:info.dlc||0,types:{}};
+      }
+      const qty=Object.values(partsMap[pn]).reduce((s,q)=>s+q,0);
+      partData[pn].types[bt]=(partData[pn].types[bt]||0)+qty;
+    });
+  });
+
+  // Filter
+  let rows=Object.entries(partData).filter(([pn,v])=>{
+    if(srch&&!pn.toLowerCase().includes(srch)&&!v.desc.toLowerCase().includes(srch)) return false;
+    if(catF&&v.cat!==catF) return false;
+    return true;
+  });
+
+  // Sort
+  rows.sort((a,b)=>{
+    if(sortBy==='qty'){
+      const qa=Object.values(a[1].types).reduce((s,q)=>s+q,0);
+      const qb=Object.values(b[1].types).reduce((s,q)=>s+q,0);
+      return qb-qa;
+    }
+    if(sortBy==='parts') return Object.keys(b[1].types).length-Object.keys(a[1].types).length;
+    return a[0].localeCompare(b[0]);
+  });
+
+  if(!rows.length){
+    tbl.innerHTML='<div class="emp"><div class="emp-i">🔍</div><div class="emp-t">No parts found</div></div>';
+    return;
+  }
+
+  // Determine columns
+  const allBTs=[...new Set(rows.flatMap(([,v])=>Object.keys(v.types)))].sort();
+
+  tbl.innerHTML=`
+  <div style="font-size:12px;color:#64748b;margin-bottom:8px">${rows.length} parts</div>
+  <div style="overflow-x:auto;border-radius:10px;border:1px solid #e2e8f0">
+  <table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead>
+      <tr style="background:#1e293b;color:#fff">
+        <th style="padding:10px 12px;text-align:left;font-weight:700">Part No</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700">Description</th>
+        <th style="padding:10px 8px;text-align:left;font-weight:700">Category</th>
+        ${allBTs.map(bt=>{
+          const c=BT_COLORS[bt]||{badge:'#fff'};
+          const ic=BT_ICON[bt]||'';
+          return `<th style="padding:10px 8px;text-align:right;font-weight:700;white-space:nowrap">${ic} ${bt}</th>`;
+        }).join('')}
+        <th style="padding:10px 8px;text-align:right;font-weight:700">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+    ${rows.slice(0,300).map(([pn,v],idx)=>{
+      const total=Object.values(v.types).reduce((s,q)=>s+q,0);
+      const bg=idx%2===0?'#fff':'#f8fafc';
+      return `<tr style="background:${bg};border-bottom:1px solid #f1f5f9">
+        <td style="padding:8px 12px;font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap">${pn}</td>
+        <td style="padding:8px 12px;color:#334155;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${v.desc}">${v.desc||'—'}</td>
+        <td style="padding:8px 8px;color:#64748b;white-space:nowrap">${v.cat||'—'}</td>
+        ${allBTs.map(bt=>{
+          const q=v.types[bt]||0;
+          const c=BT_COLORS[bt]||{badge:'#64748b'};
+          return `<td style="padding:8px 8px;text-align:right;font-weight:${q>0?'700':'400'};color:${q>0?c.badge:'#cbd5e1'}">${q>0?q.toLocaleString('en-IN'):'—'}</td>`;
+        }).join('')}
+        <td style="padding:8px 8px;text-align:right;font-weight:800;color:#0f172a">${total.toLocaleString('en-IN')}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+    <tfoot>
+      <tr style="background:#f1f5f9;font-weight:800;border-top:2px solid #e2e8f0">
+        <td colspan="3" style="padding:10px 12px;color:#0f172a">TOTAL (${rows.length} parts)</td>
+        ${allBTs.map(bt=>{
+          const sum=rows.reduce((s,[,v])=>s+(v.types[bt]||0),0);
+          return `<td style="padding:10px 8px;text-align:right;color:#1e293b">${sum.toLocaleString('en-IN')}</td>`;
+        }).join('')}
+        <td style="padding:10px 8px;text-align:right;color:#0f172a">${rows.reduce((s,[,v])=>s+Object.values(v.types).reduce((ss,q)=>ss+q,0),0).toLocaleString('en-IN')}</td>
+      </tr>
+    </tfoot>
+  </table></div>
+  ${rows.length>300?`<div style="text-align:center;font-size:12px;color:#94a3b8;margin-top:8px">Showing top 300 of ${rows.length} — use search/filter to narrow down</div>`:''}`;
+}
+
+function btExportCSV(){
+  const allBTs=Object.keys(S_SALES_BILL).sort();
+  const partData={};
+  allBTs.forEach(bt=>{
+    const partsMap=S_SALES_BILL[bt]||{};
+    Object.keys(partsMap).forEach(pn=>{
+      if(!partData[pn]){const info=S_SALES_INFO[pn]||{};partData[pn]={desc:info.desc||'',cat:info.cat||'',types:{}};}
+      partData[pn].types[bt]=Object.values(partsMap[pn]).reduce((s,q)=>s+q,0);
+    });
+  });
+  const hdr=`Part No,Description,Category,${allBTs.join(',')},Total\n`;
+  const body=Object.entries(partData).map(([pn,v])=>{
+    const cols=allBTs.map(bt=>v.types[bt]||0);
+    const total=cols.reduce((s,q)=>s+q,0);
+    return `"${pn}","${(v.desc||'').replace(/"/g,'""')}","${v.cat||''}",${cols.join(',')},${total}`;
+  }).join('\n');
+  dlCSV(hdr+body,`bill_type_analysis_${today()}.csv`);
+  toast(`Exported ${Object.keys(partData).length} parts`,'s');
 }
 
 // ═══════════════════════════════════════════════════════════
