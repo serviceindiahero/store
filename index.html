@@ -361,6 +361,134 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .dz{border:2px dashed var(--bd);border-radius:var(--r);padding:32px;text-align:center;cursor:pointer;transition:.2s}
 .dz:hover{border-color:#2563eb;background:#eff6ff}
 
+/* ══════════════════════════════════════════
+   OWNER PORTAL — PREMIUM GOLD THEME
+══════════════════════════════════════════ */
+:root{--gold:#c8922a;--gold2:#f0c060;--gold3:#7a5510;--goldl:#fffbeb;--goldg:linear-gradient(135deg,#7a5510,#c8922a,#f0c060)}
+
+/* Owner sidebar accent */
+.owner-sb .sbu{background:linear-gradient(135deg,rgba(200,146,42,.15),rgba(240,192,96,.08));border-bottom:1px solid rgba(200,146,42,.2)}
+.owner-sb .sbav{background:linear-gradient(135deg,#7a5510,#c8922a)}
+.owner-sb .ni.on{background:linear-gradient(135deg,rgba(200,146,42,.35),rgba(240,192,96,.15));box-shadow:0 2px 8px rgba(200,146,42,.25)}
+.owner-sb .ns{color:rgba(240,192,96,.4)}
+
+/* Owner crown badge in topbar */
+.owner-crown{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;
+  background:linear-gradient(135deg,#7a5510,#c8922a);color:#fff;
+  border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px;
+  box-shadow:0 2px 8px rgba(200,146,42,.4)}
+
+/* Owner KPI card (golden accent) */
+.okpi{background:#fff;border:1.5px solid #f0e0a0;border-radius:16px;padding:20px;
+  position:relative;overflow:hidden;cursor:pointer;transition:.2s;
+  box-shadow:0 2px 12px rgba(200,146,42,.08)}
+.okpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--goldg)}
+.okpi:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(200,146,42,.18)}
+.okpi .kv{font-size:30px;font-weight:800;font-family:'JetBrains Mono',monospace;
+  letter-spacing:-1.5px;color:#0f172a;margin:6px 0 4px}
+.okpi .kl{font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.6px}
+.okpi .ks{font-size:11px;color:#94a3b8;margin-top:2px}
+.okpi .ki{font-size:28px;position:absolute;top:16px;right:18px;opacity:.18}
+
+/* Owner section header */
+.osec{display:flex;align-items:center;gap:10px;margin:24px 0 14px;padding-bottom:10px;
+  border-bottom:2px solid #f0e0a0}
+.osec-title{font-size:15px;font-weight:800;color:#7a5510;letter-spacing:-.3px}
+.osec-line{flex:1;height:1px;background:linear-gradient(90deg,#f0e0a0,transparent)}
+
+/* Owner chart card */
+.ochart{background:#fff;border:1.5px solid #f0e0a0;border-radius:16px;overflow:hidden;
+  box-shadow:0 2px 12px rgba(200,146,42,.06)}
+.ochart-hd{padding:14px 18px;border-bottom:1px solid #fef3c7;
+  background:linear-gradient(135deg,#fffbeb,#fff);
+  display:flex;align-items:center;justify-content:space-between}
+.ochart-title{font-size:13px;font-weight:800;color:#7a5510}
+.ochart-body{padding:18px}
+
+/* Owner insight strip */
+.ostrip{border-radius:14px;padding:16px 18px;margin-bottom:10px;
+  border-left:4px solid;display:flex;gap:14px;align-items:flex-start}
+.ostrip.danger{background:#fef2f2;border-color:#dc2626}
+.ostrip.warning{background:#fffbeb;border-color:#d97706}
+.ostrip.success{background:#ecfdf5;border-color:#059669}
+.ostrip.info{background:#eff6ff;border-color:#2563eb}
+.ostrip-ico{font-size:22px;flex-shrink:0;margin-top:2px}
+.ostrip-body{}
+.ostrip-title{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:3px}
+.ostrip-msg{font-size:12px;color:#475569;line-height:1.6}
+.ostrip-action{font-size:11px;font-weight:700;margin-top:6px;padding:5px 12px;
+  border-radius:8px;display:inline-block;background:rgba(0,0,0,.06);color:#0f172a}
+
+/* Owner top-parts table */
+.otbl{width:100%;border-collapse:collapse}
+.otbl th{padding:9px 13px;font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:#92400e;background:#fffbeb;border-bottom:1.5px solid #f0e0a0;text-align:left}
+.otbl td{padding:11px 13px;font-size:12px;border-bottom:1px solid #fef9ec;vertical-align:middle}
+.otbl tr:last-child td{border:none}
+.otbl tr:hover td{background:#fffbeb}
+
+/* Owner financial hero */
+.ofin-hero{border-radius:20px;background:linear-gradient(135deg,#0f172a 0%,#1a2a0a 40%,#0f172a 100%);
+  padding:28px 24px;margin-bottom:20px;position:relative;overflow:hidden}
+.ofin-hero::before{content:'';position:absolute;width:350px;height:350px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,146,42,.14),transparent 70%);
+  top:-80px;right:-80px}
+.ofin-hero::after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(240,192,96,.1),transparent 70%);
+  bottom:-40px;left:30px}
+.ofin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;position:relative;z-index:1}
+@media(max-width:600px){.ofin-grid{grid-template-columns:1fr 1fr}}
+.ofin-cell{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:16px;text-align:center}
+.ofin-cell .fv{font-size:19px;font-weight:800;font-family:'JetBrains Mono',monospace;
+  letter-spacing:-1px;color:#f0c060;word-break:break-all}
+.ofin-cell .fl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:rgba(255,255,255,.4);margin-top:5px}
+.ofin-cell .fs{font-size:10px;color:rgba(255,255,255,.28);margin-top:3px}
+
+/* Owner tabs */
+.otab-bar{display:flex;gap:0;background:#fffbeb;border-radius:12px;padding:4px;margin-bottom:20px;border:1.5px solid #f0e0a0}
+.otab-btn{flex:1;padding:9px;font-size:12px;font-weight:700;border:none;background:none;
+  border-radius:9px;cursor:pointer;color:#92400e;transition:.15s;text-align:center}
+.otab-btn.on{background:linear-gradient(135deg,#c8922a,#f0c060);color:#fff;
+  box-shadow:0 2px 8px rgba(200,146,42,.35)}
+
+/* Owner progress ring */
+.oring-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.oring{transform:rotate(-90deg)}
+.oring-bg{fill:none;stroke:#f0e0a0;stroke-width:8}
+.oring-fill{fill:none;stroke:#c8922a;stroke-width:8;stroke-linecap:round;
+  transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.oring-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#7a5510}
+.oring-lbl{font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px}
+
+/* Owner welcome banner */
+.owner-welcome{background:var(--goldg);border-radius:20px;padding:24px 28px;
+  margin-bottom:20px;display:flex;align-items:center;gap:18px;
+  box-shadow:0 8px 32px rgba(200,146,42,.3);position:relative;overflow:hidden}
+.owner-welcome::after{content:'👑';position:absolute;right:24px;top:50%;transform:translateY(-50%);
+  font-size:64px;opacity:.15}
+.owner-welcome-txt h2{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.4px}
+.owner-welcome-txt p{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}
+
+/* Owner mini badge */
+.obadge{padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;
+  background:linear-gradient(135deg,#7a5510,#c8922a);color:#fff}
+
+/* Scrollable table wrapper */
+.otbl-wrap{overflow-x:auto}
+
+/* Owner filter pills */
+.ofilter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.ofilter{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;
+  border:1.5px solid #f0e0a0;background:#fff;color:#92400e;transition:.15s}
+.ofilter:hover,.ofilter.on{background:linear-gradient(135deg,#c8922a,#f0c060);color:#fff;border-color:#c8922a}
+
+/* sparkline bar */
+.spark{display:flex;align-items:flex-end;gap:2px;height:32px}
+.spark-bar{flex:1;border-radius:2px 2px 0 0;background:#f0c060;min-width:6px;transition:.5s}
+
 /* SCANNER */
 .scw{width:100%;max-width:500px;margin:0 auto}
 .svw{position:relative;width:100%;border-radius:var(--r);overflow:hidden;background:#0f172a;aspect-ratio:4/3;box-shadow:0 4px 20px rgba(0,0,0,.25)}
@@ -489,6 +617,295 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .op-qty-box{display:inline-block;background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe;border-radius:6px;padding:3px 10px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px}
 .prog-bar-wrap{height:6px;background:#f1f5f9;border-radius:6px;overflow:hidden;min-width:60px}
 .prog-bar-fill{height:100%;border-radius:6px;transition:width .5s}
+
+/* ── SPIN KEYFRAME (used by AI loading) ── */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ── PAGINATION BUTTONS ── */
+.ia-pb{padding:4px 10px;font-size:11px;font-weight:700;border:1.5px solid var(--bd);background:#fff;color:#475569;border-radius:6px;cursor:pointer;transition:.15s;min-width:32px}
+.ia-pb:hover:not(:disabled){border-color:#2563eb;color:#2563eb;background:#eff6ff}
+.ia-pb.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.ia-pb:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── GHOST PARTS ── */
+.gp-section{background:linear-gradient(135deg,#fafaf9,#f5f5f4);border:1.5px solid #d6d3d1;border-radius:var(--r);margin-top:20px;overflow:hidden}
+.gp-header{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d6d3d1;background:#f5f5f4;cursor:pointer;user-select:none}
+.gp-title{font-size:14px;font-weight:800;color:#78716c;display:flex;align-items:center;gap:8px}
+.gp-badge{background:#e7e5e4;color:#78716c;border:1px solid #d6d3d1;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.gp-toggle{font-size:18px;color:#a8a29e;transition:.2s}
+.gp-body{display:none;overflow-x:auto}
+.gp-body.open{display:block}
+.gp-tip{padding:10px 20px;font-size:11px;color:#a8a29e;background:#fafaf9;border-bottom:1px solid #e7e5e4}
+
+/* ── BIN QR PRINTER ── */
+.bin-qr-card{background:#fff;border:1px solid var(--bd);border-radius:var(--rs);padding:14px 12px;text-align:center;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:6px}
+.bin-qr-card:hover{box-shadow:0 4px 16px rgba(37,99,235,.15);border-color:#93c5fd;transform:translateY(-2px)}
+.bin-qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:16px}
+.bin-qr-name{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:#0f172a}
+.bin-qr-desc{font-size:10px;color:#64748b}
+.bin-qr-zone{font-size:9px;font-weight:700;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:1px 7px}
+
+/* ── AI CHAT ── */
+#AIC_MSGS{scroll-behavior:smooth}
+#AIC_MSGS::-webkit-scrollbar{width:4px}
+#AIC_MSGS::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:4px}
+
+/* ── PAGINATION BUTTONS ─────────────────────── */
+.ia-pb{padding:4px 10px;font-size:11px;font-weight:700;border:1.5px solid var(--bd);background:#fff;color:#475569;border-radius:6px;cursor:pointer;transition:.15s;min-width:32px}
+.ia-pb:hover:not(:disabled){border-color:#2563eb;color:#2563eb;background:#eff6ff}
+.ia-pb.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.ia-pb:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── GHOST PARTS (Dead Zero Stock) section ─── */
+.gp-section{background:linear-gradient(135deg,#fafaf9,#f5f5f4);border:1.5px solid #d6d3d1;border-radius:var(--r);margin-top:20px;overflow:hidden}
+.gp-header{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d6d3d1;background:#f5f5f4;cursor:pointer;user-select:none}
+.gp-title{font-size:14px;font-weight:800;color:#78716c;display:flex;align-items:center;gap:8px}
+.gp-badge{background:#e7e5e4;color:#78716c;border:1px solid #d6d3d1;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.gp-toggle{font-size:18px;color:#a8a29e;transition:.2s}
+.gp-body{display:none;overflow-x:auto}
+.gp-body.open{display:block}
+.gp-tip{padding:10px 20px;font-size:11px;color:#a8a29e;background:#fafaf9;border-bottom:1px solid #e7e5e4}
+
+/* ── BIN QR PRINTER ─────────────────────────── */
+.bin-qr-card{background:#fff;border:1px solid var(--bd);border-radius:var(--rs);padding:14px 12px;text-align:center;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:6px}
+.bin-qr-card:hover{box-shadow:0 4px 16px rgba(37,99,235,.15);border-color:#93c5fd;transform:translateY(-2px)}
+.bin-qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:16px}
+.bin-qr-name{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:#0f172a}
+.bin-qr-desc{font-size:10px;color:#64748b}
+.bin-qr-zone{font-size:9px;font-weight:700;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:1px 7px}
+/* ══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVENESS — Full overhaul for all screens
+   Breakpoints: 480px (small phone), 600px (large phone), 768px (tablet)
+══════════════════════════════════════════════════════════ */
+
+/* --- Global mobile base --- */
+@media(max-width:768px){
+  /* Page padding */
+  .pg{padding:10px;padding-bottom:90px}
+
+  /* Page header */
+  .ph{margin-bottom:14px;gap:8px}
+  .pt{font-size:17px;letter-spacing:-.3px}
+  .ps{font-size:11px}
+
+  /* Topbar */
+  .tb-s{display:none}
+  .tb{padding:0 12px;gap:8px}
+  .tb-lo{font-size:13px}
+
+  /* Sidebar */
+  .sb{position:fixed;left:0;top:0;bottom:0;transform:translateX(-110%);z-index:200;
+    transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:8px 0 32px rgba(0,0,0,.3);width:260px!important;min-width:0!important}
+  .sb.on{transform:translateX(0)}
+  .ov.on{display:block}
+  .tb-m{display:flex}
+  .bn{display:block!important}
+  .fab{display:flex!important}
+
+  /* Stat grids */
+  .s2,.s3,.s4{grid-template-columns:1fr 1fr}
+  .stv{font-size:clamp(16px,5vw,26px)!important}
+  .st{padding:13px}
+
+  /* Chart grid */
+  .cg{grid-template-columns:1fr}
+
+  /* Forms */
+  .f2{grid-template-columns:1fr}
+  .fg{gap:10px}
+
+  /* Tables */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0}
+  .tw table{min-width:580px}
+  thead th{font-size:9px;padding:8px 10px}
+  tbody td{font-size:11px;padding:8px 10px}
+  .tpn{font-size:10px}
+
+  /* Cards */
+  .cd{border-radius:12px}
+  .cdh{padding:11px 14px}
+  .cdb{padding:14px}
+
+  /* Modals */
+  .md{max-width:100%!important;margin:0;border-radius:18px 18px 0 0;position:fixed;bottom:0;left:0;right:0;max-height:92vh;animation:mdSlide .22s ease}
+  @keyframes mdSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .mbd{align-items:flex-end;padding:0}
+  .mdlg,.mdxl{max-width:100%!important}
+
+  /* Search overlay */
+  .gs-ov{padding:8px 0 0;align-items:flex-end}
+  .gs-box{border-radius:16px 16px 0 0;max-height:88vh}
+
+  /* Filter bars */
+  .fb{padding:8px 10px;gap:6px}
+  .fin{min-width:100px;font-size:11px;padding:6px 8px}
+
+  /* Alert */
+  .al{font-size:11px;padding:8px 11px}
+
+  /* Pagination */
+  .pag{padding:10px 12px;gap:4px}
+  .pb{padding:4px 8px;font-size:10px}
+
+  /* Financial card header */
+  .fin-hdr{flex-direction:column;align-items:flex-start!important;gap:8px!important}
+
+  /* Scan cards */
+  .qc input{width:58px;font-size:14px}
+  .qb{width:26px;height:26px;font-size:15px}
+
+  /* FOC grid */
+  .foc-grid{grid-template-columns:repeat(2,1fr)}
+  .foc-slip-row{grid-template-columns:repeat(2,1fr)}
+  .foc-cell-val{font-size:16px}
+  .foc-summary-bar{grid-template-columns:1fr}
+
+  /* Summary bar */
+  .smb{padding:8px 12px;gap:8px;font-size:10px}
+
+  /* Bins grid */
+  .bgrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+
+  /* QR grid */
+  .qr-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+
+  /* Toasts */
+  #TS{top:60px;right:10px;left:10px}
+  .t{min-width:0;max-width:100%;font-size:11px;padding:9px 12px}
+
+  /* ── Owner Portal Mobile ── */
+  .owner-welcome{padding:16px 18px;border-radius:14px}
+  .owner-welcome::after{font-size:44px;right:14px}
+  .owner-welcome-txt h2{font-size:16px}
+  .owner-welcome-txt p{font-size:10px}
+
+  .okpi{padding:14px;border-radius:12px}
+  .okpi .kv{font-size:22px}
+  .okpi .ki{font-size:22px;top:12px;right:12px}
+
+  .ofin-hero{padding:18px 14px;border-radius:14px}
+  .ofin-grid{grid-template-columns:1fr 1fr}
+  .ofin-cell .fv{font-size:15px;letter-spacing:-.5px}
+  .ofin-cell .fl{font-size:8px}
+  .ofin-cell .fs{font-size:9px}
+
+  .ochart{border-radius:12px}
+  .ochart-hd{padding:11px 14px;flex-wrap:wrap;gap:6px}
+  .ochart-title{font-size:12px}
+  .ochart-body{padding:12px}
+
+  .otbl th{padding:7px 10px;font-size:9px}
+  .otbl td{padding:8px 10px;font-size:11px}
+
+  .otab-bar{flex-wrap:wrap;gap:4px}
+  .otab-btn{font-size:11px;padding:7px 8px}
+
+  .ostrip{padding:12px 14px;gap:10px;border-radius:10px}
+  .ostrip-ico{font-size:18px}
+  .ostrip-title{font-size:12px}
+  .ostrip-msg{font-size:11px}
+  .ostrip-action{font-size:10px;padding:4px 9px}
+
+  .osec{margin:16px 0 10px}
+  .osec-title{font-size:13px}
+
+  /* Owner grid columns */
+  .owner-kpi-grid-3{grid-template-columns:1fr 1fr!important}
+  .owner-user-grid{grid-template-columns:1fr!important}
+
+  /* AI chat */
+  #AIC_MSGS{padding:10px}
+  .ai-thinking{padding:20px}
+  .ai-orb{width:48px;height:48px;font-size:22px}
+  .ai-hero-txt h2{font-size:17px}
+
+  /* Cycle plan */
+  .cyc-day-row{flex-direction:column;gap:8px}
+
+  /* Wedge scanner */
+  .wedge-box{padding:12px;border-radius:10px}
+  .wedge-inp{font-size:13px}
+}
+
+/* --- Very small phones (< 400px) --- */
+@media(max-width:400px){
+  .pg{padding:8px;padding-bottom:90px}
+  .pt{font-size:15px}
+  .s2,.s3,.s4{grid-template-columns:1fr 1fr}
+  .stv{font-size:clamp(14px,6vw,22px)!important}
+  .st{padding:10px}
+  .okpi .kv{font-size:18px}
+  .ofin-cell .fv{font-size:13px}
+  .ofin-grid{grid-template-columns:1fr 1fr}
+  .tb{height:52px;min-height:52px;padding:0 10px}
+  .av{width:30px;height:30px;font-size:11px}
+  .bni{padding:5px 8px}
+  .bni .bic{font-size:18px}
+  .bni .bit{font-size:8px}
+  .btn{padding:7px 12px;font-size:11px}
+  .bsm{padding:4px 9px;font-size:10px}
+  .okpi{padding:12px}
+  .owner-welcome{padding:14px;border-radius:12px}
+  .owner-welcome-txt h2{font-size:14px}
+  .owner-welcome::after{display:none}
+}
+
+/* --- Tablet landscape / medium screens --- */
+@media(min-width:601px) and (max-width:768px){
+  .s3{grid-template-columns:repeat(3,1fr)}
+  .ofin-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* --- Force desktop sidebar on large screens --- */
+@media(min-width:769px){
+  .bn,.fab{display:none!important}
+  .sb{transform:none!important;position:relative!important;box-shadow:4px 0 20px rgba(0,0,0,.15)!important}
+}
+
+/* --- Table card scroll fix for all inline styles --- */
+.otbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 12px 12px}
+.otbl-wrap table,.otbl-wrap .otbl{min-width:500px}
+
+/* --- Inline grid overrides for owner pages on mobile --- */
+@media(max-width:768px){
+  [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr 1fr!important}
+  [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr 1fr!important}
+  [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr!important}
+  [style*="display:grid"][style*="grid-template-columns:1fr 1fr;gap"]{grid-template-columns:1fr!important}
+}
+@media(max-width:400px){
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr 1fr!important}
+  [style*="grid-template-columns:repeat(2,1fr)"]{grid-template-columns:1fr 1fr!important}
+}
+
+/* --- Fix inline font sizes on mobile --- */
+@media(max-width:600px){
+  [style*="font-size:36px"]{font-size:24px!important}
+  [style*="font-size:30px"]{font-size:22px!important}
+  [style*="font-size:28px"]{font-size:20px!important}
+  [style*="font-size:18px"]{font-size:15px!important}
+  /* Keep smaller sizes as-is */
+}
+
+/* --- Report table horizontal scroll with sticky col --- */
+@media(max-width:768px){
+  .tw table td:first-child,
+  .tw table th:first-child{
+    position:sticky;left:0;background:#f8fafc;z-index:1;border-right:1px solid #e2e8f0
+  }
+  .tw table tbody td:first-child{background:#fff}
+  .tw table tbody tr:hover td:first-child{background:#fafbfc}
+}
+
+/* --- Owner portrait cards grid --- */
+@media(max-width:768px){
+  .owner-portrait-grid{
+    display:grid;
+    grid-template-columns:1fr!important;
+    gap:12px!important
+  }
+}
+
 </style>
 </head>
 <body>
@@ -597,7 +1014,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbzprw9D9ORSbSfQtnYiw2ZtiiQsY6ff6BPSeviFyQkU4trCfFKcZ6T1Ybd_7IEfoqPC-w/exec';
+const API = 'https://script.google.com/macros/s/AKfycbz38ZbAcoOjVjZcE2pO3SOIjaIWPcEwIPNWFSv0W6bDEIKTNdCHG3gb8fQZAIZSlW2pRw/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -757,6 +1174,23 @@ async function api(data) {
   return await callAPI(data);
 }
 
+// ── Gemini AI Proxy — routes through Apps Script so key is NEVER in frontend ──
+async function callGemini(prompt,opts={}){
+  // Apps Script action:'gemini' calls Gemini API with server-stored key
+  const r=await callAPI({action:'gemini',prompt,lang:opts.lang||'en',maxTokens:opts.maxTokens||1200});
+  if(r.success&&r.text)return r.text;
+  throw new Error(r.error||'Gemini proxy error — check Code.gs handleGemini()');
+}
+
+// ── Role normalizer — sheet may store 'owner', code expects 'dealer_owner' ──
+function normalizeRole(r){
+  if(!r)return'executive';
+  const v=(r+'').toLowerCase().replace(/[\s_\-]/g,'');
+  if(v==='masterauditor'||v==='admin')return'master_auditor';
+  if(v==='dealerowner'||v==='owner'||v==='proprietor'||v==='dealer')return'dealer_owner';
+  return'executive';
+}
+
 function enQ(d){const q=JSON.parse(localStorage.getItem(QK)||'[]');q.push({id:uid(),d,ts:Date.now()});localStorage.setItem(QK,JSON.stringify(q));syncUI();}
 
 async function flushQ(){
@@ -802,17 +1236,17 @@ async function doLogin(){
   const p=($('LPW')?.value||'').trim();
   const btn=$('LBTN');
   if(!u||!p){setErr('Enter username and password');return;}
+  // ALL authentication is handled by Google Sheets via API — no local credentials
   btn.disabled=true;btn.textContent='Signing in…';
   setErr('Connecting to server…','inf');
   const r=await callAPI({action:'login',username:u,password:p});
   if(r.success&&r.user){
-    const s={...r.user,_lt:Date.now()};
+    const s={...r.user,role:normalizeRole(r.user.role),_lt:Date.now()};
     localStorage.setItem(SK,JSON.stringify(s));
     S.user=s;
     bootApp();
   } else {
-    // Show EXACT server error so we know what went wrong
-    const msg=r.error||'Login failed';
+    const msg=r.error||'Login failed. Check username and password.';
     setErr('❌ '+msg);
     $('LCRD').classList.remove('shake');void $('LCRD').offsetWidth;$('LCRD').classList.add('shake');
     btn.disabled=false;btn.textContent='SIGN IN';
@@ -823,7 +1257,7 @@ async function testAPI(){
   setErr('Testing connection…','inf');
   const r=await callAPI({action:'login',username:'_test_',password:'_test_'});
   if(r.success!==undefined||r.error){
-    setErr('✅ API reachable! Login with: admin / admin  OR check your users sheet','ok');
+    setErr('✅ API is reachable. Enter your credentials to login.','ok');
   } else {
     setErr('❌ Cannot reach API. Set "Who has access" = Anyone in Apps Script Deploy settings');
   }
@@ -841,6 +1275,7 @@ function loadSess(){
     const r=localStorage.getItem(SK);if(!r)return null;
     const s=JSON.parse(r);
     if((Date.now()-s._lt)/3600000>10){localStorage.removeItem(SK);return null;}
+    s.role=normalizeRole(s.role); // re-normalize in case stale session has raw role
     return s;
   }catch{return null;}
 }
@@ -855,8 +1290,9 @@ async function bootApp(){
   logTrail('LOGIN',S.user?.username||'','','','','Login successful');
   await Promise.all([syncItems(),syncBins(),loadAuditSess()]);
   // Set initial history state
-  history.replaceState({page:'dashboard'}, '', '#dashboard');
-  go('dashboard');
+  const startPage = S.user?.role==='dealer_owner' ? 'ownerdash' : 'dashboard';
+  history.replaceState({page:startPage}, '', '#'+startPage);
+  go(startPage);
   if(window.innerWidth<=768){
     document.querySelector('.bn').style.display='block';
     document.querySelector('.fab').style.display='flex';
@@ -869,21 +1305,52 @@ function setUserUI(){
   const init=(u.name||u.username).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   ['TAV','SAV'].forEach(id=>{const el=$(id);if(el)el.textContent=init;});
   if($('SNM'))$('SNM').textContent=u.name||u.username;
-  if($('SRL'))$('SRL').textContent=u.role==='master_auditor'?'Master Auditor':'Executive';
+  const roleLabel=u.role==='master_auditor'?'Master Auditor':u.role==='dealer_owner'?'👑 Owner':'Executive';
+  if($('SRL'))$('SRL').textContent=roleLabel;
+  // Apply owner gold theme to sidebar
+  if(u.role==='dealer_owner'){
+    const sb=document.querySelector('.sb');
+    if(sb)sb.classList.add('owner-sb');
+    // Show crown badge in topbar
+    const tbr=document.querySelector('.tb-r');
+    if(tbr){const cr=document.createElement('div');cr.className='owner-crown';cr.innerHTML='👑 Owner';tbr.prepend(cr);}
+  }
 }
 
 function buildNav(){
   const nav=$('NAV');if(!nav)return;
   const m=S.user?.role==='master_auditor';
-  const ls=[
-    {l:'Dashboard',i:'🏠',p:'dashboard'},{l:'Scan & Count',i:'📷',p:'scan'},
-    {l:'Manual Entry',i:'✏️',p:'manual'},{l:'Bin Locations',i:'📦',p:'bins'},
-    {l:'My Scan Log',i:'📋',p:'scanlog'},
-    ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},{l:'Uncounted Parts',i:'⬜',p:'uncounted'},{l:'FOC Dashboard',i:'🎁',p:'foc'},
-            {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Bill Type Analysis',i:'🧾',p:'billtype'},{l:'Order Planning',i:'🛒',p:'orderplan'},{l:'Inventory Analysis',i:'🏭',p:'invanalysis'},{sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},{l:'Audit Trail',i:'🔍',p:'audittrail'},
-            {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
-          :[{l:'Item Master',i:'🗃️',p:'itemmaster'}])
-  ];
+  const o=S.user?.role==='dealer_owner';
+  let ls;
+  if(o){
+    ls=[
+      {sec:'📊 Executive Dashboard'},
+      {l:'Owner Dashboard',i:'👑',p:'ownerdash'},
+      {l:'Financial Overview',i:'💰',p:'ownerfinance'},
+      {l:'Inventory Health',i:'🏥',p:'ownerhealth'},
+      {sec:'📋 Reports'},
+      {l:'Variance Summary',i:'📊',p:'ownervariance'},
+      {l:'Full Stock Report',i:'📄',p:'ownerstockreport'},
+      {l:'Top Parts Analysis',i:'🔥',p:'ownertopparts'},
+      {sec:'🔍 Analytics'},
+      {l:'Movement Trends',i:'📈',p:'ownertrends'},
+      {l:'Dead Stock Alert',i:'💀',p:'ownerdeadstock'},
+      {l:'Team Performance',i:'👥',p:'ownerteam'},
+    ];
+  } else {
+    ls=[
+      {l:'Dashboard',i:'🏠',p:'dashboard'},{l:'Scan & Count',i:'📷',p:'scan'},
+      {l:'Manual Entry',i:'✏️',p:'manual'},{l:'Bin Locations',i:'📦',p:'bins'},
+      {l:'My Scan Log',i:'📋',p:'scanlog'},
+      ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},{l:'Uncounted Parts',i:'⬜',p:'uncounted'},{l:'FOC Dashboard',i:'🎁',p:'foc'},
+              {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Bill Type Analysis',i:'🧾',p:'billtype'},{l:'Order Planning',i:'🛒',p:'orderplan'},{l:'Inventory Analysis',i:'🏭',p:'invanalysis'},
+              {sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},{l:'Bin QR Printer',i:'📍',p:'binqr'},{l:'Audit Trail',i:'🔍',p:'audittrail'},
+              {l:'Cycle Count Plan',i:'📅',p:'cycleplan'},{l:'Root Cause Analysis',i:'🔬',p:'rootcause'},{l:'Photo Capture',i:'📸',p:'photocap'},
+              {l:'AI Assistant',i:'🤖',p:'aichat'},
+              {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
+            :[{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'AI Assistant',i:'🤖',p:'aichat'}])
+    ];
+  }
   nav.innerHTML=ls.map(l=>l.sec?`<div class="ns">${l.sec}</div>`
     :`<div class="ni" data-p="${l.p}" onclick="go('${l.p}')"><span class="ic">${l.i}</span>${l.l}</div>`).join('');
 }
@@ -902,17 +1369,21 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 // ═══════════════════════════════════════════════════════════
 function go(p, fromPopState){
   if(!S.user)return;
-  if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','billtype','orderplan','qrgen','audittrail','invanalysis'].includes(p)&&S.user.role!=='master_auditor'){toast('Master Auditor only','w');return;}
+  if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','billtype','orderplan','qrgen','binqr','audittrail','invanalysis','cycleplan','rootcause'].includes(p)&&S.user.role!=='master_auditor'&&S.user.role!=='dealer_owner'){toast('Master Auditor only','w');return;}
+  const ownerPages=['ownerdash','ownerfinance','ownerhealth','ownervariance','ownerstockreport','ownertopparts','ownertrends','ownerdeadstock','ownerteam'];
+  if(ownerPages.includes(p)&&S.user.role!=='dealer_owner'){toast('Owner access only','w');return;}
   stopCam();closeSB();setNav(p);
-  // Push to browser history so back button works
-  if(!fromPopState){
-    history.pushState({page:p}, '', '#'+p);
-  }
+  if(!fromPopState){history.pushState({page:p},'','#'+p);}
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
   ({dashboard:rDash,scan:rScan,manual:rManual,bins:rBins,scanlog:rScanLog,
     variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,foc:rFOC,
-    movingparts:rMovingParts,billtype:rBillType,orderplan:rOrderPlan,qrgen:rQRGen,audittrail:rAuditTrail,invanalysis:rInvAnalysis,
-    itemmaster:rItemMaster,dms:rDMS,settings:rSettings}[p]||rNF)();
+    movingparts:rMovingParts,billtype:rBillType,orderplan:rOrderPlan,qrgen:rQRGen,binqr:rBinQR,audittrail:rAuditTrail,invanalysis:rInvAnalysis,
+    itemmaster:rItemMaster,dms:rDMS,settings:rSettings,
+    ownerdash:rOwnerDash,ownerfinance:rOwnerFinance,ownerhealth:rOwnerHealth,
+    ownervariance:rOwnerVariance,ownerstockreport:rOwnerStockReport,ownertopparts:rOwnerTopParts,
+    ownertrends:rOwnerTrends,ownerdeadstock:rOwnerDeadStock,ownerteam:rOwnerTeam,
+    cycleplan:rCyclePlan,rootcause:rRootCause,photocap:rPhotoCapture,aichat:rAIChat
+  }[p]||rNF)();
 }
 function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
 
@@ -1319,16 +1790,16 @@ function mDash(st,counts){
     </div>
   </div>
 
-  <!-- ★ ENHANCED: 6-stat grid (was 4) — Total SKUs, Parts Counted, Entries, Short, Excess, Accuracy -->
-  <div class="sg" style="grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
-    <div class="st"><div class="stl">Total SKUs</div><div class="stv" style="font-size:clamp(16px,4vw,26px)">${fmt(total)}</div><div class="sts">items sheet</div></div>
-    <div class="st" onclick="go('fullsummary')" style="cursor:pointer"><div class="stl">Parts Counted</div><div class="stv" style="color:#2563eb;font-size:clamp(16px,4vw,26px)">${fmt(uniquePartsCounted)}</div><div class="sts">${pct}% done</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div></div>
-    <div class="st"><div class="stl">Total Entries</div><div class="stv" style="font-size:clamp(16px,4vw,26px)">${fmt(totalEntries)}</div><div class="sts">all users today</div></div>
+  <!-- ★ RESPONSIVE: stat cards with auto-fit grid -->
+  <div class="sg" style="grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:10px">
+    <div class="st"><div class="stl">Total SKUs</div><div class="stv" style="font-size:clamp(14px,3.5vw,26px)">${fmt(total)}</div><div class="sts" style="font-size:clamp(9px,2vw,11px)">items sheet</div></div>
+    <div class="st" onclick="go('fullsummary')" style="cursor:pointer"><div class="stl">Parts Counted</div><div class="stv" style="color:#2563eb;font-size:clamp(14px,3.5vw,26px)">${fmt(uniquePartsCounted)}</div><div class="sts" style="font-size:clamp(9px,2vw,11px)">${pct}% done</div><div class="stb"><div class="stbf" style="width:${pct}%;background:#2563eb"></div></div></div>
+    <div class="st"><div class="stl">Entries Today</div><div class="stv" style="font-size:clamp(14px,3.5vw,26px)">${fmt(totalEntries)}</div><div class="sts" style="font-size:clamp(9px,2vw,11px)">all users</div></div>
   </div>
-  <div class="sg" style="grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
-    <div class="st" onclick="go('variance')" style="cursor:pointer"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626;font-size:clamp(16px,4vw,26px)">${fmt(shortC)}</div><div class="sts">parts</div></div>
-    <div class="st" onclick="go('variance')" style="cursor:pointer"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706;font-size:clamp(16px,4vw,26px)">${fmt(excessC)}</div><div class="sts">parts</div></div>
-    <div class="st"><div class="stl" style="color:#059669">✅ Accuracy</div><div class="stv" style="color:#059669;font-size:clamp(16px,4vw,26px)">${accuracy}%</div><div class="sts">${matchC} exact matches</div></div>
+  <div class="sg" style="grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:14px">
+    <div class="st" onclick="go('variance')" style="cursor:pointer"><div class="stl" style="color:#dc2626">🔻 Short</div><div class="stv" style="color:#dc2626;font-size:clamp(14px,3.5vw,26px)">${fmt(shortC)}</div><div class="sts" style="font-size:clamp(9px,2vw,11px)">parts</div></div>
+    <div class="st" onclick="go('variance')" style="cursor:pointer"><div class="stl" style="color:#d97706">🔺 Excess</div><div class="stv" style="color:#d97706;font-size:clamp(14px,3.5vw,26px)">${fmt(excessC)}</div><div class="sts" style="font-size:clamp(9px,2vw,11px)">parts</div></div>
+    <div class="st"><div class="stl" style="color:#059669">✅ Accuracy</div><div class="stv" style="color:#059669;font-size:clamp(14px,3.5vw,26px)">${accuracy}%</div><div class="sts" style="font-size:clamp(9px,2vw,11px)">${matchC} matches</div></div>
   </div>
 
   <!-- FINANCIAL SUMMARY CARD — unchanged -->
@@ -1458,6 +1929,7 @@ function rScan(){
     <button class="tb2" onclick="swTab('TCAM','STABS',this)">📷 Camera</button>
     <button class="tb2" onclick="swTab('TMAN','STABS',this)">✏️ Manual</button>
     <button class="tb2" onclick="swTab('TPKT','STABS',this)">📦 Packet</button>
+    <button class="tb2" onclick="swTab('TBWS','STABS',this);initBinWiseScan()">📍 Bin-wise</button>
   </div>
   <div id="STABS">
     <!-- TAB 1: KEYBOARD SCANNER (Scan to Keyboard app) -->
@@ -1494,6 +1966,64 @@ function rScan(){
     <div class="tp" id="TMAN">${manForm('MS')}</div>
     <!-- TAB 4: PACKET -->
     <div class="tp" id="TPKT">${pktForm()}</div>
+    <!-- TAB 5: BIN-WISE SCAN -->
+    <div class="tp" id="TBWS">
+      <div class="cd" style="margin-bottom:14px">
+        <div class="cdh"><div class="cdt">📍 Select Bin to Audit</div></div>
+        <div class="cdb">
+          <div class="al alw" style="margin-bottom:12px">📦 Select a bin first — then all scans for this session will be auto-tagged to that bin. Each bin shows how many parts remain to count.</div>
+          <div class="fg f2" style="align-items:flex-end;gap:12px">
+            <div style="flex:1">
+              <label class="fll">Active Bin</label>
+              <select class="fi" id="BWS_BIN" onchange="onBinWiseSelect()" style="font-size:13px;font-weight:700">
+                <option value="">— Select a bin —</option>
+                ${S.bins.map(b=>{
+                  const total=S.items.filter(i=>(i.bin||'')===b.bin).length;
+                  return`<option value="${esc(b.bin)}">${esc(b.bin)}${b.description?' — '+b.description:''} (${total} parts)</option>`;
+                }).join('')}
+              </select>
+            </div>
+            <button class="btn bpr" onclick="bwsStartSession()" id="BWS_START" disabled>▶ Start Bin Session</button>
+          </div>
+        </div>
+      </div>
+      <!-- Bin progress + parts list shown after bin is selected -->
+      <div id="BWS_PANEL" style="display:none">
+        <div class="cd" style="margin-bottom:14px">
+          <div class="cdh">
+            <div class="cdt" id="BWS_TITLE">Bin Parts</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="bg bgs" id="BWS_DONE_BADGE">0 done</span>
+              <span class="bg bgw" id="BWS_REM_BADGE">0 remaining</span>
+            </div>
+          </div>
+          <div style="padding:8px 18px">
+            <div class="prg"><div class="prgf" id="BWS_PBAR" style="width:0%;background:#2563eb"></div></div>
+          </div>
+          <!-- Quick part scan input for bin-wise mode -->
+          <div style="padding:12px 18px;border-top:1px solid var(--bd);background:#f8fafc">
+            <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:7px">⌨️ SCAN / TYPE PART NUMBER — Tagged to bin: <span id="BWS_ACTIVE_BIN" style="color:#2563eb;font-family:'JetBrains Mono',monospace;font-weight:800"></span></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="fi mn" id="BWS_INPUT" placeholder="Scan or type Part No…" autocomplete="off" autocapitalize="none" style="flex:1" onkeydown="if(event.key==='Enter')bwsSave()">
+              <input class="fi" id="BWS_QTY" type="number" min="0" value="1" style="width:70px" placeholder="Qty">
+              <button class="btn bpr" onclick="bwsSave()">💾 Save</button>
+            </div>
+          </div>
+        </div>
+        <!-- Parts checklist for this bin -->
+        <div class="cd">
+          <div class="cdh">
+            <div class="cdt">Bin Parts Checklist</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn bgh bsm" onclick="bwsFilterList('all')" id="BWS_FA">All</button>
+              <button class="btn bgh bsm" onclick="bwsFilterList('pending')" id="BWS_FP">Pending</button>
+              <button class="btn bgh bsm" onclick="bwsFilterList('done')" id="BWS_FD">Done</button>
+            </div>
+          </div>
+          <div id="BWS_LIST" style="max-height:500px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
   </div>
   <!-- LOG -->
   <div class="cd" style="margin-top:18px">
@@ -1514,6 +2044,179 @@ function rScan(){
 
 function bstartCam(){$('BST').style.display='none';$('BSP').style.display='inline-flex';startCam();}
 function bstopCam(){stopCam();$('BST').style.display='inline-flex';$('BSP').style.display='none';setSt('','Stopped');}
+
+// ═══════════════════════════════════════════════════════════
+// BIN-WISE SCAN — Scan parts within a specific bin
+// ═══════════════════════════════════════════════════════════
+let BWS = { bin:'', items:[], countedMap:{} };
+
+function initBinWiseScan(){
+  BWS={bin:'',items:[],countedMap:{}};
+  // Load today's counts into countedMap for quick lookup
+  const today_s=today();
+  (S.allCounts||S.counts||[]).filter(c=>c.date===today_s).forEach(c=>{
+    BWS.countedMap[c.partNo]=(BWS.countedMap[c.partNo]||0)+(parseFloat(c.qty)||0);
+  });
+}
+
+function onBinWiseSelect(){
+  const bin=$('BWS_BIN')?.value||'';
+  const startBtn=$('BWS_START');
+  if(startBtn)startBtn.disabled=!bin;
+}
+
+function bwsStartSession(){
+  const bin=$('BWS_BIN')?.value||'';
+  if(!bin){toast('Select a bin first','w');return;}
+  BWS.bin=bin;
+  BWS.items=S.items.filter(i=>(i.bin||'').trim()===bin.trim());
+
+  const panel=$('BWS_PANEL');
+  if(panel)panel.style.display='block';
+
+  const title=$('BWS_TITLE');
+  if(title)title.textContent=`📍 ${bin} — ${BWS.items.length} Parts`;
+
+  const activeBinLbl=$('BWS_ACTIVE_BIN');
+  if(activeBinLbl)activeBinLbl.textContent=bin;
+
+  bwsRefreshProgress();
+  bwsRenderList('all');
+
+  // Focus input
+  setTimeout(()=>{ const inp=$('BWS_INPUT');if(inp)inp.focus(); },200);
+  toast(`📍 Bin ${bin} selected — ${BWS.items.length} parts to count`,'i',3000);
+}
+
+function bwsRefreshProgress(){
+  const done=BWS.items.filter(i=>BWS.countedMap[i.partNo]!==undefined).length;
+  const total=BWS.items.length;
+  const pct=total?Math.round(done/total*100):0;
+
+  const doneBadge=$('BWS_DONE_BADGE');
+  const remBadge=$('BWS_REM_BADGE');
+  const pbar=$('BWS_PBAR');
+  if(doneBadge)doneBadge.textContent=`${done} done`;
+  if(remBadge)remBadge.textContent=`${total-done} remaining`;
+  if(pbar)pbar.style.width=pct+'%';
+}
+
+function bwsRenderList(filter){
+  // Update active filter button style
+  ['BWS_FA','BWS_FP','BWS_FD'].forEach(id=>{
+    const b=$(id);if(b)b.className='btn bgh bsm';
+  });
+  const activeId=filter==='pending'?'BWS_FP':filter==='done'?'BWS_FD':'BWS_FA';
+  const ab=$(activeId);if(ab)ab.className='btn bpr bsm';
+
+  const wrap=$('BWS_LIST');if(!wrap)return;
+  let items=BWS.items;
+  if(filter==='done')   items=items.filter(i=>BWS.countedMap[i.partNo]!==undefined);
+  if(filter==='pending')items=items.filter(i=>BWS.countedMap[i.partNo]===undefined);
+
+  if(!items.length){
+    wrap.innerHTML=`<div style="text-align:center;padding:30px;color:#94a3b8">
+      <div style="font-size:32px;margin-bottom:8px">${filter==='done'?'🎉':'📋'}</div>
+      <div style="font-size:13px;font-weight:600">${filter==='done'?'No counted parts yet':filter==='pending'?'All parts counted! 🎉':'No parts in this bin'}</div>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML=`<table>
+    <thead><tr><th>#</th><th>Part No</th><th>Description</th><th style="text-align:right">DMS</th><th style="text-align:right">Counted</th><th style="text-align:right">Diff</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+    ${items.map((item,i)=>{
+      const dms=parseFloat(item.systemQty)||0;
+      const counted=BWS.countedMap[item.partNo];
+      const isDone=counted!==undefined;
+      const diff=isDone?counted-dms:null;
+      const diffColor=diff===null?'#94a3b8':diff===0?'#059669':diff<0?'#dc2626':'#d97706';
+      const rowBg=isDone?(diff===0?'#f0fdf4':diff<0?'#fef2f2':'#fffbeb'):'';
+      const status=isDone?(diff===0?'<span class="bg bgs">✅ Match</span>':diff<0?'<span class="bg bgd">🔻 Short</span>':'<span class="bg bgw">🔺 Excess</span>'):'<span class="bg bgg">Pending</span>';
+      return`<tr style="background:${rowBg}">
+        <td style="color:#94a3b8;font-size:11px">${i+1}</td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(item.partNo)}</span></td>
+        <td style="font-size:11px" title="${esc(item.desc)}">${esc(tr2(item.desc,22))}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${fmt(dms)}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:800;color:${isDone?'#059669':'#94a3b8'}">${isDone?fmt(counted):'—'}</td>
+        <td style="text-align:right;font-weight:700;color:${diffColor}">${diff!==null?(diff>0?'+':'')+diff:'—'}</td>
+        <td>${status}</td>
+        <td>
+          <button class="btn bgh bsm" style="padding:3px 8px;font-size:10px" onclick="bwsQuickCount('${esc(item.partNo)}',${dms})">${isDone?'✏️ Recount':'📷 Count'}</button>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+async function bwsSave(){
+  const pn=($('BWS_INPUT')?.value||'').trim().toUpperCase();
+  if(!pn){toast('Enter Part No','w');return;}
+  const qty=parseInt($('BWS_QTY')?.value)||0;
+  const bin=BWS.bin;
+  if(!bin){toast('Select a bin first','w');return;}
+
+  // Check if part belongs to this bin
+  const item=findItem(pn);
+  if(item&&item.bin&&item.bin!==bin){
+    if(!confirm(`⚠️ ${pn} is assigned to bin "${item.bin}", not "${bin}".\nSave to current bin "${bin}" anyway?`))return;
+  }
+  if(!item){
+    toast(`Part ${pn} not found in inventory — count recorded anyway`,'w');
+  }
+
+  if(isLocked(pn)){toast(`🔒 ${pn} is locked`,'w');return;}
+
+  const dmsQty=parseFloat(item?.systemQty||0);
+  const{variance,status}=calcVariance(qty,dmsQty);
+  let reason='';
+  if(variance!==0){
+    reason=await promptReason(pn,variance,status);
+    if(reason===null){toast('Cancelled','w');return;}
+  }
+
+  const existingEntry=(S.allCounts||[]).find(c=>
+    c.partNo===pn && c.date===today() && c.auditor===S.user.username
+  );
+  const r=await api({action:'saveCount',count:{
+    id:existingEntry?existingEntry.id:uid(),
+    partNo:pn, desc:item?.desc||'', bin,
+    date:today(), qty, time:nowt(),
+    type:'BinWise', remarks:reason||`Bin-wise scan: ${bin}`,
+    auditor:S.user.username, auditorName:S.user.name,
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+  }});
+
+  if(r.success){
+    BWS.countedMap[pn]=qty;
+    toast(`✅ ${pn} → ${qty} (Bin: ${bin})`,'s',2000);
+    appendHistory({partNo:pn, user:S.user.username, userName:S.user.name, countedQty:qty, systemQty:dmsQty, variance, status, reason, date:today(), time:nowt(), type:'BinWise', action:existingEntry?'RECOUNT':'FIRST_COUNT'});
+    trackUserPerf(S.user.username, variance!==0);
+    if(existingEntry){existingEntry.qty=qty;}
+    else{(S.allCounts||(S.allCounts=[])).push({id:uid(),partNo:pn,desc:item?.desc||'',bin,date:today(),qty,time:nowt(),type:'BinWise',auditor:S.user.username});}
+    // Clear input, keep qty=1 for speed
+    if($('BWS_INPUT')){$('BWS_INPUT').value='';$('BWS_INPUT').focus();}
+    if($('BWS_QTY'))$('BWS_QTY').value='1';
+    bwsRefreshProgress();
+    // Re-render current filter
+    const activeFilter=$('BWS_FP')?.className?.includes('bpr')?'pending':$('BWS_FD')?.className?.includes('bpr')?'done':'all';
+    bwsRenderList(activeFilter);
+    reloadLog();
+  } else toast(r.error||'Failed','d');
+}
+
+function bwsQuickCount(pn, dms){
+  // Pre-fill the bin-wise input with this part number
+  const inp=$('BWS_INPUT');
+  if(inp){inp.value=pn;inp.focus();}
+  if($('BWS_QTY'))$('BWS_QTY').value=dms>0?dms:1;
+  toast(`Part ${pn} loaded — verify qty and save`,'i',2500);
+  // Scroll to input
+  inp?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function bwsFilterList(f){bwsRenderList(f);}
 
 // ── WEDGE (Scan-to-Keyboard) ──
 let wedgeBuf='',wedgeT=null;
@@ -3373,6 +4076,166 @@ function qrDlSheet(){
 }
 
 // ═══════════════════════════════════════════════════════════
+// BIN QR PRINTER — Location QR codes for all bin labels
+// ═══════════════════════════════════════════════════════════
+function rBinQR(){
+  const pg=$('PG');
+  const bins=S.bins;
+  const zones=[...new Set(bins.map(b=>b.zone||'').filter(Boolean))].sort();
+  const zoneOpts=zones.map(z=>`<option value="${esc(z)}">${esc(z)}</option>`).join('');
+
+  pg.innerHTML=`
+  <div class="print-header"><h2>🏍️ India Motors — Bin Location Labels</h2><p>Scan to navigate · ${new Date().toLocaleDateString('en-IN')}</p></div>
+  <div class="ph" style="align-items:center">
+    <div>
+      <div class="pt">📍 Bin QR Printer</div>
+      <div class="ps">Print QR labels for all bin locations — stick on shelves for easy identification</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bgh bsm" onclick="window.print()">🖨️ Print All</button>
+      <button class="btn bpr bsm" onclick="binQRDlCSV()">⬇️ Export List</button>
+    </div>
+  </div>
+
+  <div class="cd" style="margin-bottom:16px">
+    <div class="cdb" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;padding:14px 18px">
+      <div style="flex:1;min-width:160px">
+        <label class="fll">🔍 Search Bin</label>
+        <input class="fi" id="BQSI" placeholder="Bin name or description…" oninput="binQRFilter()" autocapitalize="none" autocomplete="off">
+      </div>
+      ${zones.length?`<div style="min-width:140px">
+        <label class="fll">Zone</label>
+        <select class="fi" id="BQZONE" onchange="binQRFilter()">
+          <option value="">All Zones</option>${zoneOpts}
+        </select>
+      </div>`:''}
+      <div style="min-width:110px">
+        <label class="fll">Label Size</label>
+        <select class="fi" id="BQSZ" onchange="binQRFilter()">
+          <option value="100">Small (100px)</option>
+          <option value="130" selected>Medium (130px)</option>
+          <option value="170">Large (170px)</option>
+        </select>
+      </div>
+    </div>
+    <div style="padding:8px 18px;background:#f8fafc;border-top:1px solid var(--bd);font-size:12px;color:#475569">
+      📦 <strong id="BQCOUNT">${bins.length}</strong> bins · QR encodes: <code style="background:#e2e8f0;padding:1px 5px;border-radius:3px;font-size:10px">BIN:&lt;name&gt;|&lt;desc&gt;|&lt;zone&gt;</code>
+    </div>
+  </div>
+
+  <div id="BQGRID" class="bin-qr-grid"></div>`;
+
+  window._binQRAll=bins;
+  setTimeout(()=>binQRRender(bins),80);
+}
+
+function binQRFilter(){
+  const q=($('BQSI')?.value||'').trim().toLowerCase();
+  const zone=$('BQZONE')?.value||'';
+  let bins=window._binQRAll||S.bins;
+  if(q) bins=bins.filter(b=>(b.bin||'').toLowerCase().includes(q)||(b.description||'').toLowerCase().includes(q));
+  if(zone) bins=bins.filter(b=>(b.zone||'')===zone);
+  if($('BQCOUNT'))$('BQCOUNT').textContent=bins.length;
+  binQRRender(bins);
+}
+
+function binQRRender(bins){
+  const grid=$('BQGRID');if(!grid)return;
+  const sz=parseInt($('BQSZ')?.value)||130;
+  if(!bins.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8"><div style="font-size:40px;margin-bottom:12px">📦</div><div style="font-size:14px;font-weight:600">No bins found</div></div>';
+    return;
+  }
+  grid.innerHTML=bins.map((b,i)=>{
+    const partCount=S.items.filter(it=>(it.bin||'').trim()===b.bin.trim()).length;
+    const safeDesc=(b.description||'').replace(/'/g,"\\'");
+    const safeZone=(b.zone||'').replace(/'/g,"\\'");
+    return`<div class="bin-qr-card" onclick="binQRZoom('${esc(b.bin)}','${safeDesc}','${safeZone}',${sz})">
+      <canvas id="BQRC_${i}" width="${sz}" height="${sz}" style="width:${sz}px;height:${sz}px;border-radius:6px;border:1px solid #e2e8f0"></canvas>
+      <div class="bin-qr-name">${esc(b.bin)}</div>
+      ${b.description?`<div class="bin-qr-desc">${esc(tr2(b.description,20))}</div>`:''}
+      ${b.zone?`<div class="bin-qr-zone">${esc(b.zone)}</div>`:''}
+      <div style="font-size:9px;color:#94a3b8;margin-top:2px">${partCount} parts</div>
+    </div>`;
+  }).join('');
+
+  // Generate QR images for all bins
+  bins.forEach((b,i)=>{
+    const canvas=$(`BQRC_${i}`);if(!canvas)return;
+    // QR data format: BIN:A-01|Parts Storage Area|Zone A
+    const qrData=`BIN:${b.bin}|${b.description||''}|${b.zone||''}`;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${sz*2}x${sz*2}&data=${encodeURIComponent(qrData)}&ecc=H&margin=1&color=1a1a2e&bgcolor=ffffff`;
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=((c,bi)=>()=>{
+      const ctx=c.getContext('2d');
+      ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);
+      ctx.drawImage(img,0,0,c.width,c.height);
+      // Add subtle border overlay
+    })(canvas,b);
+    img.onerror=((c,bi)=>()=>{
+      const ctx=c.getContext('2d');
+      ctx.fillStyle='#eff6ff';ctx.fillRect(0,0,c.width,c.height);
+      ctx.fillStyle='#2563eb';ctx.font=`bold ${Math.floor(c.width/6)}px monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(bi.bin,c.width/2,c.height/2);
+    })(canvas,b);
+    img.src=url;
+  });
+}
+
+function binQRZoom(binName, desc, zone, sz){
+  const qrData=`BIN:${binName}|${desc||''}|${zone||''}`;
+  const zsz=220;
+  const partCount=S.items.filter(i=>(i.bin||'').trim()===binName.trim()).length;
+  modal(`<div class="md">
+    <div class="mdh">
+      <div class="mdt">📍 ${esc(binName)}</div>
+      <button class="mdc" onclick="closeMd()">✕</button>
+    </div>
+    <div class="mdb" style="text-align:center;padding:20px">
+      <canvas id="BQRZC" width="${zsz}" height="${zsz}" style="border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.1)"></canvas>
+      <div style="font-size:22px;font-weight:800;color:#0f172a;margin-top:12px;font-family:'JetBrains Mono',monospace">${esc(binName)}</div>
+      ${desc?`<div style="font-size:12px;color:#64748b;margin-top:4px">${esc(desc)}</div>`:''}
+      ${zone?`<div style="margin-top:6px"><span class="bg bgp">📍 Zone: ${esc(zone)}</span></div>`:''}
+      <div style="margin-top:6px;font-size:11px;color:#94a3b8">${partCount} parts assigned to this bin</div>
+      <div style="margin-top:10px;font-size:10px;color:#64748b;background:#f8fafc;border-radius:6px;padding:8px 12px;display:inline-block;font-family:'JetBrains Mono',monospace;word-break:break-all;text-align:left;max-width:100%">
+        <div style="font-weight:700;color:#0f172a;margin-bottom:3px">QR Data:</div>
+        ${esc(qrData)}
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn bpr" onclick="binQRDownload('${esc(binName)}')">⬇️ Download PNG</button>
+        <button class="btn bgh" onclick="window.print()">🖨️ Print</button>
+        <button class="btn bsu bsm" onclick="closeMd();go('bins')">📦 View Bin</button>
+      </div>
+    </div>
+  </div>`);
+  setTimeout(()=>{
+    const canvas=$('BQRZC');if(!canvas)return;
+    const url=`https://api.qrserver.com/v1/create-qr-code/?size=${zsz*2}x${zsz*2}&data=${encodeURIComponent(qrData)}&ecc=H&margin=2&color=1a1a2e`;
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);};
+    img.src=url;
+  },200);
+}
+
+function binQRDownload(binName){
+  const canvas=$('BQRZC');if(!canvas)return;
+  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`BinQR_${binName.replace(/[^a-zA-Z0-9]/g,'_')}.png`;a.click();
+  toast(`QR for ${binName} downloaded`,'s');
+}
+
+function binQRDlCSV(){
+  const bins=window._binQRAll||S.bins;
+  const csv='Bin Name,Description,Zone,Parts Count,QR Data\n'
+    +bins.map(b=>{
+      const cnt=S.items.filter(i=>(i.bin||'').trim()===b.bin.trim()).length;
+      return`"${b.bin}","${(b.description||'').replace(/"/g,'""')}","${b.zone||''}",${cnt},"BIN:${b.bin}|${b.description||''}|${b.zone||''}"`;
+    }).join('\n');
+  dlCSV(csv,`bin_locations_${today()}.csv`);
+  toast(`${bins.length} bins exported`,'s');
+}
+
+// ═══════════════════════════════════════════════════════════
 // SALES DATA ENGINE — Google Sheets Persistent Store
 // ═══════════════════════════════════════════════════════════
 // In-memory: S_SALES_MAP[partNo][YYYY-MM] = qty
@@ -4982,6 +5845,7 @@ function renderInvAnalysis(){
     <button class="tb2"    id="IATAB_excess"    onclick="iaFilter('excess')">📈 Excess (${excessStock})</button>
     <button class="tb2"    id="IATAB_fast"      onclick="iaFilter('fast')">🔥 Fast (${fastMoving})</button>
     <button class="tb2"    id="IATAB_nosale"    onclick="iaFilter('nosale')">⬜ No Sale (${noStockNoSale})</button>
+    <button class="tb2"    id="IATAB_ghost"     onclick="iaFilter('ghost')" style="color:#a8a29e">👻 Ghost Parts (${noStockNoSale})</button>
   </div>
 
   <div class="cd" id="IACARD">
@@ -4996,6 +5860,51 @@ function renderInvAnalysis(){
       </div>
     </div>
     <div class="tw" id="IATBL"></div>
+  </div>
+
+  <!-- GHOST PARTS — Zero Stock & Zero Sales — Separate Section -->
+  <div class="gp-section" id="IA_GHOST_SEC" style="display:block">
+    <div class="gp-header" onclick="toggleGhostSec()">
+      <div class="gp-title">
+        👻 Ghost Parts
+        <span class="gp-badge">${noStockNoSale} parts</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;color:#a8a29e">Zero Stock &amp; Zero Sales — Not active in inventory</span>
+        <span class="gp-toggle" id="GP_ARROW">▼</span>
+      </div>
+    </div>
+    <div class="gp-tip">
+      💡 These parts have <strong>0 physical stock today</strong> and <strong>no sales history</strong>. They exist in DMS master but are effectively inactive.
+      Consider cleaning them up to keep your inventory lean — or archive if they may be needed in future.
+    </div>
+    <div class="gp-body" id="GP_BODY">
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Part No</th><th>Description</th><th>Category</th><th>Bin</th>
+            <th style="text-align:right">MRP ₹</th><th style="text-align:right">DLC ₹</th>
+            <th>Action</th>
+          </tr></thead>
+          <tbody>
+          ${rows.filter(r=>r.currentStock===0&&r.totalSalesQty===0).slice(0,200).map((r,i)=>`
+            <tr style="opacity:.75">
+              <td style="color:#a8a29e;font-size:11px">${i+1}</td>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#78716c">${esc(r.partNo)}</span></td>
+              <td style="font-size:11px;color:#78716c" title="${esc(r.desc)}">${esc(tr2(r.desc,30))}</td>
+              <td style="font-size:10px;color:#a8a29e">${esc(tr2(r.cat,14))}</td>
+              <td><span class="bg bgg" style="font-size:9px">${esc(r.bin||'—')}</span></td>
+              <td style="text-align:right;font-size:11px;color:#a8a29e">₹${fmt(r.mrp)}</td>
+              <td style="text-align:right;font-size:11px;color:#a8a29e">₹${fmt(r.dlc)}</td>
+              <td>
+                <button class="btn bgh bsm" style="padding:2px 8px;font-size:10px" onclick="showDetail('${esc(r.partNo)}')">View</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        ${rows.filter(r=>r.currentStock===0&&r.totalSalesQty===0).length>200?`<div style="padding:10px 16px;font-size:11px;color:#a8a29e;border-top:1px solid #e7e5e4">Showing 200 of ${rows.filter(r=>r.currentStock===0&&r.totalSalesQty===0).length} ghost parts. Export full report for complete list.</div>`:''}
+      </div>
+    </div>
   </div>`;
 
   // Store rows for filtering
@@ -5008,7 +5917,7 @@ let _iaCurrentFilter='all';
 function iaFilter(type){
   _iaCurrentFilter=type;
   const rows=window._iaAllRows||[];
-  ['all','critical','low','dead','excess','fast','nosale'].forEach(t=>{
+  ['all','critical','low','dead','excess','fast','nosale','ghost'].forEach(t=>{
     const btn=$(`IATAB_${t}`);if(btn)btn.classList.toggle('on',t===type);
   });
   let filtered=rows;
@@ -5019,7 +5928,8 @@ function iaFilter(type){
     dead:'💀 Dead Stock — Zero Sales, Stock Exists',
     excess:'📈 Excess Stock — Over 6 Months Cover',
     fast:'🔥 Fast Moving Parts',
-    nosale:'⬜ No Stock & No Sales'
+    nosale:'⬜ No Stock & No Sales',
+    ghost:'👻 Ghost Parts — Zero Stock & Zero Sales (Not in Inventory)'
   };
   if(type==='critical') filtered=rows.filter(r=>r.currentStock===0&&r.totalSalesQty>0);
   else if(type==='low')  filtered=rows.filter(r=>r.stockCoverDays!==null&&r.stockCoverDays<30&&r.currentStock>0);
@@ -5027,7 +5937,15 @@ function iaFilter(type){
   else if(type==='excess')filtered=rows.filter(r=>r.isExcess);
   else if(type==='fast') filtered=rows.filter(r=>r.avgMonthly>=5);
   else if(type==='nosale')filtered=rows.filter(r=>r.currentStock===0&&r.totalSalesQty===0);
+  else if(type==='ghost') filtered=rows.filter(r=>r.currentStock===0&&r.totalSalesQty===0);
+  else filtered=rows.filter(r=>r.currentStock>0||r.totalSalesQty>0); // 'all' — exclude ghost parts
+
   const title=$('IATITLE');if(title)title.textContent=`${titleMap[type]||type} — ${filtered.length} items`;
+
+  // Show/hide ghost section banner
+  const ghostSec=$('IA_GHOST_SEC');
+  if(ghostSec) ghostSec.style.display=(type==='all'||type==='ghost')?'block':'none';
+
   iaRenderTable(filtered);
 }
 
@@ -5051,13 +5969,46 @@ function iaCatFilter(){
   iaRenderTable(rows);
 }
 
+// ── Pagination state for Inventory Analysis table ──────────
+const IA_PAGE_SZ = 100; // rows per page
+let _iaPage = 1;
+let _iaCurrentRows = [];
+
 function iaRenderTable(rows){
+  _iaCurrentRows = rows;
+  _iaPage = 1;
+  iaRenderPage();
+}
+
+function iaRenderPage(){
   const wrap=$('IATBL');if(!wrap)return;
+  const rows=_iaCurrentRows;
   if(!rows.length){
     wrap.innerHTML='<div class="emp" style="padding:40px"><div class="emp-i">📊</div><div class="emp-t">No items found</div></div>';
     return;
   }
   const hasSales=S_SALES_META&&S_SALES_META.totalRows>0;
+  const totalPages=Math.max(1,Math.ceil(rows.length/IA_PAGE_SZ));
+  const p=Math.max(1,Math.min(_iaPage,totalPages));
+  _iaPage=p;
+  const start=(p-1)*IA_PAGE_SZ, end=Math.min(start+IA_PAGE_SZ,rows.length);
+  const slice=rows.slice(start,end);
+
+  // Build pagination bar HTML
+  let pagBar='';
+  if(totalPages>1){
+    pagBar=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--bd);background:#f8fafc;flex-wrap:wrap;gap:8px">
+      <div style="font-size:11px;color:#64748b">Showing <strong>${start+1}–${end}</strong> of <strong>${rows.length}</strong> items &nbsp;·&nbsp; Page ${p}/${totalPages}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="ia-pb" onclick="iaGoPage(1)" ${p<=1?'disabled':''} title="First">«</button>
+        <button class="ia-pb" onclick="iaGoPage(${p-1})" ${p<=1?'disabled':''}>‹ Prev</button>
+        ${(()=>{let h='';const s=Math.max(1,p-2),e2=Math.min(totalPages,p+2);for(let i=s;i<=e2;i++)h+=`<button class="ia-pb${i===p?' on':''}" onclick="iaGoPage(${i})">${i}</button>`;return h;})()}
+        <button class="ia-pb" onclick="iaGoPage(${p+1})" ${p>=totalPages?'disabled':''}>Next ›</button>
+        <button class="ia-pb" onclick="iaGoPage(${totalPages})" ${p>=totalPages?'disabled':''} title="Last">»</button>
+      </div>
+    </div>`;
+  }
+
   wrap.innerHTML=`<table>
     <thead><tr>
       <th>#</th>
@@ -5077,11 +6028,12 @@ function iaRenderTable(rows){
       <th style="text-align:right">DLC ₹</th>
     </tr></thead>
     <tbody>
-    ${rows.slice(0,500).map((r,i)=>{
+    ${slice.map((r,i)=>{
+      const globalIdx=start+i;
       const coverTxt=r.stockCoverDays===null?'—':r.stockCoverDays>=999?'∞':r.stockCoverDays+'d';
       const coverColor=r.stockCoverDays===null?'#94a3b8':r.stockCoverDays<14?'#dc2626':r.stockCoverDays<30?'#d97706':r.stockCoverDays>180?'#0891b2':'#059669';
       return`<tr style="background:${r.statusBg||''}">
-        <td style="color:#94a3b8;font-size:11px">${i+1}</td>
+        <td style="color:#94a3b8;font-size:11px">${globalIdx+1}</td>
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(r.partNo)}</span></td>
         <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${esc(r.desc)}">${esc(tr2(r.desc,24))}</td>
         <td style="font-size:10px;color:#64748b">${esc(tr2(r.cat,14))}</td>
@@ -5113,8 +6065,14 @@ function iaRenderTable(rows){
         ${hasSales?`<td colspan="4"></td>`:'<td colspan="2"></td>'}
       </tr>
     </tfoot>
-  </table>
-  ${rows.length>500?`<div style="padding:10px 16px;font-size:11px;color:#94a3b8;border-top:1px solid var(--bd)">Showing 500 of ${rows.length}. Use search/filter to narrow down.</div>`:''}`;
+  </table>${pagBar}`;
+}
+
+function iaGoPage(n){
+  _iaPage=n;
+  iaRenderPage();
+  // Scroll table into view
+  const wrap=$('IATBL');if(wrap)wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function iaExport(){
@@ -5127,6 +6085,1819 @@ function iaExport(){
   dlCSV(csv,`full_inventory_analysis_${today()}.csv`);
   toast(`${rows.length} items exported`,'s');
 }
+
+function toggleGhostSec(){
+  const body=$('GP_BODY'),arrow=$('GP_ARROW');
+  if(!body)return;
+  const open=body.classList.toggle('open');
+  if(arrow)arrow.textContent=open?'▲':'▼';
+}
+
+// ═══════════════════════════════════════════════════════════
+// OWNER PORTAL — ALL PAGES
+// ═══════════════════════════════════════════════════════════
+
+// ── Shared helper: build full inventory analytics ──────────
+async function ownerBuildData(){
+  const [counts, allCounts] = await Promise.all([fetchCounts(today()), fetchCounts()]);
+  await ensureSalesLoaded();
+
+  // Build final-count map (mode per part, all users)
+  const partUserMap={};
+  allCounts.forEach(c=>{
+    if(!partUserMap[c.partNo])partUserMap[c.partNo]={};
+    const ex=partUserMap[c.partNo][c.auditor];
+    if(!ex||c.time>ex.time) partUserMap[c.partNo][c.auditor]=c;
+  });
+  const cMap={};
+  Object.entries(partUserMap).forEach(([pn,byUser])=>{
+    const vals=Object.values(byUser).map(e=>parseInt(e.qty)||0);
+    const freq={};vals.forEach(v=>{freq[v]=(freq[v]||0)+1;});
+    let mode=vals[0],maxF=0;
+    Object.entries(freq).forEach(([v,f])=>{if(parseInt(f)>maxF){maxF=parseInt(f);mode=parseInt(v);}});
+    cMap[pn]=mode;
+  });
+
+  let totalStockVal=0,shortVal=0,excessVal=0,deadVal=0;
+  let shortCount=0,excessCount=0,deadCount=0,matchCount=0;
+  const shortItems=[],excessItems=[],deadItems=[],fastLow=[];
+
+  S.items.forEach(item=>{
+    const pn=item.partNo;
+    const sysQty=parseFloat(item.systemQty)||0;
+    const dlc=parseFloat(item.dlc)||0;
+    const mrp=parseFloat(item.mrp)||0;
+    const stockVal=sysQty*dlc;
+    totalStockVal+=stockVal;
+
+    const salesMonths=S_SALES_MAP[pn]?Object.values(S_SALES_MAP[pn]):[];
+    const totalSales=salesMonths.reduce((a,b)=>a+b,0);
+    const avgMonthly=salesMonths.length?totalSales/salesMonths.length:0;
+    const coverDays=avgMonthly>0?Math.round(sysQty/(avgMonthly/30)):null;
+
+    const physQty=cMap[pn]!==undefined?cMap[pn]:null;
+    const variance=physQty!==null?physQty-sysQty:null;
+
+    if(variance!==null){
+      if(variance<0){
+        shortCount++;shortVal+=Math.abs(variance)*dlc;
+        shortItems.push({...item,variance,dlc,mrp,totalSales,avgMonthly,coverDays,stockVal,physQty});
+      } else if(variance>0){
+        excessCount++;excessVal+=variance*dlc;
+        excessItems.push({...item,variance,dlc,mrp,totalSales,avgMonthly,coverDays,stockVal,physQty});
+      } else { matchCount++; }
+    }
+    if(totalSales===0&&sysQty>0){deadCount++;deadVal+=stockVal;deadItems.push({...item,dlc,mrp,stockVal});}
+    if(avgMonthly>0&&coverDays!==null&&coverDays<30&&sysQty>=0){
+      fastLow.push({...item,dlc,mrp,totalSales,avgMonthly,coverDays,stockVal});
+    }
+  });
+
+  // Category breakdown
+  const catMap={};
+  S.items.forEach(i=>{
+    const c=i.category||'Uncategorised';
+    if(!catMap[c])catMap[c]={count:0,val:0,sales:0};
+    catMap[c].count++;catMap[c].val+=(parseFloat(i.systemQty)||0)*(parseFloat(i.dlc)||0);
+    const s=S_SALES_MAP[i.partNo];
+    if(s)catMap[c].sales+=Object.values(s).reduce((a,b)=>a+b,0);
+  });
+  const categories=Object.entries(catMap).sort((a,b)=>b[1].val-a[1].val).slice(0,8);
+
+  // User perf
+  const userPerf=getUserPerf();
+  const users=Object.entries(userPerf).map(([u,d])=>({
+    username:u,total:d.totalCounts||0,errors:d.errorCounts||0,
+    accuracy:d.totalCounts?Math.round(((d.totalCounts-(d.errorCounts||0))/d.totalCounts)*100):100
+  }));
+
+  // Monthly sales trend (from salesMeta months)
+  const salesMeta=S_SALES_META;
+  const months=salesMeta?.months||[];
+  const monthlyTotals=months.map(m=>{
+    let tot=0;
+    Object.values(S_SALES_MAP).forEach(pm=>{tot+=pm[m]||0;});
+    return{month:m,qty:tot};
+  }).slice(-6);
+
+  return{
+    counts,allCounts,cMap,
+    totalStockVal,shortVal,excessVal,deadVal,
+    shortCount,excessCount,deadCount,matchCount,
+    shortItems:shortItems.sort((a,b)=>Math.abs(b.variance*b.dlc)-Math.abs(a.variance*a.dlc)),
+    excessItems:excessItems.sort((a,b)=>(b.variance*b.dlc)-(a.variance*a.dlc)),
+    deadItems:deadItems.sort((a,b)=>b.stockVal-a.stockVal),
+    fastLow:fastLow.sort((a,b)=>a.coverDays-b.coverDays),
+    categories,users,monthlyTotals,
+    totalItems:S.items.length,
+    countedItems:Object.keys(cMap).length,
+    hasSales:!!(salesMeta&&salesMeta.totalRows>0)
+  };
+}
+
+// ─── Helper: owner page shell ──────────────────────────────
+function ownerShell(title,sub,btns,inner){
+  $('PG').innerHTML=`
+  <div class="ph">
+    <div><div class="pt">${title}</div><div class="ps">${sub}</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${btns||''}</div>
+  </div>${inner}`;
+}
+
+function oFmt(n){return'₹'+(Math.round(n)||0).toLocaleString('en-IN');}
+function oFmtN(n){return(parseFloat(n)||0).toLocaleString('en-IN');}
+
+// ════════════════════════════════════════════
+// 1. OWNER DASHBOARD
+// ════════════════════════════════════════════
+async function rOwnerDash(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading your dashboard…</div>';
+  const d=await ownerBuildData();
+  const pct=d.totalItems?Math.round(d.countedItems/d.totalItems*100):0;
+  const today_s=today();
+  const todayCounts=d.counts.length;
+  const activeUsers=[...new Set((d.allCounts||[]).filter(c=>c.date===today_s).map(c=>c.auditorName||c.auditor))];
+
+  // Top 5 short by value
+  const top5Short=d.shortItems.slice(0,5);
+  // Top 5 excess by value
+  const top5Excess=d.excessItems.slice(0,5);
+
+  $('PG').innerHTML=`
+  <!-- Welcome banner -->
+  <div class="owner-welcome">
+    <div>
+      <div style="font-size:36px;margin-bottom:4px">👑</div>
+    </div>
+    <div class="owner-welcome-txt">
+      <h2>${greet()}, ${esc((S.user?.name||'').split(' ')[0]||'Owner')}</h2>
+      <p>${fmtD(new Date())} · India Motors Dealership · Dealer Code: 12172</p>
+    </div>
+  </div>
+
+  <!-- KPI Row 1 -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+    <div class="okpi" onclick="go('ownerstockreport')">
+      <div class="ki">📦</div>
+      <div class="kl">Total SKUs</div>
+      <div class="kv">${oFmtN(d.totalItems)}</div>
+      <div class="ks">in item master</div>
+    </div>
+    <div class="okpi" onclick="go('ownervariance')">
+      <div class="ki">✅</div>
+      <div class="kl">Parts Counted</div>
+      <div class="kv" style="color:#2563eb">${oFmtN(d.countedItems)}</div>
+      <div class="ks">${pct}% complete</div>
+    </div>
+    <div class="okpi">
+      <div class="ki">👥</div>
+      <div class="kl">Active Users</div>
+      <div class="kv" style="color:#7c3aed">${activeUsers.length}</div>
+      <div class="ks">counting today</div>
+    </div>
+  </div>
+
+  <!-- Financial hero -->
+  <div class="ofin-hero">
+    <div style="font-size:11px;font-weight:700;color:rgba(240,192,96,.7);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;position:relative;z-index:1">💰 Financial Snapshot (DLC Based)</div>
+    <div class="ofin-grid">
+      <div class="ofin-cell">
+        <div class="fv">${oFmt(d.totalStockVal)}</div>
+        <div class="fl">Total Stock Value</div>
+        <div class="fs">${oFmtN(d.totalItems)} parts</div>
+      </div>
+      <div class="ofin-cell" style="border:1px solid rgba(220,38,38,.3)">
+        <div class="fv" style="color:#fca5a5">${oFmt(d.shortVal)}</div>
+        <div class="fl">Shortage Loss</div>
+        <div class="fs">${d.shortCount} parts short</div>
+      </div>
+      <div class="ofin-cell" style="border:1px solid rgba(217,119,6,.3)">
+        <div class="fv" style="color:#fde68a">${oFmt(d.excessVal)}</div>
+        <div class="fl">Excess Blocked</div>
+        <div class="fs">${d.excessCount} parts excess</div>
+      </div>
+      <div class="ofin-cell" style="border:1px solid rgba(124,58,237,.3)">
+        <div class="fv" style="color:#c4b5fd">${oFmt(d.deadVal)}</div>
+        <div class="fl">Dead Stock Value</div>
+        <div class="fs">${d.deadCount} non-moving parts</div>
+      </div>
+      <div class="ofin-cell">
+        <div class="fv" style="color:#86efac">${pct}%</div>
+        <div class="fl">Audit Progress</div>
+        <div class="fs">${d.countedItems} / ${d.totalItems} parts</div>
+      </div>
+      <div class="ofin-cell">
+        <div class="fv" style="color:#7dd3fc">${oFmtN(todayCounts)}</div>
+        <div class="fl">Today's Entries</div>
+        <div class="fs">${activeUsers.length} staff active</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Critical Alerts -->
+  <div class="osec"><div class="osec-title">🚨 Critical Alerts</div><div class="osec-line"></div></div>
+
+  ${d.shortCount>0?`<div class="ostrip danger">
+    <div class="ostrip-ico">🔻</div>
+    <div class="ostrip-body">
+      <div class="ostrip-title">Stock Shortage Detected — ${d.shortCount} Parts</div>
+      <div class="ostrip-msg">Total shortage value is <strong>${oFmt(d.shortVal)}</strong>. Top risk: <strong>${esc(d.shortItems[0]?.desc||d.shortItems[0]?.partNo||'—')}</strong> (${Math.abs(d.shortItems[0]?.variance||0)} units short = ${oFmt(Math.abs((d.shortItems[0]?.variance||0)*(d.shortItems[0]?.dlc||0)))}). Immediate investigation required.</div>
+      <span class="ostrip-action" onclick="go('ownervariance')" style="cursor:pointer">→ View Variance Report</span>
+    </div>
+  </div>`:''}
+
+  ${d.fastLow.length>0?`<div class="ostrip warning">
+    <div class="ostrip-ico">⚡</div>
+    <div class="ostrip-body">
+      <div class="ostrip-title">Reorder Alert — ${d.fastLow.length} Fast-Moving Parts Low</div>
+      <div class="ostrip-msg"><strong>${esc(d.fastLow[0]?.desc||d.fastLow[0]?.partNo||'')}</strong> has only <strong>${d.fastLow[0]?.coverDays||0} days cover</strong> left at current sales rate. Stock out risk if not reordered this week.</div>
+      <span class="ostrip-action" onclick="go('ownertrends')" style="cursor:pointer">→ View Movement Trends</span>
+    </div>
+  </div>`:''}
+
+  ${d.deadVal>0?`<div class="ostrip info">
+    <div class="ostrip-ico">💀</div>
+    <div class="ostrip-body">
+      <div class="ostrip-title">Dead Stock — ${oFmt(d.deadVal)} Capital Locked</div>
+      <div class="ostrip-msg">${d.deadCount} parts have zero sales movement but are occupying shelf space worth <strong>${oFmt(d.deadVal)}</strong>. Consider returning to supplier or running promotions.</div>
+      <span class="ostrip-action" onclick="go('ownerdeadstock')" style="cursor:pointer">→ View Dead Stock List</span>
+    </div>
+  </div>`:''}
+
+  <!-- Top Short & Excess tables side by side -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">
+    <div class="ochart">
+      <div class="ochart-hd"><div class="ochart-title">🔻 Top Shortage (by ₹ value)</div><span class="obadge" onclick="go('ownervariance')" style="cursor:pointer">View All</span></div>
+      <div class="otbl-wrap"><table class="otbl">
+        <thead><tr><th>Part</th><th>Desc</th><th style="text-align:right">Units</th><th style="text-align:right">₹ Loss</th></tr></thead>
+        <tbody>${top5Short.map(r=>`<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+          <td style="font-size:11px">${esc(tr2(r.desc,18))}</td>
+          <td style="text-align:right;color:#dc2626;font-weight:700;font-size:12px">${Math.abs(r.variance)}</td>
+          <td style="text-align:right;color:#dc2626;font-weight:800;font-size:11px">${oFmt(Math.abs(r.variance*r.dlc))}</td>
+        </tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:16px;color:#94a3b8">No shortages 🎉</td></tr>'}</tbody>
+      </table></div>
+    </div>
+    <div class="ochart">
+      <div class="ochart-hd"><div class="ochart-title">🔺 Top Excess (by ₹ value)</div><span class="obadge" onclick="go('ownervariance')" style="cursor:pointer">View All</span></div>
+      <div class="otbl-wrap"><table class="otbl">
+        <thead><tr><th>Part</th><th>Desc</th><th style="text-align:right">Units</th><th style="text-align:right">₹ Excess</th></tr></thead>
+        <tbody>${top5Excess.map(r=>`<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+          <td style="font-size:11px">${esc(tr2(r.desc,18))}</td>
+          <td style="text-align:right;color:#d97706;font-weight:700;font-size:12px">+${r.variance}</td>
+          <td style="text-align:right;color:#d97706;font-weight:800;font-size:11px">${oFmt(r.variance*r.dlc)}</td>
+        </tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:16px;color:#94a3b8">No excess 🎉</td></tr>'}</tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- Progress ring + category chart -->
+  <div class="osec" style="margin-top:22px"><div class="osec-title">📊 Stock by Category</div><div class="osec-line"></div></div>
+  <div class="ochart">
+    <div class="ochart-hd"><div class="ochart-title">Category-wise Stock Value</div></div>
+    <div class="ochart-body"><canvas id="OC_CAT" style="max-height:240px"></canvas></div>
+  </div>`;
+
+  setTimeout(()=>{
+    const ctx=$('OC_CAT');
+    if(ctx&&window.Chart){
+      if(S.charts.oc_cat)S.charts.oc_cat.destroy();
+      S.charts.oc_cat=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:d.categories.map(([c])=>c.length>14?c.slice(0,14)+'…':c),
+          datasets:[{
+            label:'Stock Value (₹)',
+            data:d.categories.map(([,v])=>Math.round(v.val)),
+            backgroundColor:'rgba(200,146,42,0.7)',
+            borderColor:'#c8922a',borderWidth:1,borderRadius:6
+          }]
+        },
+        options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN'),font:{size:9}},grid:{color:'#f0e0a0'}},x:{ticks:{font:{size:9}}}},responsive:true,maintainAspectRatio:true}
+      });
+    }
+  },150);
+}
+
+// ════════════════════════════════════════════
+// 2. FINANCIAL OVERVIEW
+// ════════════════════════════════════════════
+async function rOwnerFinance(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const d=await ownerBuildData();
+  const netImpact=d.shortVal-d.excessVal;
+  const auditedVal=d.shortItems.reduce((s,i)=>s+Math.abs(i.variance*(i.dlc||0)),0)+d.excessItems.reduce((s,i)=>s+i.variance*(i.dlc||0),0);
+
+  $('PG').innerHTML=`
+  <div class="ph"><div><div class="pt">💰 Financial Overview</div><div class="ps">Full financial impact of the inventory audit · Dealer Code 12172</div></div></div>
+
+  <!-- Big number cards -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px">
+    <div class="okpi" style="grid-column:1/-1;background:linear-gradient(135deg,#0f172a,#1e293b);border-color:#334155">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="kl" style="color:rgba(240,192,96,.7)">Total Inventory Value (DLC)</div>
+          <div style="font-size:36px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f0c060;letter-spacing:-2px;margin-top:4px">${oFmt(d.totalStockVal)}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px">${oFmtN(d.totalItems)} parts in master</div>
+        </div>
+        <div style="font-size:52px;opacity:.2">💰</div>
+      </div>
+    </div>
+    <div class="okpi">
+      <div class="ki" style="color:#dc2626">🔻</div>
+      <div class="kl" style="color:#dc2626">Shortage Loss</div>
+      <div class="kv" style="color:#dc2626">${oFmt(d.shortVal)}</div>
+      <div class="ks">${d.shortCount} parts · ${oFmtN(d.shortItems.reduce((s,i)=>s+Math.abs(i.variance),0))} units missing</div>
+    </div>
+    <div class="okpi">
+      <div class="ki" style="color:#d97706">🔺</div>
+      <div class="kl" style="color:#d97706">Excess Blocked</div>
+      <div class="kv" style="color:#d97706">${oFmt(d.excessVal)}</div>
+      <div class="ks">${d.excessCount} parts · ${oFmtN(d.excessItems.reduce((s,i)=>s+i.variance,0))} units excess</div>
+    </div>
+    <div class="okpi">
+      <div class="ki" style="color:#7c3aed">💀</div>
+      <div class="kl" style="color:#7c3aed">Dead Stock Capital</div>
+      <div class="kv" style="color:#7c3aed">${oFmt(d.deadVal)}</div>
+      <div class="ks">${d.deadCount} non-moving parts locked</div>
+    </div>
+    <div class="okpi">
+      <div class="ki">${netImpact>0?'📉':'📈'}</div>
+      <div class="kl" style="color:${netImpact>0?'#dc2626':'#059669'}">Net Audit Impact</div>
+      <div class="kv" style="color:${netImpact>0?'#dc2626':'#059669'}">${netImpact>=0?'-':'+'} ${oFmt(Math.abs(netImpact))}</div>
+      <div class="ks">${netImpact>0?'Net loss (shortage > excess)':'Net positive (excess > shortage)'}</div>
+    </div>
+  </div>
+
+  <!-- Shortage breakdown table -->
+  <div class="osec"><div class="osec-title">🔻 Shortage Details — All Parts</div><div class="osec-line"></div></div>
+  <div class="ochart" style="margin-bottom:20px">
+    <div class="ochart-hd">
+      <div class="ochart-title">All Short Parts (sorted by ₹ loss)</div>
+      <span style="font-size:11px;color:#94a3b8">${d.shortCount} parts · ${oFmt(d.shortVal)} total</span>
+    </div>
+    <div class="otbl-wrap" style="max-height:320px;overflow-y:auto">
+      <table class="otbl">
+        <thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Bin</th><th style="text-align:right">DMS</th><th style="text-align:right">Physical</th><th style="text-align:right">Variance</th><th style="text-align:right">DLC</th><th style="text-align:right">₹ Loss</th></tr></thead>
+        <tbody>${d.shortItems.map((r,i)=>`<tr>
+          <td style="color:#94a3b8;font-size:10px">${i+1}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+          <td style="font-size:11px">${esc(tr2(r.desc,22))}</td>
+          <td><span class="bg bgp" style="font-size:9px">${esc(r.bin||'—')}</span></td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px">${oFmtN(r.systemQty)}</td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:#059669">${oFmtN(r.physQty)}</td>
+          <td style="text-align:right;color:#dc2626;font-weight:800">${r.variance}</td>
+          <td style="text-align:right;font-size:11px">₹${(r.dlc||0).toFixed(2)}</td>
+          <td style="text-align:right;color:#dc2626;font-weight:800;font-size:12px">${oFmt(Math.abs(r.variance*r.dlc))}</td>
+        </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;padding:20px;color:#94a3b8">No shortages found 🎉</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Shortage vs Excess chart -->
+  <div class="ochart">
+    <div class="ochart-hd"><div class="ochart-title">📊 Shortage vs Excess Breakdown</div></div>
+    <div class="ochart-body"><canvas id="OC_FIN" style="max-height:260px"></canvas></div>
+  </div>`;
+
+  setTimeout(()=>{
+    const ctx=$('OC_FIN');
+    if(ctx&&window.Chart){
+      if(S.charts.oc_fin)S.charts.oc_fin.destroy();
+      S.charts.oc_fin=new Chart(ctx,{
+        type:'doughnut',
+        data:{
+          labels:['Shortage Loss','Excess Blocked','Dead Stock','Healthy Stock'],
+          datasets:[{
+            data:[Math.round(d.shortVal),Math.round(d.excessVal),Math.round(d.deadVal),Math.round(Math.max(0,d.totalStockVal-d.shortVal-d.excessVal-d.deadVal))],
+            backgroundColor:['#dc2626','#d97706','#7c3aed','#059669'],
+            borderWidth:2,borderColor:'#fff'
+          }]
+        },
+        options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'65%',responsive:true,maintainAspectRatio:true}
+      });
+    }
+  },150);
+}
+
+// ════════════════════════════════════════════
+// 3. INVENTORY HEALTH
+// ════════════════════════════════════════════
+async function rOwnerHealth(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const d=await ownerBuildData();
+  const pct=d.totalItems?Math.round(d.countedItems/d.totalItems*100):0;
+  const matchPct=d.countedItems?Math.round(d.matchCount/d.countedItems*100):0;
+  const healthScore=Math.round((pct*0.4)+(matchPct*0.4)+((d.deadCount?Math.max(0,100-d.deadCount/d.totalItems*100):100)*0.2));
+
+  const scoreColor=healthScore>=80?'#059669':healthScore>=60?'#d97706':'#dc2626';
+  const scoreLabel=healthScore>=80?'Excellent 🟢':healthScore>=60?'Moderate ⚠️':'Needs Attention 🔴';
+  const R=60,C=2*Math.PI*R,pctDash=C-(pct/100*C);
+  const mDash=C-(matchPct/100*C);
+  const hDash=C-(healthScore/100*C);
+
+  $('PG').innerHTML=`
+  <div class="ph"><div><div class="pt">🏥 Inventory Health</div><div class="ps">Overall audit health score · Live analysis</div></div></div>
+
+  <!-- Health score ring -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+    ${[
+      {val:pct,label:'Audit Complete',color:'#2563eb',dash:pctDash},
+      {val:matchPct,label:'Match Accuracy',color:'#059669',dash:mDash},
+      {val:healthScore,label:'Health Score',color:scoreColor,dash:hDash}
+    ].map(r=>`
+    <div class="ochart" style="padding:20px;text-align:center">
+      <svg class="oring" width="140" height="140" viewBox="0 0 140 140" style="display:block;margin:0 auto">
+        <circle class="oring-bg" cx="70" cy="70" r="${R}"/>
+        <circle class="oring-fill" cx="70" cy="70" r="${R}"
+          stroke="${r.color}" stroke-dasharray="${C}" stroke-dashoffset="${r.dash}"/>
+      </svg>
+      <div class="oring-val" style="color:${r.color};margin-top:8px">${r.val}%</div>
+      <div class="oring-lbl">${r.label}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Health status card -->
+  <div class="ostrip ${healthScore>=80?'success':healthScore>=60?'warning':'danger'}" style="margin-bottom:20px">
+    <div class="ostrip-ico">${healthScore>=80?'✅':healthScore>=60?'⚠️':'🚨'}</div>
+    <div class="ostrip-body">
+      <div class="ostrip-title">Overall Health: ${scoreLabel} · Score: ${healthScore}/100</div>
+      <div class="ostrip-msg">
+        ${pct}% audit complete · ${matchPct}% accuracy on counted parts · ${d.deadCount} dead stock parts (${oFmt(d.deadVal)} locked) ·
+        ${d.fastLow.length} fast-moving parts need reorder
+      </div>
+    </div>
+  </div>
+
+  <!-- Category health table -->
+  <div class="osec"><div class="osec-title">📦 Category-wise Breakdown</div><div class="osec-line"></div></div>
+  <div class="ochart" style="margin-bottom:20px">
+    <div class="ochart-hd"><div class="ochart-title">Stock Value & Sales by Category</div></div>
+    <div class="otbl-wrap">
+      <table class="otbl">
+        <thead><tr><th>#</th><th>Category</th><th style="text-align:right">Parts</th><th style="text-align:right">Stock Value</th><th style="text-align:right">Total Sales</th><th>Contribution</th></tr></thead>
+        <tbody>${d.categories.map(([cat,v],i)=>{
+          const pctCat=d.totalStockVal?Math.round(v.val/d.totalStockVal*100):0;
+          return`<tr>
+            <td style="font-size:10px;color:#94a3b8">${i+1}</td>
+            <td style="font-weight:700;font-size:12px">${esc(cat)}</td>
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace">${v.count}</td>
+            <td style="text-align:right;font-weight:700;color:#c8922a">${oFmt(v.val)}</td>
+            <td style="text-align:right;color:#059669;font-weight:700">${oFmtN(v.sales)} units</td>
+            <td style="min-width:100px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div style="flex:1;height:6px;background:#f0e0a0;border-radius:6px;overflow:hidden">
+                  <div style="width:${pctCat}%;height:100%;background:linear-gradient(90deg,#c8922a,#f0c060);border-radius:6px"></div>
+                </div>
+                <span style="font-size:10px;font-weight:700;color:#92400e;min-width:28px">${pctCat}%</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fast-moving low stock warning table -->
+  <div class="osec"><div class="osec-title">⚡ Fast-Moving Parts — Low Stock Alert</div><div class="osec-line"></div></div>
+  <div class="ochart">
+    <div class="ochart-hd"><div class="ochart-title">Parts that may stock out soon</div><span style="font-size:11px;color:#d97706;font-weight:700">${d.fastLow.length} alerts</span></div>
+    <div class="otbl-wrap">
+      <table class="otbl">
+        <thead><tr><th>Part No</th><th>Description</th><th style="text-align:right">Stock</th><th style="text-align:right">Avg/Month</th><th style="text-align:right">Cover</th><th>Risk</th></tr></thead>
+        <tbody>${d.fastLow.slice(0,15).map(r=>{
+          const risk=r.coverDays<7?'🔴 Critical':r.coverDays<15?'🟠 High':'🟡 Medium';
+          const rcol=r.coverDays<7?'#dc2626':r.coverDays<15?'#d97706':'#d97706';
+          return`<tr>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+            <td style="font-size:11px">${esc(tr2(r.desc,24))}</td>
+            <td style="text-align:right;font-weight:800;font-family:'JetBrains Mono',monospace">${oFmtN(r.systemQty)}</td>
+            <td style="text-align:right;color:#059669;font-weight:700">${r.avgMonthly.toFixed(1)}</td>
+            <td style="text-align:right;font-weight:800;color:${rcol}">${r.coverDays}d</td>
+            <td>${risk}</td>
+          </tr>`;
+        }).join('')||'<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">All parts have adequate stock cover ✅</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════
+// 4. VARIANCE SUMMARY (Owner view)
+// ════════════════════════════════════════════
+async function rOwnerVariance(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const d=await ownerBuildData();
+  let _filter='all';
+
+  function renderVTable(filter){
+    let rows=[];
+    if(filter==='all'||filter==='short') rows=[...rows,...d.shortItems.map(r=>({...r,_st:'short'}))];
+    if(filter==='all'||filter==='excess') rows=[...rows,...d.excessItems.map(r=>({...r,_st:'excess'}))];
+    if(filter==='match') rows=[];// matches not in shortItems/excessItems — skip for now
+    rows.sort((a,b)=>Math.abs(b.variance*(b.dlc||0))-Math.abs(a.variance*(a.dlc||0)));
+    const tbody=$('OVT');if(!tbody)return;
+    if(!rows.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:#94a3b8">No variance found 🎉</td></tr>';return;}
+    tbody.innerHTML=rows.map((r,i)=>{
+      const isS=r._st==='short';
+      return`<tr>
+        <td style="font-size:10px;color:#94a3b8">${i+1}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+        <td style="font-size:11px">${esc(tr2(r.desc,20))}</td>
+        <td><span class="bg bgp" style="font-size:9px">${esc(r.bin||'—')}</span></td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace">${oFmtN(r.systemQty)}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:#059669">${oFmtN(r.physQty)}</td>
+        <td style="text-align:right;font-weight:800;color:${isS?'#dc2626':'#d97706'}">${isS?'':'+'}${r.variance}</td>
+        <td style="text-align:right;font-size:11px">₹${(r.dlc||0).toFixed(2)}</td>
+        <td style="text-align:right;font-weight:800;color:${isS?'#dc2626':'#d97706'};font-size:12px">${oFmt(Math.abs(r.variance*(r.dlc||0)))}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  $('PG').innerHTML=`
+  <div class="ph">
+    <div><div class="pt">📊 Variance Summary</div><div class="ps">Physical vs DMS stock · All counted parts</div></div>
+    <button class="btn bgh bsm" onclick="ownerExportVariance()">⬇ Export CSV</button>
+  </div>
+
+  <!-- Summary pills -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    ${[
+      {l:'Total Short',v:d.shortCount,c:'#dc2626',bg:'#fef2f2',f:'short'},
+      {l:'Total Excess',v:d.excessCount,c:'#d97706',bg:'#fffbeb',f:'excess'},
+      {l:'Shortage ₹',v:oFmt(d.shortVal),c:'#dc2626',bg:'#fef2f2',f:'short'},
+      {l:'Excess ₹',v:oFmt(d.excessVal),c:'#d97706',bg:'#fffbeb',f:'excess'}
+    ].map(s=>`<div style="background:${s.bg};border-radius:12px;padding:14px;text-align:center;cursor:pointer;border:1.5px solid ${s.c}22" onclick="ownerVFilter('${s.f}')">
+      <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${s.c}">${s.v}</div>
+      <div style="font-size:10px;font-weight:700;color:${s.c};text-transform:uppercase;letter-spacing:.5px;margin-top:4px">${s.l}</div>
+    </div>`).join('')}
+  </div>
+
+  <div class="ofilter-bar" id="OV_FILTERS">
+    <div class="ofilter on" data-f="all" onclick="ownerVFilter('all')">All Variance</div>
+    <div class="ofilter" data-f="short" onclick="ownerVFilter('short')">🔻 Short Only</div>
+    <div class="ofilter" data-f="excess" onclick="ownerVFilter('excess')">🔺 Excess Only</div>
+  </div>
+
+  <div class="ochart">
+    <div class="ochart-hd"><div class="ochart-title">Variance Details</div><span style="font-size:11px;color:#94a3b8">${d.shortCount+d.excessCount} items</span></div>
+    <div class="otbl-wrap" style="max-height:480px;overflow-y:auto">
+      <table class="otbl">
+        <thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Bin</th><th style="text-align:right">DMS</th><th style="text-align:right">Physical</th><th style="text-align:right">Variance</th><th style="text-align:right">DLC</th><th style="text-align:right">₹ Impact</th></tr></thead>
+        <tbody id="OVT"></tbody>
+      </table>
+    </div>
+  </div>`;
+
+  window._ownerVData=d;
+  renderVTable('all');
+  window.ownerVFilter=function(f){
+    document.querySelectorAll('#OV_FILTERS .ofilter').forEach(b=>b.classList.toggle('on',b.dataset.f===f));
+    renderVTable(f);
+  };
+}
+
+window.ownerExportVariance=function(){
+  const d=window._ownerVData;if(!d)return;
+  const rows=[...d.shortItems.map(r=>({...r,_st:'short'})),...d.excessItems.map(r=>({...r,_st:'excess'}))];
+  const csv='Part No,Description,Bin,DMS Qty,Physical Qty,Variance,DLC,Impact Value,Type\n'
+    +rows.map(r=>`"${r.partNo}","${(r.desc||'').replace(/"/g,'""')}","${r.bin||''}",${r.systemQty},${r.physQty},${r.variance},${r.dlc||0},${Math.round(Math.abs(r.variance*(r.dlc||0)))},"${r._st}"`).join('\n');
+  dlCSV(csv,`owner_variance_${today()}.csv`);
+  toast('Variance exported','s');
+};
+
+// ════════════════════════════════════════════
+// 5. FULL STOCK REPORT
+// ════════════════════════════════════════════
+async function rOwnerStockReport(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const d=await ownerBuildData();
+  let _pg=1;const _sz=50;
+  let _rows=[...S.items].map(item=>{
+    const sales=S_SALES_MAP[item.partNo];
+    const totalSales=sales?Object.values(sales).reduce((a,b)=>a+b,0):0;
+    const avgMonthly=sales&&Object.keys(sales).length?totalSales/Object.keys(sales).length:0;
+    const sysQty=parseFloat(item.systemQty)||0;
+    const dlc=parseFloat(item.dlc)||0;
+    return{...item,totalSales,avgMonthly,stockVal:sysQty*dlc,sysQty,dlc};
+  });
+  const totalStockVal=_rows.reduce((s,r)=>s+r.stockVal,0);
+
+  function renderSR(){
+    const w=$('OSR_TBL'),pag=$('OSR_PAG');if(!w)return;
+    const q=($('OSR_SRCH')?.value||'').toUpperCase();
+    let rows=_rows;
+    if(q)rows=rows.filter(r=>(r.partNo||'').toUpperCase().includes(q)||(r.desc||'').toUpperCase().includes(q)||(r.category||'').toUpperCase().includes(q));
+    const tot=rows.length,pages=Math.ceil(tot/_sz),st=(_pg-1)*_sz;
+    w.innerHTML='<div class="otbl-wrap"><table class="otbl"><thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Category</th><th>Bin</th><th style="text-align:right">DMS Qty</th><th style="text-align:right">Stock Value</th><th style="text-align:right">Total Sales</th><th style="text-align:right">Avg/Mo</th><th style="text-align:right">MRP</th></tr></thead><tbody>'
+      +rows.slice(st,st+_sz).map((r,i)=>`<tr>
+        <td style="font-size:10px;color:#94a3b8">${st+i+1}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+        <td style="font-size:11px">${esc(tr2(r.desc||'—',22))}</td>
+        <td style="font-size:10px;color:#64748b">${esc(tr2(r.category||'—',14))}</td>
+        <td><span class="bg bgp" style="font-size:9px">${esc(r.bin||'—')}</span></td>
+        <td style="text-align:right;font-weight:800;font-family:'JetBrains Mono',monospace;color:${r.sysQty===0?'#dc2626':'#0f172a'}">${oFmtN(r.sysQty)}</td>
+        <td style="text-align:right;font-weight:700;color:#c8922a">₹${oFmtN(Math.round(r.stockVal))}</td>
+        <td style="text-align:right;color:#059669;font-weight:700">${oFmtN(r.totalSales)}</td>
+        <td style="text-align:right;color:#64748b">${r.avgMonthly>0?r.avgMonthly.toFixed(1):'—'}</td>
+        <td style="text-align:right;font-size:11px">₹${(r.mrp||0).toFixed(2)}</td>
+      </tr>`).join('')+'</tbody><tfoot><tr style="background:#fffbeb"><td colspan="6" style="text-align:right;padding:10px;font-size:12px;font-weight:800">Total ('+rows.length+' items):</td><td style="text-align:right;font-weight:800;color:#c8922a;font-size:14px">₹'+oFmtN(Math.round(rows.reduce((s,r)=>s+r.stockVal,0)))+'</td><td colspan="3"></td></tr></tfoot></table></div>';
+    let ph='<span style="font-size:11px;color:#94a3b8;margin-right:6px">'+(Math.min(st+1,tot))+'–'+Math.min(st+_sz,tot)+' of '+tot+'</span>';
+    ph+=`<button class="pb" onclick="_osrPg(${_pg-1})" ${_pg<=1?'disabled':''}>‹</button>`;
+    for(let i=Math.max(1,_pg-2);i<=Math.min(pages,_pg+2);i++) ph+=`<button class="pb ${i===_pg?'on':''}" onclick="_osrPg(${i})">${i}</button>`;
+    ph+=`<button class="pb" onclick="_osrPg(${_pg+1})" ${_pg>=pages?'disabled':''}>›</button>`;
+    if(pag)pag.innerHTML=ph;
+  }
+  window._osrPg=function(n){_pg=n;renderSR();};
+
+  $('PG').innerHTML=`
+  <div class="ph">
+    <div><div class="pt">📄 Full Stock Report</div><div class="ps">${S.items.length} parts · Total Value: ${oFmt(totalStockVal)}</div></div>
+    <button class="btn bgh bsm" onclick="ownerExportStock()">⬇ Export CSV</button>
+  </div>
+  <div class="ochart">
+    <div class="ochart-hd" style="flex-wrap:wrap;gap:8px">
+      <div class="ochart-title">Complete Inventory List</div>
+      <input style="padding:7px 12px;border:1.5px solid #f0e0a0;border-radius:8px;font-size:12px;outline:none;min-width:200px" id="OSR_SRCH" placeholder="🔍 Search part / desc / category…" oninput="_pg=1;renderSRProxy()">
+    </div>
+    <div id="OSR_TBL"></div>
+    <div id="OSR_PAG" class="pag"></div>
+  </div>`;
+
+  window.renderSRProxy=renderSR;
+  window._ownerStockRows=_rows;
+  renderSR();
+}
+
+window.ownerExportStock=function(){
+  const rows=window._ownerStockRows||[];
+  const csv='Part No,Description,Category,Bin,DMS Qty,Stock Value,Total Sales,Avg Monthly,MRP,DLC\n'
+    +rows.map(r=>`"${r.partNo}","${(r.desc||'').replace(/"/g,'""')}","${r.category||''}","${r.bin||''}",${r.sysQty},${Math.round(r.stockVal)},${r.totalSales},${r.avgMonthly.toFixed(2)},${r.mrp||0},${r.dlc||0}`).join('\n');
+  dlCSV(csv,`owner_stock_report_${today()}.csv`);
+  toast('Stock report exported','s');
+};
+
+// ════════════════════════════════════════════
+// 6. TOP PARTS ANALYSIS
+// ════════════════════════════════════════════
+async function rOwnerTopParts(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const d=await ownerBuildData();
+
+  // Top by stock value
+  const topByVal=[...S.items].map(i=>{
+    const sysQty=parseFloat(i.systemQty)||0;const dlc=parseFloat(i.dlc)||0;
+    return{...i,stockVal:sysQty*dlc};
+  }).sort((a,b)=>b.stockVal-a.stockVal).slice(0,10);
+
+  // Top by sales
+  const topBySales=[...S.items].map(i=>{
+    const s=S_SALES_MAP[i.partNo];
+    const totalSales=s?Object.values(s).reduce((a,b)=>a+b,0):0;
+    return{...i,totalSales};
+  }).filter(i=>i.totalSales>0).sort((a,b)=>b.totalSales-a.totalSales).slice(0,10);
+
+  // Top by MRP
+  const topByMRP=[...S.items].filter(i=>parseFloat(i.mrp)>0).sort((a,b)=>parseFloat(b.mrp)-parseFloat(a.mrp)).slice(0,10);
+
+  let _activeTab='val';
+  function renderTab(tab){
+    const rows=tab==='val'?topByVal:tab==='sales'?topBySales:topByMRP;
+    const w=$('OTP_TBL');if(!w)return;
+    w.innerHTML=`<table class="otbl"><thead><tr>
+      <th>#</th><th>Part No</th><th>Description</th><th>Category</th><th style="text-align:right">${tab==='val'?'Stock Value':tab==='sales'?'Total Sales':'MRP'}</th>
+      <th style="text-align:right">${tab==='val'?'Qty':tab==='sales'?'Avg/Month':'Stock Qty'}</th>
+    </tr></thead><tbody>
+    ${rows.map((r,i)=>{
+      const mainVal=tab==='val'?oFmt(r.stockVal):tab==='sales'?oFmtN(r.totalSales)+'u':oFmt(r.mrp);
+      const secVal=tab==='val'?oFmtN(parseFloat(r.systemQty)||0):tab==='sales'?(r.avgMonthly||(r.totalSales/Math.max(1,Object.keys(S_SALES_MAP[r.partNo]||{}).length)).toFixed(1)+'/mo'):oFmtN(parseFloat(r.systemQty)||0);
+      const medals=['🥇','🥈','🥉'];
+      return`<tr>
+        <td style="font-size:14px">${medals[i]||i+1}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+        <td style="font-size:12px;font-weight:600">${esc(tr2(r.desc||'—',26))}</td>
+        <td><span class="bg bgg" style="font-size:9px">${esc(r.category||'—')}</span></td>
+        <td style="text-align:right;font-weight:800;font-size:13px;color:#c8922a">${mainVal}</td>
+        <td style="text-align:right;font-size:12px;color:#64748b">${secVal}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+  }
+
+  $('PG').innerHTML=`
+  <div class="ph"><div><div class="pt">🔥 Top Parts Analysis</div><div class="ps">Ranked by value, movement, and price</div></div></div>
+  <div class="otab-bar">
+    <button class="otab-btn on" onclick="otabSwitch('val',this)">💰 By Stock Value</button>
+    <button class="otab-btn" onclick="otabSwitch('sales',this)">📈 By Sales Volume</button>
+    <button class="otab-btn" onclick="otabSwitch('mrp',this)">🏷️ By MRP Price</button>
+  </div>
+  <div class="ochart">
+    <div class="ochart-hd"><div class="ochart-title" id="OTP_TITLE">Top 10 Parts by Stock Value</div></div>
+    <div class="otbl-wrap" id="OTP_TBL"></div>
+  </div>
+  <div class="ochart" style="margin-top:14px">
+    <div class="ochart-hd"><div class="ochart-title">Top 10 by Stock Value — Chart</div></div>
+    <div class="ochart-body"><canvas id="OC_TOP" style="max-height:280px"></canvas></div>
+  </div>`;
+
+  window.otabSwitch=function(tab,btn){
+    document.querySelectorAll('.otab-btn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    const titles={val:'Top 10 Parts by Stock Value',sales:'Top 10 Parts by Sales Volume',mrp:'Top 10 Parts by MRP Price'};
+    $('OTP_TITLE').textContent=titles[tab]||'';
+    renderTab(tab);
+  };
+  renderTab('val');
+
+  setTimeout(()=>{
+    const ctx=$('OC_TOP');
+    if(ctx&&window.Chart){
+      if(S.charts.oc_top)S.charts.oc_top.destroy();
+      S.charts.oc_top=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:topByVal.map(r=>r.partNo),
+          datasets:[{label:'Stock Value (₹)',data:topByVal.map(r=>Math.round(r.stockVal)),
+            backgroundColor:'rgba(200,146,42,0.75)',borderColor:'#c8922a',borderWidth:1,borderRadius:4}]
+        },
+        options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN'),font:{size:9}}},x:{ticks:{font:{size:8}}}},responsive:true,maintainAspectRatio:true}
+      });
+    }
+  },150);
+}
+
+// ════════════════════════════════════════════
+// 7. MOVEMENT TRENDS
+// ════════════════════════════════════════════
+async function rOwnerTrends(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const d=await ownerBuildData();
+
+  $('PG').innerHTML=`
+  <div class="ph"><div><div class="pt">📈 Movement Trends</div><div class="ps">Sales velocity, stock cover, and reorder signals</div></div></div>
+
+  ${!d.hasSales?'<div class="al alw">⚠️ Sales data not loaded. Please upload DMS CSV via Settings → DMS Upload for trend analysis.</div>':''}
+
+  <!-- Monthly trend chart -->
+  ${d.monthlyTotals.length?`<div class="ochart" style="margin-bottom:20px">
+    <div class="ochart-hd"><div class="ochart-title">📅 Monthly Sales Volume (Last 6 Months)</div></div>
+    <div class="ochart-body"><canvas id="OC_TREND" style="max-height:240px"></canvas></div>
+  </div>`:''}
+
+  <!-- Fast moving low stock -->
+  <div class="osec"><div class="osec-title">⚡ Reorder Required — Fast Moving Parts</div><div class="osec-line"></div></div>
+  <div class="ochart" style="margin-bottom:20px">
+    <div class="ochart-hd">
+      <div class="ochart-title">Parts with < 30 days stock cover</div>
+      <span style="font-size:11px;font-weight:700;color:#d97706">${d.fastLow.length} parts need reorder</span>
+    </div>
+    <div class="otbl-wrap">
+      <table class="otbl">
+        <thead><tr><th>Part No</th><th>Description</th><th style="text-align:right">Stock</th><th style="text-align:right">Monthly Avg</th><th style="text-align:right">Cover Days</th><th style="text-align:right">Reorder Qty</th><th>Urgency</th></tr></thead>
+        <tbody>${d.fastLow.map(r=>{
+          const reorderQty=Math.ceil(r.avgMonthly*2); // 2 months buffer
+          const urg=r.coverDays<7?'🔴 Critical':r.coverDays<15?'🟠 Urgent':'🟡 Plan';
+          return`<tr>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+            <td style="font-size:11px">${esc(tr2(r.desc,22))}</td>
+            <td style="text-align:right;font-weight:800;font-family:'JetBrains Mono',monospace">${oFmtN(r.systemQty)}</td>
+            <td style="text-align:right;color:#059669;font-weight:700">${r.avgMonthly.toFixed(1)}</td>
+            <td style="text-align:right;font-weight:800;color:${r.coverDays<15?'#dc2626':'#d97706'}">${r.coverDays}d</td>
+            <td style="text-align:right;font-weight:800;color:#2563eb">${reorderQty}</td>
+            <td>${urg}</td>
+          </tr>`;
+        }).join('')||'<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">All parts have sufficient stock ✅</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>`;
+
+  setTimeout(()=>{
+    if(d.monthlyTotals.length){
+      const ctx=$('OC_TREND');
+      if(ctx&&window.Chart){
+        if(S.charts.oc_trend)S.charts.oc_trend.destroy();
+        S.charts.oc_trend=new Chart(ctx,{
+          type:'line',
+          data:{
+            labels:d.monthlyTotals.map(m=>m.month),
+            datasets:[{label:'Total Units Sold',data:d.monthlyTotals.map(m=>m.qty),
+              borderColor:'#c8922a',backgroundColor:'rgba(200,146,42,0.1)',
+              tension:.4,fill:true,pointRadius:5,pointBackgroundColor:'#c8922a'}]
+          },
+          options:{plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:9}},grid:{color:'#f0e0a0'}},x:{ticks:{font:{size:9}}}},responsive:true,maintainAspectRatio:true}
+        });
+      }
+    }
+  },150);
+}
+
+// ════════════════════════════════════════════
+// 8. DEAD STOCK ALERT
+// ════════════════════════════════════════════
+async function rOwnerDeadStock(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const d=await ownerBuildData();
+
+  $('PG').innerHTML=`
+  <div class="ph">
+    <div><div class="pt">💀 Dead Stock Alert</div><div class="ps">Zero-movement parts with stock on shelf · Capital locked: ${oFmt(d.deadVal)}</div></div>
+    <button class="btn bgh bsm" onclick="ownerExportDead()">⬇ Export</button>
+  </div>
+
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+    <div class="okpi"><div class="kl" style="color:#7c3aed">Dead Stock Parts</div><div class="kv" style="color:#7c3aed">${d.deadCount}</div><div class="ks">zero sales movement</div></div>
+    <div class="okpi"><div class="kl" style="color:#7c3aed">Capital Locked</div><div class="kv" style="color:#7c3aed">${oFmt(d.deadVal)}</div><div class="ks">at DLC price</div></div>
+    <div class="okpi"><div class="kl" style="color:#7c3aed">% of Total Stock</div><div class="kv" style="color:#7c3aed">${d.totalStockVal?Math.round(d.deadVal/d.totalStockVal*100):0}%</div><div class="ks">of inventory value</div></div>
+  </div>
+
+  <div class="ostrip info" style="margin-bottom:20px">
+    <div class="ostrip-ico">💡</div>
+    <div class="ostrip-body">
+      <div class="ostrip-title">Recommended Actions for Dead Stock</div>
+      <div class="ostrip-msg">
+        1. <strong>Return to Supplier</strong> — check Hero MotoCorp return policy for slow-moving parts<br>
+        2. <strong>Internal Promotion</strong> — offer mechanics these parts at discount to clear shelf<br>
+        3. <strong>Write-off Review</strong> — items older than 12 months with nil movement may be candidates for write-off
+      </div>
+    </div>
+  </div>
+
+  <div class="ochart">
+    <div class="ochart-hd"><div class="ochart-title">Complete Dead Stock List</div><span style="font-size:11px;color:#94a3b8">${d.deadCount} parts · ${oFmt(d.deadVal)}</span></div>
+    <div class="otbl-wrap" style="max-height:500px;overflow-y:auto">
+      <table class="otbl">
+        <thead><tr><th>#</th><th>Part No</th><th>Description</th><th>Category</th><th>Bin</th><th style="text-align:right">Qty</th><th style="text-align:right">DLC</th><th style="text-align:right">Value Locked</th><th style="text-align:right">MRP</th></tr></thead>
+        <tbody>${d.deadItems.map((r,i)=>`<tr>
+          <td style="font-size:10px;color:#94a3b8">${i+1}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#7c3aed">${esc(r.partNo)}</td>
+          <td style="font-size:11px">${esc(tr2(r.desc||'—',22))}</td>
+          <td style="font-size:10px;color:#64748b">${esc(r.category||'—')}</td>
+          <td><span class="bg bgp" style="font-size:9px">${esc(r.bin||'—')}</span></td>
+          <td style="text-align:right;font-weight:800;font-family:'JetBrains Mono',monospace">${oFmtN(parseFloat(r.systemQty)||0)}</td>
+          <td style="text-align:right;font-size:11px">₹${(r.dlc||0).toFixed(2)}</td>
+          <td style="text-align:right;font-weight:800;color:#7c3aed">${oFmt(r.stockVal)}</td>
+          <td style="text-align:right;font-size:11px">₹${(r.mrp||0).toFixed(2)}</td>
+        </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;padding:24px;color:#94a3b8">No dead stock found! Great inventory health 🎉</td></tr>'}</tbody>
+        ${d.deadItems.length?`<tfoot><tr style="background:#fffbeb"><td colspan="7" style="text-align:right;padding:10px;font-weight:800">Total Dead Stock Value:</td><td style="text-align:right;font-weight:800;color:#7c3aed;font-size:14px">${oFmt(d.deadVal)}</td><td></td></tr></tfoot>`:''}
+      </table>
+    </div>
+  </div>`;
+
+  window._ownerDeadData=d;
+}
+
+window.ownerExportDead=function(){
+  const d=window._ownerDeadData;if(!d)return;
+  const csv='Part No,Description,Category,Bin,Qty,DLC,Value Locked,MRP\n'
+    +d.deadItems.map(r=>`"${r.partNo}","${(r.desc||'').replace(/"/g,'""')}","${r.category||''}","${r.bin||''}",${parseFloat(r.systemQty)||0},${r.dlc||0},${Math.round(r.stockVal)},${r.mrp||0}`).join('\n');
+  dlCSV(csv,`dead_stock_${today()}.csv`);
+  toast('Dead stock exported','s');
+};
+
+// ════════════════════════════════════════════
+// 9. TEAM PERFORMANCE
+// ════════════════════════════════════════════
+async function rOwnerTeam(){
+  $('PG').innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
+  const allCounts=await fetchCounts();
+  const userPerf=getUserPerf();
+
+  // Build per-user daily activity
+  const byUser={};
+  allCounts.forEach(c=>{
+    const u=c.auditorName||c.auditor||'Unknown';
+    if(!byUser[u])byUser[u]={name:u,username:c.auditor||u,dates:new Set(),totalCounts:0,lastScan:'',bins:new Set()};
+    byUser[u].totalCounts++;
+    byUser[u].dates.add(c.date);
+    if(c.bin)byUser[u].bins.add(c.bin);
+    if(!byUser[u].lastScan||c.time>byUser[u].lastScan)byUser[u].lastScan=c.time||'';
+  });
+
+  const users=Object.values(byUser).map(u=>{
+    const perf=userPerf[u.username]||{totalCounts:0,errorCounts:0};
+    const acc=perf.totalCounts?Math.round(((perf.totalCounts-(perf.errorCounts||0))/perf.totalCounts)*100):100;
+    return{...u,accuracy:acc,daysWorked:u.dates.size,binsCount:u.bins.size,perfTotal:perf.totalCounts,perfErrors:perf.errorCounts||0};
+  }).sort((a,b)=>b.totalCounts-a.totalCounts);
+
+  const teamAvgAcc=users.length?Math.round(users.reduce((s,u)=>s+u.accuracy,0)/users.length):0;
+  const totalEntriesAll=users.reduce((s,u)=>s+u.totalCounts,0);
+
+  $('PG').innerHTML=`
+  <div class="ph"><div><div class="pt">👥 Team Performance</div><div class="ps">Audit staff accuracy, count volume, and activity</div></div></div>
+
+  <!-- Summary row -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+    <div class="okpi"><div class="ki">👥</div><div class="kl">Team Members</div><div class="kv">${users.length}</div><div class="ks">participated in audit</div></div>
+    <div class="okpi"><div class="ki">📋</div><div class="kl">Total Entries</div><div class="kv">${oFmtN(totalEntriesAll)}</div><div class="ks">all users combined</div></div>
+    <div class="okpi"><div class="ki">✅</div><div class="kl">Team Accuracy</div>
+      <div class="kv" style="color:${teamAvgAcc>=90?'#059669':teamAvgAcc>=75?'#d97706':'#dc2626'}">${teamAvgAcc}%</div>
+      <div class="ks">average across team</div>
+    </div>
+  </div>
+
+  <!-- User cards -->
+  <div class="osec"><div class="osec-title">📋 Individual Performance</div><div class="osec-line"></div></div>
+  ${users.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+    ${users.map(u=>{
+      const accColor=u.accuracy>=90?'#059669':u.accuracy>=75?'#d97706':'#dc2626';
+      const init=(u.name||u.username||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      return`<div class="ochart" style="padding:0">
+        <div style="padding:16px 18px;border-bottom:1px solid #fef3c7">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c8922a,#f0c060);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">${init}</div>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:#0f172a">${esc(u.name)}</div>
+              <div style="font-size:11px;color:#94a3b8">@${esc(u.username)}</div>
+            </div>
+            <div style="margin-left:auto;font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${accColor}">${u.accuracy}%</div>
+          </div>
+        </div>
+        <div style="padding:14px 18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+          <div>
+            <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb">${u.totalCounts}</div>
+            <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px">Entries</div>
+          </div>
+          <div>
+            <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#059669">${u.daysWorked}</div>
+            <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px">Days Active</div>
+          </div>
+          <div>
+            <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#c8922a">${u.binsCount}</div>
+            <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px">Bins Covered</div>
+          </div>
+        </div>
+        <div style="padding:0 18px 14px">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b;margin-bottom:4px"><span>Accuracy</span><span style="font-weight:700;color:${accColor}">${u.accuracy}%</span></div>
+          <div style="height:7px;background:#f0e0a0;border-radius:7px;overflow:hidden">
+            <div style="width:${u.accuracy}%;height:100%;background:${accColor};border-radius:7px;transition:width 1s"></div>
+          </div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:5px">${u.perfErrors} variance entries · ${u.perfTotal-u.perfErrors} exact matches</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`:'<div style="text-align:center;padding:40px;color:#94a3b8">No team data available yet.</div>'}
+
+  <!-- Chart -->
+  <div class="ochart" style="margin-top:20px">
+    <div class="ochart-hd"><div class="ochart-title">Team Count Volume Comparison</div></div>
+    <div class="ochart-body"><canvas id="OC_TEAM" style="max-height:220px"></canvas></div>
+  </div>`;
+
+  setTimeout(()=>{
+    const ctx=$('OC_TEAM');
+    if(ctx&&window.Chart&&users.length){
+      if(S.charts.oc_team)S.charts.oc_team.destroy();
+      S.charts.oc_team=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:users.map(u=>u.name||u.username),
+          datasets:[
+            {label:'Total Entries',data:users.map(u=>u.totalCounts),backgroundColor:'rgba(200,146,42,0.7)',borderColor:'#c8922a',borderWidth:1,borderRadius:4},
+            {label:'Variance Entries',data:users.map(u=>u.perfErrors),backgroundColor:'rgba(220,38,38,0.5)',borderColor:'#dc2626',borderWidth:1,borderRadius:4}
+          ]
+        },
+        options:{plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{y:{ticks:{font:{size:9}},grid:{color:'#f0e0a0'}},x:{ticks:{font:{size:10}}}},responsive:true,maintainAspectRatio:true}
+      });
+    }
+  },150);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// CYCLE COUNT PLAN — day-wise automated audit scheduler
+// ═══════════════════════════════════════════════════════════
+const CC_KEY='imCyclePlan3';
+function loadCyclePlan(){try{return JSON.parse(localStorage.getItem(CC_KEY)||'null')}catch{return null;}}
+function saveCyclePlan(d){localStorage.setItem(CC_KEY,JSON.stringify(d));}
+
+async function rCyclePlan(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
+  const counts=await fetchCounts();
+  const countedParts=new Set(counts.map(c=>c.partNo));
+  const plan=loadCyclePlan();
+  renderCyclePlanUI(plan,countedParts);
+}
+
+function renderCyclePlanUI(plan,countedParts){
+  const pg=$('PG');
+  const todayStr=today();
+  const bins=[...new Set(S.items.map(i=>i.bin||'Unassigned'))].sort();
+
+  if(!plan){
+    // Setup screen
+    pg.innerHTML=`
+    <div class="ph"><div class="pt">📅 Cycle Count Plan</div><div class="ps">Set your audit target and get a day-wise automated plan</div></div>
+    <div class="cd" style="max-width:560px;margin:0 auto">
+      <div class="cdh"><div class="cdt">⚙️ Create New Cycle Count Plan</div></div>
+      <div class="cdb">
+        <div class="al ali" style="margin-bottom:16px">🧠 The system will automatically divide all <strong>${S.items.length} parts</strong> across your chosen number of days — bin-wise and category-wise for maximum efficiency.</div>
+        <div class="fg f2" style="margin-bottom:14px">
+          <div class="fl"><label class="fll">Start Date *</label><input class="fi" id="CC_SD" type="date" value="${todayStr}"></div>
+          <div class="fl"><label class="fll">Total Days (Target) *</label><input class="fi mn" id="CC_DAYS" type="number" min="1" max="90" placeholder="e.g. 7" value="7"></div>
+        </div>
+        <div class="fg f2" style="margin-bottom:14px">
+          <div class="fl"><label class="fll">Daily Work Hours</label><input class="fi" id="CC_HRS" type="number" min="1" max="12" value="8" placeholder="8"></div>
+          <div class="fl"><label class="fll">Parts/Hour (estimate)</label><input class="fi" id="CC_PPH" type="number" min="1" value="30" placeholder="30"></div>
+        </div>
+        <div class="fl" style="margin-bottom:14px">
+          <label class="fll">Priority Strategy</label>
+          <select class="fi" id="CC_STRAT">
+            <option value="bin">Bin-wise (recommended — minimize movement)</option>
+            <option value="value">High Value First (financial risk priority)</option>
+            <option value="variance">Variance History First (repeat issues first)</option>
+          </select>
+        </div>
+        <div class="fl" style="margin-bottom:16px">
+          <label class="fll">Exclude Bins (optional, comma separated)</label>
+          <input class="fi" id="CC_EXCL" placeholder="e.g. G-01, F-03">
+        </div>
+        <button class="btn bpr" style="width:100%;padding:13px" onclick="generateCyclePlan()">📅 Generate Day-wise Plan</button>
+      </div>
+    </div>`;
+    return;
+  }
+
+  // Show existing plan
+  const elapsed=Math.floor((new Date(todayStr)-new Date(plan.startDate))/(86400000))+1;
+  const totalDays=plan.days.length;
+  const todayPlan=plan.days.find(d=>d.date===todayStr)||plan.days[Math.min(elapsed-1,totalDays-1)];
+  const overallDone=countedParts?plan.days.flatMap(d=>d.parts).filter(p=>countedParts.has(p.partNo)).length:0;
+  const overallTotal=plan.days.flatMap(d=>d.parts).length;
+  const overallPct=overallTotal?Math.round(overallDone/overallTotal*100):0;
+
+  pg.innerHTML=`
+  <div class="ph" style="flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="pt">📅 Cycle Count Plan</div>
+      <div class="ps">Started ${fmtD(plan.startDate)} · Day ${Math.min(elapsed,totalDays)} of ${totalDays} · ${overallPct}% complete</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bgh bsm" onclick="ccExport()">⬇️ Export Plan</button>
+      <button class="btn bda bsm" onclick="if(confirm('Delete plan and start over?')){localStorage.removeItem('${CC_KEY}');rCyclePlan();}">🗑 Reset Plan</button>
+    </div>
+  </div>
+
+  <!-- Overall progress -->
+  <div class="cd" style="margin-bottom:16px;background:linear-gradient(135deg,#0f172a,#1e293b);border:none">
+    <div style="padding:16px 20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-bottom:14px">
+        <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#fff;font-family:'JetBrains Mono',monospace">${overallPct}%</div><div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Overall Done</div></div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#60a5fa;font-family:'JetBrains Mono',monospace">${overallDone}</div><div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Parts Counted</div></div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#fde68a;font-family:'JetBrains Mono',monospace">${overallTotal-overallDone}</div><div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Remaining</div></div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#4ade80;font-family:'JetBrains Mono',monospace">${Math.max(0,totalDays-elapsed)}</div><div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Days Left</div></div>
+      </div>
+      <div style="height:8px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden">
+        <div style="width:${overallPct}%;height:100%;background:linear-gradient(90deg,#2563eb,#059669);border-radius:99px;transition:width 1s ease"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TODAY'S plan highlighted -->
+  ${todayPlan?`
+  <div class="cd" style="margin-bottom:16px;border:2px solid #2563eb">
+    <div class="cdh" style="background:#eff6ff">
+      <div class="cdt" style="color:#1d4ed8">📍 TODAY — ${fmtD(todayPlan.date)} &nbsp;·&nbsp; Day ${todayPlan.dayNum}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:11px;font-weight:700;color:#2563eb">${todayPlan.parts.filter(p=>countedParts?.has(p.partNo)).length}/${todayPlan.parts.length} done</span>
+        <button class="btn bpr bsm" onclick="go('scan')">📷 Start Scanning</button>
+      </div>
+    </div>
+    <div style="padding:10px 16px;font-size:11px;color:#475569;border-bottom:1px solid var(--bd);display:flex;gap:12px;flex-wrap:wrap">
+      <span>📦 Bins: <strong>${[...new Set(todayPlan.parts.map(p=>p.bin))].filter(Boolean).join(', ')||'—'}</strong></span>
+      <span>🔢 Parts: <strong>${todayPlan.parts.length}</strong></span>
+      <span>⏱️ Est: <strong>${Math.ceil(todayPlan.parts.length/(plan.pph||30))}h</strong></span>
+    </div>
+    <div class="tw" style="max-height:320px;overflow-y:auto"><table>
+      <thead><tr><th>Part No</th><th>Description</th><th>Bin</th><th>DMS Qty</th><th>Status</th></tr></thead>
+      <tbody>${todayPlan.parts.map(p=>{
+        const done=countedParts?.has(p.partNo);
+        return`<tr style="background:${done?'#f0fdf4':''}">
+          <td class="tpn" style="color:${done?'#059669':'#2563eb'}">${esc(p.partNo)}</td>
+          <td style="font-size:11px">${esc(tr2(p.desc,26))}</td>
+          <td><span class="bg bgp" style="font-size:9px">${esc(p.bin||'—')}</span></td>
+          <td class="tq">${p.dms}</td>
+          <td><span class="bg ${done?'bgs':'bgg'}">${done?'✅ Done':'⏳ Pending'}</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>
+  </div>`:''}
+
+  <!-- All days timeline -->
+  <div class="cd">
+    <div class="cdh"><div class="cdt">📊 Full Plan — All ${totalDays} Days</div></div>
+    <div style="padding:14px 18px;display:flex;flex-direction:column;gap:8px">
+      ${plan.days.map(d=>{
+        const isDone=d.date<todayStr;
+        const isToday=d.date===todayStr;
+        const doneParts=d.parts.filter(p=>countedParts?.has(p.partNo)).length;
+        const pct2=d.parts.length?Math.round(doneParts/d.parts.length*100):0;
+        const bins2=[...new Set(d.parts.map(p=>p.bin).filter(Boolean))];
+        return`<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--rs);border:1.5px solid ${isToday?'#2563eb':isDone?'#a7f3d0':'var(--bd)'};background:${isToday?'#eff6ff':isDone?'#f0fdf4':'#fafbfc'}">
+          <div style="width:36px;height:36px;border-radius:50%;background:${isToday?'#2563eb':isDone&&pct2===100?'#059669':isDone?'#d97706':'#e2e8f0'};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${isToday||isDone?'#fff':'#94a3b8'};flex-shrink:0">${d.dayNum}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:#0f172a">${fmtD(d.date)} ${isToday?'← TODAY':''}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:1px">${bins2.slice(0,4).join(', ')}${bins2.length>4?` +${bins2.length-4} more`:''} · ${d.parts.length} parts</div>
+            <div style="height:4px;background:#e2e8f0;border-radius:99px;margin-top:6px;overflow:hidden"><div style="width:${pct2}%;height:100%;background:${pct2===100?'#059669':isToday?'#2563eb':'#d97706'};border-radius:99px"></div></div>
+          </div>
+          <div style="text-align:right;font-size:12px;font-weight:800;color:${pct2===100?'#059669':isToday?'#2563eb':'#94a3b8'}">${pct2}%</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function generateCyclePlan(){
+  const startDate=$('CC_SD')?.value||today();
+  const days=parseInt($('CC_DAYS')?.value)||7;
+  const pph=parseInt($('CC_PPH')?.value)||30;
+  const strategy=$('CC_STRAT')?.value||'bin';
+  const excl=($('CC_EXCL')?.value||'').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+
+  let items=[...S.items].filter(i=>!excl.includes((i.bin||'').toUpperCase()));
+
+  // Sort by strategy
+  if(strategy==='bin'){
+    items.sort((a,b)=>(a.bin||'ZZZ').localeCompare(b.bin||'ZZZ'));
+  } else if(strategy==='value'){
+    items.sort((a,b)=>(parseFloat(b.mrp)||0)-(parseFloat(a.mrp)||0));
+  } else {
+    // variance history — random shuffle (no history at planning time)
+    items.sort(()=>Math.random()-0.5);
+  }
+
+  // Distribute across days
+  const perDay=Math.ceil(items.length/days);
+  const plan={startDate,totalItems:items.length,days:[],pph,strategy};
+  for(let d=0;d<days;d++){
+    const slice=items.slice(d*perDay,(d+1)*perDay);
+    const dt=new Date(startDate);dt.setDate(dt.getDate()+d);
+    plan.days.push({
+      dayNum:d+1,
+      date:dt.toISOString().split('T')[0],
+      parts:slice.map(i=>({partNo:i.partNo,desc:i.desc||'',bin:i.bin||'',dms:i.systemQty||0}))
+    });
+  }
+
+  saveCyclePlan(plan);
+  toast(`✅ Plan created — ${items.length} parts across ${days} days`,'s',3000);
+  rCyclePlan();
+}
+
+async function ccExport(){
+  const plan=loadCyclePlan();if(!plan){toast('No plan found','w');return;}
+  const counts=await fetchCounts();
+  const countedParts=new Set(counts.map(c=>c.partNo));
+  let csv='Day,Date,Part No,Description,Bin,DMS Qty,Status\n';
+  plan.days.forEach(d=>{
+    d.parts.forEach(p=>{
+      csv+=`${d.dayNum},"${fmtD(d.date)}","${p.partNo}","${(p.desc||'').replace(/"/g,'""')}","${p.bin||''}",${p.dms},"${countedParts.has(p.partNo)?'Done':'Pending'}"\n`;
+    });
+  });
+  dlCSV(csv,`cycle_count_plan_${today()}.csv`);
+  toast('Plan exported','s');
+}
+
+// ═══════════════════════════════════════════════════════════
+// ROOT CAUSE ANALYSIS — AI-powered variance investigation
+// ═══════════════════════════════════════════════════════════
+// AI calls proxied via Google Apps Script — API key is ONLY in Code.gs, never in frontend
+
+async function rRootCause(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading variance data…</div>';
+  const counts=await fetchCounts();
+
+  // Build variance map
+  const varParts=[];
+  const cMap={};
+  counts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]={qty:0,bin:'',type:c.type||'QR'};cMap[c.partNo].qty+=parseFloat(c.qty)||0;cMap[c.partNo].bin=c.bin||cMap[c.partNo].bin;});
+  S.items.forEach(item=>{
+    const cnt=cMap[item.partNo];if(!cnt)return;
+    const dms=parseFloat(item.systemQty)||0;
+    const variance=cnt.qty-dms;
+    if(variance!==0)varParts.push({partNo:item.partNo,desc:item.desc||'',bin:item.bin||cnt.bin||'',dms,counted:cnt.qty,variance,mrp:parseFloat(item.mrp)||0,value:Math.abs(variance)*(parseFloat(item.mrp)||0),type:cnt.type});
+  });
+  varParts.sort((a,b)=>b.value-a.value);
+
+  pg.innerHTML=`
+  <div class="ph" style="flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="pt">🔬 Root Cause Analysis</div>
+      <div class="ps">${varParts.length} variance parts · AI-powered investigation</div>
+    </div>
+    <button class="btn bpr bsm" onclick="runRCA()" id="RCA_BTN">🤖 Run AI Analysis</button>
+  </div>
+
+  <!-- Summary -->
+  <div class="sg" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px">
+    <div class="st" style="border-left:4px solid #dc2626">
+      <div class="stl">Short Parts</div>
+      <div class="stv" style="color:#dc2626">${varParts.filter(p=>p.variance<0).length}</div>
+      <div class="sts">₹${Math.round(varParts.filter(p=>p.variance<0).reduce((s,p)=>s+p.value,0)).toLocaleString('en-IN')} at risk</div>
+    </div>
+    <div class="st" style="border-left:4px solid #d97706">
+      <div class="stl">Excess Parts</div>
+      <div class="stv" style="color:#d97706">${varParts.filter(p=>p.variance>0).length}</div>
+      <div class="sts">₹${Math.round(varParts.filter(p=>p.variance>0).reduce((s,p)=>s+p.value,0)).toLocaleString('en-IN')} extra</div>
+    </div>
+    <div class="st" style="border-left:4px solid #7c3aed">
+      <div class="stl">High Value Risk</div>
+      <div class="stv" style="color:#7c3aed">${varParts.filter(p=>p.variance<0&&p.mrp>500).length}</div>
+      <div class="sts">Parts &gt;₹500 short</div>
+    </div>
+    <div class="st" style="border-left:4px solid #0f172a">
+      <div class="stl">Total Impact</div>
+      <div class="stv" style="font-size:16px">₹${Math.round(varParts.reduce((s,p)=>s+p.value,0)).toLocaleString('en-IN')}</div>
+      <div class="sts">Financial exposure</div>
+    </div>
+  </div>
+
+  <!-- AI Output Area -->
+  <div id="RCA_OUT" style="margin-bottom:16px"></div>
+
+  <!-- Variance Table -->
+  <div class="cd">
+    <div class="cdh"><div class="cdt">⚠️ All Variance Parts (${varParts.length})</div></div>
+    ${varParts.length?`<div class="tw" style="max-height:500px;overflow-y:auto"><table>
+      <thead><tr><th>Part No</th><th>Description</th><th>Bin</th><th style="text-align:right">DMS</th><th style="text-align:right">Counted</th><th style="text-align:right">Variance</th><th style="text-align:right">Value at Risk</th><th>Type</th></tr></thead>
+      <tbody>${varParts.map(p=>`<tr style="background:${p.variance<0?'#fef9f9':'#fffcf0'}">
+        <td class="tpn">${esc(p.partNo)}</td>
+        <td style="font-size:11px">${esc(tr2(p.desc,22))}</td>
+        <td><span class="bg bgp" style="font-size:9px">${esc(p.bin||'—')}</span></td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${fmt(p.dms)}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${fmt(p.counted)}</td>
+        <td style="text-align:right;font-weight:800;color:${p.variance<0?'#dc2626':'#d97706'}">${p.variance>0?'+':''}${p.variance}</td>
+        <td style="text-align:right;font-size:11px;font-weight:700;color:#7c3aed">₹${fmt(Math.round(p.value))}</td>
+        <td><span class="bg bgg" style="font-size:9px">${esc(p.type)}</span></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`:'<div class="emp" style="padding:30px"><div class="emp-i">✅</div><div class="emp-t">No variances found — perfect audit!</div></div>'}
+  </div>`;
+
+  // Store for AI use
+  window._rcaVarParts=varParts;
+}
+
+async function runRCA(){
+  const varParts=window._rcaVarParts||[];
+  if(!varParts.length){toast('No variance parts to analyse','w');return;}
+  const btn=$('RCA_BTN');
+  const out=$('RCA_OUT');
+  if(btn){btn.disabled=true;btn.textContent='🤖 Analysing…';}
+  if(out){out.innerHTML=`<div class="cd" style="margin-bottom:0"><div style="padding:24px;text-align:center">
+    <div style="font-size:32px;margin-bottom:10px;animation:spin 2s linear infinite;display:inline-block">🧠</div>
+    <div style="font-weight:700;color:#0f172a">AI is investigating root causes…</div>
+    <div style="font-size:12px;color:#64748b;margin-top:6px">Analysing ${varParts.length} variance items · India Motors · Alwar</div>
+  </div></div>`;}
+
+  const top=varParts.slice(0,20);
+  const prompt=`You are a senior inventory consultant for India Motors, an automobile spare parts dealership (Hero MotoCorp authorized) in Alwar, Rajasthan.
+
+Analyse the following variance data and identify root causes. Be concise, practical, and use simple business language.
+
+VARIANCE DATA (top ${top.length} by financial impact):
+${JSON.stringify(top.map(p=>({partNo:p.partNo,desc:p.desc,bin:p.bin,dmsQty:p.dms,physicalCount:p.counted,variance:p.variance,valueAtRisk:'₹'+Math.round(p.value),type:p.type})),null,1)}
+
+Generate a JSON array of root cause findings. Each object must have:
+- type: "danger" | "warning" | "info"
+- title: short heading (max 8 words)
+- rootCause: the most likely reason for this variance
+- affectedParts: array of part numbers (max 5)  
+- financialImpact: rupee amount as string
+- action: specific actionable step (1-2 sentences)
+
+Rules:
+- Return ONLY valid JSON array, no markdown
+- Group related parts into one finding where possible
+- Look for patterns: same bin, same category, same type, same variance direction
+- Be specific to Hero MotoCorp dealership context (returns, warranty, GRN, DMS, billing)
+- Maximum 8 findings`;
+
+  try{
+    const rawReply=await callGemini(prompt+'\n\nReturn ONLY valid JSON array. No markdown, no backticks.',{maxTokens:1000});
+    const clean=rawReply.replace(/```json|```/gi,'').trim();
+    let findings;
+    try{findings=JSON.parse(clean);}
+    catch{findings=[{type:'warning',title:'Analysis Complete',rootCause:'Could not parse Gemini response. Check Apps Script logs.',affectedParts:[],financialImpact:'—',action:'Open Apps Script > Executions and check for errors.'}];}
+
+    const sevColor={danger:'#dc2626',warning:'#d97706',info:'#2563eb'};
+    const sevBg={danger:'#fef2f2',warning:'#fffbeb',info:'#eff6ff'};
+    const sevIcon={danger:'🚨',warning:'⚠️',info:'💡'};
+
+    if(out){out.innerHTML=`
+    <div class="cd" style="margin-bottom:16px">
+      <div class="cdh" style="background:#f8fafc"><div class="cdt">🤖 AI Root Cause Findings (${findings.length})</div><div style="font-size:10px;color:#94a3b8">Powered by Claude AI</div></div>
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+        ${findings.map(f=>`
+        <div style="border-radius:var(--rs);border:1.5px solid ${sevColor[f.type]||'#e2e8f0'}20;background:${sevBg[f.type]||'#f8fafc'};overflow:hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid ${sevColor[f.type]||'#e2e8f0'}20">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:15px">${sevIcon[f.type]||'💡'}</span>
+              <span style="font-size:13px;font-weight:800;color:#0f172a">${esc(f.title||'')}</span>
+              ${f.financialImpact&&f.financialImpact!=='—'?`<span style="margin-left:auto;font-size:11px;font-weight:800;color:${sevColor[f.type]||'#64748b'};background:${sevColor[f.type]||'#e2e8f0'}15;padding:2px 8px;border-radius:20px">${esc(f.financialImpact)}</span>`:''}
+            </div>
+            <div style="font-size:12px;color:#374151;line-height:1.55">${esc(f.rootCause||'')}</div>
+          </div>
+          <div style="padding:10px 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+            ${f.affectedParts?.length?`<div style="font-size:10px;color:#64748b">${f.affectedParts.slice(0,4).map(p=>`<span style="font-family:'JetBrains Mono',monospace;font-size:10px;background:#f1f5f9;padding:2px 6px;border-radius:4px;margin-right:3px">${esc(p)}</span>`).join('')}${f.affectedParts.length>4?`<span style="font-size:10px;color:#94a3b8">+${f.affectedParts.length-4} more</span>`:''}</div>`:''}
+            <div style="margin-left:auto;font-size:11px;font-weight:600;color:${sevColor[f.type]||'#475569'}">⚡ ${esc(f.action||'')}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;}
+  }catch(e){
+    if(out)out.innerHTML=`<div class="al" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:var(--rs)">❌ AI Error: ${esc(e.message)} — Check internet connection and API access.</div>`;
+  }
+  if(btn){btn.disabled=false;btn.textContent='🤖 Re-run Analysis';}
+}
+
+// ═══════════════════════════════════════════════════════════
+// PHOTO CAPTURE — Geo-tagged photos saved to Google Sheet
+// ═══════════════════════════════════════════════════════════
+let PC={stream:null,track:null,blob:null,coords:null};
+
+async function rPhotoCapture(){
+  const pg=$('PG');
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  pg.innerHTML=`
+  <div class="ph"><div class="pt">📸 Photo Capture</div><div class="ps">Capture geo-tagged evidence photos — saved to Google Sheet</div></div>
+
+  <div class="cd" style="margin-bottom:14px">
+    <div class="cdh"><div class="cdt">📷 Camera</div></div>
+    <div style="padding:14px;display:flex;flex-direction:column;align-items:center;gap:12px">
+      <!-- Video preview -->
+      <div style="position:relative;width:100%;max-width:480px;aspect-ratio:4/3;background:#0f172a;border-radius:var(--r);overflow:hidden">
+        <video id="PC_VID" playsinline muted autoplay style="width:100%;height:100%;object-fit:cover;display:none"></video>
+        <canvas id="PC_CVS" style="width:100%;height:100%;object-fit:cover;display:none;border-radius:var(--r)"></canvas>
+        <div id="PC_PLACEHOLDER" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.4)">
+          <div style="font-size:48px;margin-bottom:10px">📷</div>
+          <div style="font-size:13px;font-weight:600">Tap Start Camera</div>
+        </div>
+        <!-- Geo badge overlay -->
+        <div id="PC_GEO" style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.6);color:#4ade80;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;display:none;backdrop-filter:blur(4px)">📍 Getting location…</div>
+        <!-- Flash effect -->
+        <div id="PC_FLASH" style="position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .1s;border-radius:var(--r)"></div>
+      </div>
+
+      <!-- Controls -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <button class="btn bpr" id="PC_START" onclick="pcStart()">▶ Start Camera</button>
+        <button class="btn bsu" id="PC_SNAP" onclick="pcSnap()" style="display:none">📸 Capture Photo</button>
+        <button class="btn bgh" id="PC_RETAKE" onclick="pcRetake()" style="display:none">🔄 Retake</button>
+        <button class="btn bgh" id="PC_STOP" onclick="pcStop()" style="display:none">⏹ Stop</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo details form -->
+  <div class="cd" id="PC_FORM" style="display:none;margin-bottom:14px">
+    <div class="cdh"><div class="cdt">📝 Photo Details</div></div>
+    <div class="cdb">
+      <div id="PC_PREVIEW" style="margin-bottom:14px;text-align:center"></div>
+      <div class="fg f2" style="margin-bottom:12px">
+        <div class="fl"><label class="fll">Part Number</label>
+          <div class="acw"><input class="fi mn" id="PC_PN" placeholder="Part No (optional)" oninput="acFn('PC_PN','PC_AL','pcfl')" autocapitalize="none"><div class="acl" id="PC_AL"></div></div>
+        </div>
+        <div class="fl"><label class="fll">Bin Location</label><select class="fi" id="PC_BIN"><option value="">Select bin…</option>${bo}</select></div>
+      </div>
+      <div class="fl" style="margin-bottom:12px"><label class="fll">Description / Reason *</label>
+        <textarea class="fi" id="PC_DESC" rows="2" placeholder="e.g. Short found in shelf, Damaged unit, Excess stock in corner…"></textarea>
+      </div>
+      <div class="fl" style="margin-bottom:14px"><label class="fll">Photo Type</label>
+        <select class="fi" id="PC_TYPE">
+          <option value="Variance Evidence">Variance Evidence</option>
+          <option value="Damaged Stock">Damaged Stock</option>
+          <option value="Bin Condition">Bin Condition</option>
+          <option value="Excess Stock">Excess Stock</option>
+          <option value="Missing Parts">Missing Parts</option>
+          <option value="General Audit">General Audit</option>
+        </select>
+      </div>
+      <div id="PC_GEO_INFO" style="margin-bottom:14px;font-size:11px;color:#64748b;background:#f8fafc;border-radius:var(--rs);padding:10px 13px;display:flex;align-items:center;gap:8px">
+        <span>📍</span><span id="PC_GEO_TXT">Getting GPS location…</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn bpr" onclick="pcSave()" id="PC_SAVE_BTN">💾 Save Photo to Sheet</button>
+        <button class="btn bgh" onclick="pcRetake()">✕ Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved photos log -->
+  <div class="cd">
+    <div class="cdh"><div class="cdt">🖼️ Recent Photos (Today)</div><button class="btn bgh bsm" onclick="pcLoadLog()">🔄 Refresh</button></div>
+    <div id="PC_LOG"><div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Loading…</div></div>
+  </div>`;
+
+  pcLoadLog();
+  pcGetLocation(); // start getting location immediately
+}
+
+function pcfl(pn,d,b){const i=$('PC_PN');if(i)i.value=pn;const bi=$('PC_BIN');if(bi)bi.value=b||'';$('PC_AL').style.display='none';}
+
+async function pcStart(){
+  try{
+    // Stop any existing stream first
+    if(PC.stream){PC.stream.getTracks().forEach(t=>t.stop());PC.stream=null;}
+    const stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:960}}
+    });
+    PC.stream=stream;
+    PC.track=stream.getVideoTracks()[0];
+    PC.blob=null;
+
+    const vid=$('PC_VID');
+    if(vid){vid.srcObject=stream;vid.style.display='block';vid.play().catch(()=>{});}
+    $('PC_PLACEHOLDER') && ($('PC_PLACEHOLDER').style.display='none');
+    $('PC_CVS') && ($('PC_CVS').style.display='none');
+    $('PC_START') && ($('PC_START').style.display='none');
+    $('PC_SNAP') && ($('PC_SNAP').style.display='inline-flex');
+    $('PC_STOP') && ($('PC_STOP').style.display='inline-flex');
+    $('PC_FORM') && ($('PC_FORM').style.display='none');
+    const geo=$('PC_GEO');if(geo)geo.style.display='block';
+    toast('Camera started — point at part/shelf and capture','i',3000);
+  }catch(e){
+    toast('Camera error: '+e.message+' — allow camera permission in browser','d',5000);
+  }
+}
+
+function pcSnap(){
+  const vid=$('PC_VID');const cvs=$('PC_CVS');if(!vid||!cvs||!PC.stream)return;
+  // Flash
+  const flash=$('PC_FLASH');if(flash){flash.style.opacity='1';setTimeout(()=>flash.style.opacity='0',150);}
+  // Draw frame to canvas
+  cvs.width=vid.videoWidth||640;cvs.height=vid.videoHeight||480;
+  const ctx=cvs.getContext('2d');
+  ctx.drawImage(vid,0,0);
+
+  // Overlay geo + timestamp
+  const geo=PC.coords;
+  ctx.fillStyle='rgba(0,0,0,0.55)';
+  ctx.fillRect(0,cvs.height-38,cvs.width,38);
+  ctx.fillStyle='#ffffff';ctx.font='bold 13px monospace';ctx.textAlign='left';
+  const ts=new Date().toLocaleString('en-IN');
+  ctx.fillText(`📍 ${geo?`${geo.lat.toFixed(5)},${geo.lng.toFixed(5)}`:'No GPS'} · ${ts}`,10,cvs.height-14);
+
+  // Convert to blob
+  cvs.toBlob(blob=>{
+    PC.blob=blob;
+    vid.style.display='none';
+    cvs.style.display='block';
+    $('PC_SNAP').style.display='none';
+    $('PC_RETAKE').style.display='inline-flex';
+    $('PC_STOP').style.display='none';
+
+    // Show form
+    const form=$('PC_FORM');if(form)form.style.display='block';
+    // Preview thumbnail
+    const prev=$('PC_PREVIEW');
+    if(prev){const url=URL.createObjectURL(blob);prev.innerHTML=`<img src="${url}" style="max-width:200px;border-radius:8px;border:1px solid #e2e8f0;">`;}
+    // Update geo info
+    const gt=$('PC_GEO_TXT');
+    if(gt)gt.textContent=geo?`Lat: ${geo.lat.toFixed(6)}, Lng: ${geo.lng.toFixed(6)} · Accuracy: ±${Math.round(geo.acc)}m`:'GPS not available — photo will save without location';
+    toast('Photo captured!','s',2000);
+    form?.scrollIntoView({behavior:'smooth',block:'start'});
+  },'image/jpeg',0.85);
+}
+
+function pcRetake(){
+  PC.blob=null;
+  $('PC_CVS') && ($('PC_CVS').style.display='none');
+  $('PC_VID') && ($('PC_VID').style.display='block');
+  $('PC_SNAP') && ($('PC_SNAP').style.display='inline-flex');
+  $('PC_RETAKE') && ($('PC_RETAKE').style.display='none');
+  $('PC_STOP') && ($('PC_STOP').style.display='inline-flex');
+  $('PC_FORM') && ($('PC_FORM').style.display='none');
+}
+
+function pcStop(){
+  if(PC.stream){PC.stream.getTracks().forEach(t=>t.stop());PC.stream=null;PC.track=null;}
+  $('PC_VID') && ($('PC_VID').style.display='none');
+  $('PC_CVS') && ($('PC_CVS').style.display='none');
+  $('PC_PLACEHOLDER') && ($('PC_PLACEHOLDER').style.display='flex');
+  $('PC_START') && ($('PC_START').style.display='inline-flex');
+  $('PC_SNAP') && ($('PC_SNAP').style.display='none');
+  $('PC_RETAKE') && ($('PC_RETAKE').style.display='none');
+  $('PC_STOP') && ($('PC_STOP').style.display='none');
+  $('PC_GEO') && ($('PC_GEO').style.display='none');
+  $('PC_FORM') && ($('PC_FORM').style.display='none');
+}
+
+function pcGetLocation(){
+  if(!navigator.geolocation){PC.coords=null;return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    PC.coords={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy};
+    const geo=$('PC_GEO');
+    if(geo){geo.textContent=`📍 ${PC.coords.lat.toFixed(4)}, ${PC.coords.lng.toFixed(4)}`;geo.style.color='#4ade80';}
+    const gt=$('PC_GEO_TXT');
+    if(gt)gt.textContent=`Lat: ${PC.coords.lat.toFixed(6)}, Lng: ${PC.coords.lng.toFixed(6)} · ±${Math.round(PC.coords.acc)}m`;
+  },err=>{
+    PC.coords=null;
+    const geo=$('PC_GEO');if(geo){geo.textContent='📍 GPS unavailable';geo.style.color='#f87171';}
+  },{enableHighAccuracy:true,timeout:10000});
+}
+
+async function pcSave(){
+  if(!PC.blob){toast('No photo captured','w');return;}
+  const desc=($('PC_DESC')?.value||'').trim();
+  if(!desc){toast('Enter a description','w');return;}
+  const btn=$('PC_SAVE_BTN');if(btn){btn.disabled=true;btn.textContent='Saving…';}
+
+  try{
+    // Convert blob to base64
+    const b64=await new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=e=>resolve(e.target.result.split(',')[1]);
+      reader.readAsDataURL(PC.blob);
+    });
+    const payload={
+      action:'savePhoto',
+      photo:{
+        id:uid(),
+        partNo:$('PC_PN')?.value||'',
+        bin:$('PC_BIN')?.value||'',
+        desc,
+        photoType:$('PC_TYPE')?.value||'General Audit',
+        date:today(),
+        time:nowt(),
+        auditor:S.user.username,
+        auditorName:S.user.name,
+        lat:PC.coords?.lat||'',
+        lng:PC.coords?.lng||'',
+        accuracy:PC.coords?.acc||'',
+        imageBase64:b64
+      }
+    };
+    const r=await api(payload);
+    if(r.success){
+      toast('✅ Photo saved to Google Sheet!','s',3000);
+      pcStop();
+      pcLoadLog();
+      // Clear form
+      ['PC_PN','PC_DESC'].forEach(id=>{const el=$(id);if(el)el.value='';});
+      if($('PC_BIN'))$('PC_BIN').value='';
+    } else {
+      toast('Failed: '+(r.error||'Unknown error'),'d',4000);
+    }
+  }catch(e){
+    toast('Error: '+e.message,'d',4000);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='💾 Save Photo to Sheet';}
+  }
+}
+
+async function pcLoadLog(){
+  const wrap=$('PC_LOG');if(!wrap)return;
+  wrap.innerHTML='<div style="text-align:center;padding:16px;color:#94a3b8;font-size:12px">Loading…</div>';
+  try{
+    const r=await api({action:'getPhotos',date:today()});
+    const photos=(r.success&&r.photos)||[];
+    if(!photos.length){
+      wrap.innerHTML='<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">No photos captured today</div>';
+      return;
+    }
+    wrap.innerHTML=`<div style="padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+      ${photos.map(p=>`
+      <div style="border:1px solid var(--bd);border-radius:var(--rs);overflow:hidden;font-size:11px">
+        <div style="background:#f0f4f8;padding:8px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:28px">📸</div>
+        <div style="padding:8px">
+          <div style="font-weight:700;color:#0f172a;font-size:11px">${esc(p.photoType||'Photo')}</div>
+          ${p.partNo?`<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#2563eb;margin-top:1px">${esc(p.partNo)}</div>`:''}
+          <div style="color:#64748b;margin-top:2px;font-size:10px">${esc(tr2(p.desc||'',28))}</div>
+          <div style="color:#94a3b8;margin-top:3px;font-size:9px">${(p.time||'').slice(0,5)} · ${esc(p.auditorName||p.auditor||'')}</div>
+          ${p.lat?`<div style="color:#059669;font-size:9px;margin-top:2px">📍 ${parseFloat(p.lat).toFixed(4)}, ${parseFloat(p.lng).toFixed(4)}</div>`:''}
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }catch(e){
+    wrap.innerHTML='<div style="padding:16px;font-size:12px;color:#dc2626">Error loading photos: '+esc(e.message)+'</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI CHAT ASSISTANT — Full inventory context chat
+// ═══════════════════════════════════════════════════════════
+let AI_HISTORY=[];let AI_LANG="en";
+
+async function rAIChat(){
+  const pg=$('PG');
+  AI_HISTORY=[];AI_LANG='en';
+  pg.innerHTML=`
+  <div class="ph" style="margin-bottom:12px">
+    <div>
+      <div class="pt">🤖 AI Assistant</div>
+      <div class="ps">Gemini AI · English & Hindi · Inventory ke baare mein kuch bhi poochho</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;background:#f1f5f9;border-radius:8px;padding:3px;border:1px solid #e2e8f0;flex-shrink:0">
+        <button id="LANG_EN" onclick="aiSetLang('en')" style="padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;transition:.15s">🇬🇧 EN</button>
+        <button id="LANG_HI" onclick="aiSetLang('hi')" style="padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:#64748b;transition:.15s">🇮🇳 HI</button>
+      </div>
+      <button class="btn bgh bsm" onclick="AI_HISTORY=[];$('AIC_MSGS').innerHTML=renderAIWelcome();">🗑 Clear</button>
+    </div>
+  </div>
+
+  <!-- On-demand Full Inventory Summary -->
+  <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:14px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="flex:1;min-width:180px">
+      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:3px">📊 Full Inventory Summary</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.5">AI se puri inventory ka summary maango — shortage, dead stock, financial impact, team performance sab ek jagah</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0">
+      <button onclick="aiFullSummary('en')" style="padding:9px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 English Summary</button>
+      <button onclick="aiFullSummary('hi')" style="padding:9px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 हिंदी Summary</button>
+    </div>
+  </div>
+
+  <!-- Quick chips — mix of English & Hindi -->
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px" id="AIC_CHIPS">
+    ${[
+      "Today's audit progress?","Which parts are short?","Dead stock list dikhao",
+      "Reorder kya karna chahiye?","Sabse costly parts kaunse hain?",
+      "Financial impact summary","Team performance today","Bin-wise progress"
+    ].map(q=>`<button onclick="aiChip(this)" style="padding:5px 11px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;transition:.15s;white-space:nowrap">${esc(q)}</button>`).join('')}
+  </div>
+
+  <!-- Chat window -->
+  <div class="cd" style="display:flex;flex-direction:column;height:calc(100vh - 400px);min-height:360px">
+    <div id="AIC_MSGS" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px">
+      ${renderAIWelcome()}
+    </div>
+    <div style="border-top:1px solid var(--bd);padding:10px 14px;display:flex;gap:8px;align-items:flex-end">
+      <textarea id="AIC_INP" rows="1" placeholder="English ya Hindi mein poochho…"
+        style="flex:1;padding:9px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;outline:none;resize:none;font-family:'Inter',sans-serif;max-height:100px;overflow-y:auto;transition:.2s"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend();}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+        onfocus="this.style.borderColor='#2563eb';this.style.boxShadow='0 0 0 3px rgba(37,99,235,.1)'"
+        onblur="this.style.borderColor='var(--bd)';this.style.boxShadow='none'"></textarea>
+      <button class="btn bpr" id="AIC_SEND" onclick="aiSend()" style="padding:10px 16px;border-radius:10px;height:42px;flex-shrink:0">↑</button>
+    </div>
+  </div>`;
+}
+
+function aiSetLang(lang){
+  AI_LANG=lang;
+  const en=$('LANG_EN'),hi=$('LANG_HI');
+  if(lang==='en'){
+    if(en)en.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;transition:.15s';
+    if(hi)hi.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:#64748b;transition:.15s';
+  } else {
+    if(hi)hi.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;transition:.15s';
+    if(en)en.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:#64748b;transition:.15s';
+  }
+  toast(lang==='hi'?'Hindi mode 🇮🇳':'English mode 🇬🇧','i',2000);
+}
+
+async function aiFullSummary(lang){
+  const msgs=$('AIC_MSGS');if(!msgs)return;
+  const counts=S.allCounts||S.counts||[];
+  const today_s=today();
+  const todayCounts=counts.filter(c=>c.date===today_s);
+  const cMap={};todayCounts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
+  let shortCount=0,excessCount=0,matchCount=0,shortVal=0,excessVal=0,deadCount=0,deadVal=0;
+  const shortParts=[];
+  S.items.forEach(item=>{
+    const dms=parseFloat(item.systemQty)||0,dlc=parseFloat(item.dlc)||0;
+    const sm=typeof S_SALES_MAP!=='undefined'?S_SALES_MAP[item.partNo]:null;
+    if((!sm||Object.values(sm).reduce((a,b)=>a+b,0)===0)&&dms>0){deadCount++;deadVal+=dms*dlc;}
+    const cnt=cMap[item.partNo];if(cnt===undefined)return;
+    const diff=cnt-dms;
+    if(diff<0){shortCount++;shortVal+=Math.abs(diff)*dlc;shortParts.push({p:item.partNo,d:item.desc,v:diff,loss:Math.round(Math.abs(diff)*dlc)});}
+    else if(diff>0){excessCount++;excessVal+=diff*dlc;}
+    else matchCount++;
+  });
+  const uCounted=new Set(todayCounts.map(c=>c.partNo)).size;
+  const pct=S.items.length?Math.round(uCounted/S.items.length*100):0;
+  const top5=shortParts.sort((a,b)=>b.loss-a.loss).slice(0,5);
+  const isHi=lang==='hi';
+  const prompt=isHi
+    ?`Aap India Motors (Hero MotoCorp authorized dealer, Alwar, Rajasthan) ke inventory AI assistant hain. Dealer owner ke liye ek professional summary Hindi (Devanagari) mein likhein:
+
+DATA:
+- Kul parts: ${S.items.length} | Counted: ${uCounted} (${pct}%)
+- Match: ${matchCount} | Short: ${shortCount} (Loss: Rs.${Math.round(shortVal).toLocaleString('en-IN')}) | Excess: ${excessCount} (Value: Rs.${Math.round(excessVal).toLocaleString('en-IN')})
+- Dead stock: ${deadCount} parts (Rs.${Math.round(deadVal).toLocaleString('en-IN')} blocked)
+- Top 5 shortage: ${JSON.stringify(top5)}
+
+In 5 sections likhein: 1) Aaj ki progress, 2) Financial impact, 3) Badi problems, 4) Turant karne wale kaam (3-5 points), 5) Owner ke liye ek line advice. Hindi Devanagari mein.`
+    :`You are the AI for India Motors (Hero MotoCorp dealer, Alwar). Write a professional inventory summary in English for the dealer owner:
+
+DATA: Total SKUs: ${S.items.length} | Counted: ${uCounted} (${pct}%) | Match: ${matchCount} | Short: ${shortCount} (Loss: Rs.${Math.round(shortVal).toLocaleString('en-IN')}) | Excess: ${excessCount} | Dead stock: ${deadCount} parts (Rs.${Math.round(deadVal).toLocaleString('en-IN')}) | Top shortages: ${JSON.stringify(top5)}
+
+Cover: 1) Audit progress, 2) Financial impact, 3) Key risks, 4) Immediate actions (3-5 bullets), 5) Closing recommendation. Be specific with rupee figures.`;
+
+  const label=isHi?'📋 हिंदी में inventory summary दो':'📋 Give full inventory summary in English';
+  msgs.innerHTML+=aiMsg('user',label);
+  const lid='AIL_'+Date.now();
+  msgs.innerHTML+=`<div id="${lid}">${aiMsg('assistant','',true)}</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  try{
+    const reply=await callGemini(prompt,{lang,maxTokens:1200});
+    AI_HISTORY.push({role:'user',content:label},{role:'assistant',content:reply});
+    const el=$(lid);if(el)el.outerHTML=aiMsg('assistant',reply);
+  }catch(e){
+    const el=$(lid);if(el)el.outerHTML=aiMsg('assistant','❌ '+esc(e.message)+' — Check Apps Script Code.gs handleGemini()');
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+
+function renderAIWelcome(){
+  const isMaster=S.user?.role==='master_auditor'||S.user?.role==='dealer_owner';
+  return`<div style="text-align:center;padding:24px 16px">
+    <div style="font-size:40px;margin-bottom:10px">🤖</div>
+    <div style="font-weight:800;font-size:15px;color:#0f172a;margin-bottom:6px">India Motors AI Assistant</div>
+    <div style="font-size:12px;color:#64748b;max-width:320px;margin:0 auto;line-height:1.6">
+      I have full access to your inventory data — ${S.items.length} parts, ${S.bins.length} bins, audit counts, variances and more. Ask me anything!
+    </div>
+  </div>`;
+}
+
+function aiChip(btn){
+  const inp=$('AIC_INP');if(!inp)return;
+  inp.value=btn.textContent;
+  aiSend();
+}
+
+function aiMsg(role,text,isLoading){
+  const isUser=role==='user';
+  return`<div style="display:flex;gap:10px;align-items:flex-start;flex-direction:${isUser?'row-reverse':'row'}">
+    <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:${isUser?'linear-gradient(135deg,#2563eb,#7c3aed)':'linear-gradient(135deg,#0f172a,#1e293b)'};color:#fff;font-weight:800">
+      ${isUser?(S.user?.name||'U')[0].toUpperCase():'🤖'}
+    </div>
+    <div style="max-width:80%;background:${isUser?'linear-gradient(135deg,#2563eb,#1d4ed8)':'#fff'};color:${isUser?'#fff':'#0f172a'};border-radius:${isUser?'16px 4px 16px 16px':'4px 16px 16px 16px'};padding:11px 15px;font-size:13px;line-height:1.6;border:${isUser?'none':'1.5px solid #e2e8f0'};box-shadow:0 1px 4px rgba(0,0,0,.06)">
+      ${isLoading?'<span style="opacity:.6">⏳ Thinking…</span>':text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-family:\'JetBrains Mono\',monospace;font-size:11px">$1</code>')}
+    </div>
+  </div>`;
+}
+
+async function aiSend(){
+  const inp=$('AIC_INP');const msgs=$('AIC_MSGS');const btn=$('AIC_SEND');
+  if(!inp||!msgs)return;
+  const text=(inp.value||'').trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+
+  // Append user message
+  msgs.innerHTML+=aiMsg('user',esc(text));
+  const loadId='AIL_'+Date.now();
+  msgs.innerHTML+=`<div id="${loadId}">${aiMsg('assistant','',true)}</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  if(btn){btn.disabled=true;btn.textContent='…';}
+
+  // Build context snapshot
+  const counts=S.allCounts||S.counts||[];
+  const today_s=today();
+  const todayCounts=counts.filter(c=>c.date===today_s);
+  const cMap={};todayCounts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
+  const variances=S.items.filter(i=>cMap[i.partNo]!==undefined&&cMap[i.partNo]!==parseFloat(i.systemQty)).map(i=>({partNo:i.partNo,desc:i.desc,bin:i.bin,dms:i.systemQty,counted:cMap[i.partNo],variance:cMap[i.partNo]-parseFloat(i.systemQty),mrp:i.mrp})).sort((a,b)=>Math.abs(b.variance*b.mrp)-Math.abs(a.variance*a.mrp)).slice(0,30);
+  const binProgress=S.bins.map(b=>{const total=S.items.filter(i=>i.bin===b.bin).length;const done=todayCounts.filter(c=>c.bin===b.bin).length;return{bin:b.bin,total,done,pct:total?Math.round(done/total*100):0};});
+  const uniqueCounted=new Set(todayCounts.map(c=>c.partNo)).size;
+  const pct=S.items.length?Math.round(uniqueCounted/S.items.length*100):0;
+
+  const systemCtx=`You are the AI assistant embedded inside India Motors Inventory Audit System (Hero MotoCorp dealership, Alwar, Rajasthan). You have real-time access to the following data snapshot:
+
+CURRENT USER: ${S.user?.name||'Unknown'} (${S.user?.role||'unknown'})
+TODAY: ${today_s}
+ACTIVE SESSION: ${S.auditS?.sessionName||'None'}
+
+INVENTORY SUMMARY:
+- Total SKUs: ${S.items.length}
+- Total Bins: ${S.bins.length}
+- Parts counted today: ${uniqueCounted} (${pct}%)
+- Today's scan entries: ${todayCounts.length}
+
+TOP VARIANCES (by financial impact):
+${JSON.stringify(variances.slice(0,15),null,1)}
+
+BIN PROGRESS:
+${JSON.stringify(binProgress.slice(0,20),null,1)}
+
+UNCOUNTED PARTS COUNT: ${S.items.length-uniqueCounted}
+HIGH VALUE SHORT PARTS: ${variances.filter(v=>v.variance<0&&parseFloat(v.mrp||0)>500).length}
+
+Respond in simple, clear language. Use bullet points for lists. Be specific with numbers. Keep responses concise (under 200 words unless asked for detail). If data isn't available, say so honestly.`;
+
+  AI_HISTORY.push({role:'user',content:text});
+  // Build full prompt: system context + last 12 turns + new user message
+  const histBlock=AI_HISTORY.slice(-13,-1).map(m=>(m.role==='user'?'User':'Assistant')+': '+m.content).join('\n');
+  const fullPrompt=systemCtx+'\n\n---\nConversation history:\n'+histBlock+'\n\nUser: '+text+'\n\nAssistant:';
+  try{
+    const reply=await callGemini(fullPrompt,{lang:AI_LANG||'en',maxTokens:1000});
+    AI_HISTORY.push({role:'assistant',content:reply});
+    const el=$(loadId);if(el)el.outerHTML=aiMsg('assistant',reply);
+  }catch(e){
+    const el=$(loadId);if(el)el.outerHTML=aiMsg('assistant','❌ '+esc(e.message)+' — Check Apps Script / internet.');
+    AI_HISTORY.pop();
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+  if(btn){btn.disabled=false;btn.textContent='Send ↑';}
+  inp.focus();
+}
+
+// Also add a spin keyframe if not already present
+// (needed for RCA loading spinner)
 
 // Hook logTrail into key existing functions (patch at boot)
 const _origSaveCount=window.saveCount;
@@ -5201,7 +7972,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('hashchange',()=>{
     if(!S.user)return;
     const hash=location.hash.replace('#','');
-    const validPages=['dashboard','scan','manual','bins','scanlog','variance','daywise','fullsummary','uncounted','foc','movingparts','orderplan','qrgen','audittrail','invanalysis','itemmaster','dms','settings'];
+    const validPages=['dashboard','scan','manual','bins','scanlog','variance','daywise','fullsummary','uncounted','foc','movingparts','billtype','orderplan','qrgen','binqr','audittrail','invanalysis','itemmaster','dms','settings'];
     if(validPages.includes(hash))go(hash,true);
   });
 
