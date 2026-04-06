@@ -827,7 +827,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
     </div>
     <span class="tb-s" id="TBS">March 2026 Audit</span>
     <div class="tb-r">
-      <button class="tb-srch" onclick="openGS()" title="Search Inventory (Ctrl+K)">🔍</button>
+      <button class="tb-srch" onclick="openGS()" title="Search Inventory (Ctrl+K)">🔍</button><button onclick="openQuickCount()" title="Quick Count" style="background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px">⚡ Quick</button>
       <div class="sp"><div class="sd" id="SDI"></div><span id="STX">Online</span></div>
       <div class="av" id="TAV">N</div>
     </div>
@@ -1117,6 +1117,14 @@ function syncUI(){
 }
 
 // Offline queue helpers (kept for offline fallback)
+function normalizeRole(r){
+  if(!r)return'executive';
+  const v=(r+'').toLowerCase().replace(/[\s_\-]/g,'');
+  if(v==='masterauditor'||v==='admin')return'master_auditor';
+  if(v==='dealerowner'||v==='owner'||v==='proprietor'||v==='dealer')return'dealer_owner';
+  return'executive';
+}
+
 function enQ(d){const q=JSON.parse(localStorage.getItem(QK)||'[]');q.push({id:uid(),d,ts:Date.now()});localStorage.setItem(QK,JSON.stringify(q));syncUI();}
 async function flushQ(){
   // Flush both offline queue and optimistic queue on reconnect
@@ -1163,7 +1171,7 @@ async function doLogin(){
   setErr('Connecting to server…','inf');
   const r=await callAPI({action:'login',username:u,password:p});
   if(r.success&&r.user){
-    const s={...r.user,_lt:Date.now()};
+    const s={...r.user,role:normalizeRole(r.user.role),_lt:Date.now()};
     localStorage.setItem(SK,JSON.stringify(s));
     S.user=s;
     bootApp();
@@ -1274,11 +1282,11 @@ function buildNav(){
               {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Bill Type Analysis',i:'🧾',p:'billtype'},{l:'Order Planning',i:'🛒',p:'orderplan'},{l:'Inventory Analysis',i:'🏭',p:'invanalysis'},
               {sec:'Owner Reports'},{l:'Owner Dashboard',i:'👑',p:'ownerdash'},{l:'Financial Overview',i:'💰',p:'ownerfinance'},{l:'Inventory Health',i:'🏥',p:'ownerhealth'},{l:'Variance Summary',i:'📊',p:'ownervariance'},{l:'Full Stock Report',i:'📄',p:'ownerstockreport'},{l:'Top Parts Analysis',i:'🔥',p:'ownertopparts'},{l:'Movement Trends',i:'📈',p:'ownertrends'},{l:'Dead Stock Alert',i:'💀',p:'ownerdeadstock'},{l:'Team Performance',i:'👥',p:'ownerteam'},{l:'ABC Analysis',i:'🔠',p:'ownerabc'},{l:'FMS Report',i:'⚡',p:'ownerfms'},
               {sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},{l:'Bin QR Printer',i:'📍',p:'binqr'},{l:'Audit Trail',i:'🔍',p:'audittrail'},
-              {l:'Cycle Count Plan',i:'📅',p:'cycleplan'},{l:'Root Cause Analysis',i:'🔬',p:'rootcause'},{l:'Photo Capture',i:'📸',p:'photocap'},
+              {l:'Cycle Count Plan',i:'📅',p:'cycleplan'},{l:'Root Cause Analysis',i:'🔬',p:'rootcause'},{l:'Variance Heatmap',i:'🔥',p:'heatmap'},{l:'Photo Capture',i:'📸',p:'photocap'},
               {l:'AI Assistant',i:'🤖',p:'aichat'},
               {l:'Pending Approvals',i:'⏳',p:'ownerapprovals'},
               {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
-            :[{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'AI Assistant',i:'🤖',p:'aichat'}])
+            :[{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'AI Assistant',i:'🤖',p:'aichat'},{l:'My Target',i:'🎯',p:'dailytarget'},{l:'Shift Summary',i:'📋',p:'shiftsummary'}])
     ];
   }
   nav.innerHTML=ls.map(l=>l.sec?`<div class="ns">${l.sec}</div>`
@@ -1313,7 +1321,7 @@ function go(p, fromPopState){
     ownervariance:rOwnerVariance,ownerstockreport:rOwnerStockReport,ownertopparts:rOwnerTopParts,
     ownertrends:rOwnerTrends,ownerdeadstock:rOwnerDeadStock,ownerteam:rOwnerTeam,
     ownerabc:rOwnerABC,ownerfms:rOwnerFMS,ownertrail:rOwnerTrail,ownerapprovals:rOwnerApprovals,
-    cycleplan:rCyclePlan,rootcause:rRootCause,photocap:rPhotoCapture,aichat:rAIChat
+    cycleplan:rCyclePlan,rootcause:rRootCause,photocap:rPhotoCapture,aichat:rAIChat,heatmap:rHeatmap,dailytarget:rDailyTarget,shiftsummary:rShiftSummary
   }[p]||rNF)();
 }
 function rNF(){$('PG').innerHTML='<div class="emp"><div class="emp-i">🚧</div><div class="emp-t">Coming Soon</div></div>';}
@@ -7220,7 +7228,7 @@ async function ccExport(){
 // ═══════════════════════════════════════════════════════════
 // ROOT CAUSE ANALYSIS — AI-powered variance investigation
 // ═══════════════════════════════════════════════════════════
-const ANTHROPIC_API='https://api.anthropic.com/v1/messages';
+// ── 100% Built-in Intelligence Engine — zero external AI ──
 
 async function rRootCause(){
   const pg=$('PG');
@@ -7245,7 +7253,7 @@ async function rRootCause(){
       <div class="pt">🔬 Root Cause Analysis</div>
       <div class="ps">${varParts.length} variance parts · AI-powered investigation</div>
     </div>
-    <button class="btn bpr bsm" onclick="runRCA()" id="RCA_BTN">🤖 Run AI Analysis</button>
+    <button class="btn bpr bsm" onclick="runRCA()" id="RCA_BTN">🔬 Run Analysis</button>
   </div>
 
   <!-- Summary -->
@@ -7310,44 +7318,9 @@ async function runRCA(){
   </div></div>`;}
 
   const top=varParts.slice(0,20);
-  const prompt=`You are a senior inventory consultant for India Motors, an automobile spare parts dealership (Hero MotoCorp authorized) in Alwar, Rajasthan.
-
-Analyse the following variance data and identify root causes. Be concise, practical, and use simple business language.
-
-VARIANCE DATA (top ${top.length} by financial impact):
-${JSON.stringify(top.map(p=>({partNo:p.partNo,desc:p.desc,bin:p.bin,dmsQty:p.dms,physicalCount:p.counted,variance:p.variance,valueAtRisk:'₹'+Math.round(p.value),type:p.type})),null,1)}
-
-Generate a JSON array of root cause findings. Each object must have:
-- type: "danger" | "warning" | "info"
-- title: short heading (max 8 words)
-- rootCause: the most likely reason for this variance
-- affectedParts: array of part numbers (max 5)  
-- financialImpact: rupee amount as string
-- action: specific actionable step (1-2 sentences)
-
-Rules:
-- Return ONLY valid JSON array, no markdown
-- Group related parts into one finding where possible
-- Look for patterns: same bin, same category, same type, same variance direction
-- Be specific to Hero MotoCorp dealership context (returns, warranty, GRN, DMS, billing)
-- Maximum 8 findings`;
-
+  // ── Built-in RCA — instant, no external API ──────────────
   try{
-    const res=await fetch(ANTHROPIC_API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data=await res.json();
-    const raw=data.content?.find(b=>b.type==='text')?.text||'[]';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    let findings;
-    try{findings=JSON.parse(clean);}
-    catch{findings=[{type:'warning',title:'Analysis Complete',rootCause:'Could not parse AI response — check API connection.',affectedParts:[],financialImpact:'—',action:'Check browser console for errors.'}];}
+    let findings=imBuiltinRCA(top);
 
     const sevColor={danger:'#dc2626',warning:'#d97706',info:'#2563eb'};
     const sevBg={danger:'#fef2f2',warning:'#fffbeb',info:'#eff6ff'};
@@ -7355,7 +7328,7 @@ Rules:
 
     if(out){out.innerHTML=`
     <div class="cd" style="margin-bottom:16px">
-      <div class="cdh" style="background:#f8fafc"><div class="cdt">🤖 AI Root Cause Findings (${findings.length})</div><div style="font-size:10px;color:#94a3b8">Powered by Claude AI</div></div>
+      <div class="cdh" style="background:#f8fafc"><div class="cdt">🤖 AI Root Cause Findings (${findings.length})</div><div style="font-size:10px;color:#64748b">Built-in Analysis Engine · Instant Results</div></div>
       <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px">
         ${findings.map(f=>`
         <div style="border-radius:var(--rs);border:1.5px solid ${sevColor[f.type]||'#e2e8f0'}20;background:${sevBg[f.type]||'#f8fafc'};overflow:hidden">
@@ -7654,51 +7627,59 @@ async function rAIChat(){
   pg.innerHTML=`
   <div class="ph" style="margin-bottom:12px">
     <div>
-      <div class="pt">🤖 AI Assistant</div>
-      <div class="ps">Ask anything about your inventory, audit progress, variance — powered by Claude AI</div>
+      <div class="pt">🧠 Inventory Intelligence</div>
+      <div class="ps">Built-in engine · ${S.items.length} parts · ${S.bins.length} bins · No internet needed</div>
     </div>
-    <button class="btn bgh bsm" onclick="AI_HISTORY=[];$('AIC_MSGS').innerHTML=renderAIWelcome();">🗑 Clear</button>
+    <button class="btn bgh bsm" onclick="$('AIC_MSGS').innerHTML=renderAIWelcome();">🗑 Clear</button>
   </div>
 
-  <!-- Quick prompts -->
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="AIC_CHIPS">
-    ${[
-      'What is today\'s audit progress?',
-      'Which parts have the most variance?',
-      'Show me dead stock summary',
-      'Who is performing best today?',
-      'Which bins are not started?',
-      'What should I reorder urgently?',
-      'Summarise financial impact of variances',
-      'Which high-value parts are short?'
-    ].map(q=>`<button onclick="aiChip(this)" style="padding:6px 12px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;transition:.15s;white-space:nowrap" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">${esc(q)}</button>`).join('')}
+  <!-- Full summary on-demand -->
+  <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:14px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="flex:1;min-width:160px">
+      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:2px">📊 Full Inventory Summary</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.5)">Click to get a complete business report — financial impact, risks, actions, team</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0">
+      <button onclick="document.getElementById('AIC_INP').value='summary';aiSend()" style="padding:8px 14px;border:none;border-radius:9px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 English Report</button>
+    </div>
+  </div>
+
+  <!-- Quick chips -->
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">
+    ${['progress','short parts','excess','dead stock','reorder','financial','bins','team','high value','summary'].map(q=>
+      `<button onclick="document.getElementById('AIC_INP').value='${q}';aiSend()" style="padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;white-space:nowrap;transition:.15s">${q}</button>`
+    ).join('')}
   </div>
 
   <!-- Chat window -->
-  <div class="cd" style="display:flex;flex-direction:column;height:calc(100vh - 320px);min-height:400px">
-    <div id="AIC_MSGS" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
+  <div class="cd" style="display:flex;flex-direction:column;height:calc(100vh - 390px);min-height:360px">
+    <div id="AIC_MSGS" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px">
       ${renderAIWelcome()}
     </div>
-    <!-- Input -->
-    <div style="border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;align-items:flex-end">
-      <textarea id="AIC_INP" rows="1" placeholder="Ask about inventory, audits, stock levels, variances…"
-        style="flex:1;padding:10px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;outline:none;resize:none;font-family:'Inter',sans-serif;max-height:100px;overflow-y:auto;transition:.2s"
+    <div style="border-top:1px solid var(--bd);padding:10px 14px;display:flex;gap:8px;align-items:flex-end">
+      <textarea id="AIC_INP" rows="1" placeholder="Type query or part number… (e.g. 'short parts', 'progress', '06M11MX0021')"
+        style="flex:1;padding:9px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;outline:none;resize:none;font-family:'Inter',sans-serif;max-height:100px;overflow-y:auto;transition:.2s"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend();}"
-        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';this.style.borderColor='#2563eb'"
-        onfocus="this.style.borderColor='#2563eb';this.style.boxShadow='0 0 0 3px rgba(37,99,235,.15)'"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+        onfocus="this.style.borderColor='#2563eb';this.style.boxShadow='0 0 0 3px rgba(37,99,235,.1)'"
         onblur="this.style.borderColor='var(--bd)';this.style.boxShadow='none'"></textarea>
-      <button class="btn bpr" id="AIC_SEND" onclick="aiSend()" style="padding:10px 18px;border-radius:10px;height:44px">Send ↑</button>
+      <button class="btn bpr" id="AIC_SEND" onclick="aiSend()" style="padding:10px 16px;border-radius:10px;height:42px;flex-shrink:0">↑</button>
     </div>
   </div>`;
 }
 
 function renderAIWelcome(){
-  const isMaster=S.user?.role==='master_auditor'||S.user?.role==='dealer_owner';
-  return`<div style="text-align:center;padding:24px 16px">
-    <div style="font-size:40px;margin-bottom:10px">🤖</div>
-    <div style="font-weight:800;font-size:15px;color:#0f172a;margin-bottom:6px">India Motors AI Assistant</div>
-    <div style="font-size:12px;color:#64748b;max-width:320px;margin:0 auto;line-height:1.6">
-      I have full access to your inventory data — ${S.items.length} parts, ${S.bins.length} bins, audit counts, variances and more. Ask me anything!
+  return`<div style="text-align:center;padding:20px 16px">
+    <div style="width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#0f172a,#1e3a5f);display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:12px;box-shadow:0 8px 24px rgba(15,23,42,.25)">🧠</div>
+    <div style="font-weight:800;font-size:15px;color:#0f172a;margin-bottom:4px">India Motors Intelligence Engine</div>
+    <div style="font-size:11px;color:#64748b;max-width:300px;margin:0 auto;line-height:1.7">
+      <strong>${S.items.length}</strong> parts · <strong>${S.bins.length}</strong> bins · Live audit data<br>
+      100% built-in · No internet · No external AI · Instant answers
+    </div>
+    <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center">
+      ${['progress','financial','short parts','dead stock','team'].map(q=>
+        `<button onclick="document.getElementById('AIC_INP').value='${q}';aiSend()" style="padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569">${q}</button>`
+      ).join('')}
     </div>
   </div>`;
 }
@@ -7721,76 +7702,311 @@ function aiMsg(role,text,isLoading){
   </div>`;
 }
 
-async function aiSend(){
+// ══════════════════════════════════════════════════════════
+// BUILT-IN INTELLIGENCE ENGINE — 100% local, zero external AI
+// Analyses live S.items, counts, sales in real-time
+// ══════════════════════════════════════════════════════════
+
+function imSnap(){
+  const counts=S.allCounts||S.counts||[];
+  const today_s=today();
+  const todayCounts=counts.filter(c=>c.date===today_s);
+  // Mode-based final count per part
+  const puMap={};
+  counts.forEach(c=>{
+    if(!puMap[c.partNo])puMap[c.partNo]={};
+    const ex=puMap[c.partNo][c.auditor];
+    if(!ex||c.time>ex.time) puMap[c.partNo][c.auditor]=c;
+  });
+  const cMap={};
+  Object.entries(puMap).forEach(([pn,byU])=>{
+    const vals=Object.values(byU).map(e=>parseInt(e.qty)||0);
+    const freq={};vals.forEach(v=>{freq[v]=(freq[v]||0)+1;});
+    let mode=vals[0],maxF=0;
+    Object.entries(freq).forEach(([v,f])=>{if(parseInt(f)>maxF){maxF=parseInt(f);mode=parseInt(v);}});
+    cMap[pn]=mode;
+  });
+
+  let totalStockVal=0,shortVal=0,excessVal=0,deadVal=0;
+  let shortCount=0,excessCount=0,matchCount=0,deadCount=0;
+  const shortParts=[],excessParts=[],deadParts=[],fastLow=[],binMap={};
+
+  S.items.forEach(item=>{
+    const pn=item.partNo;
+    const sysQty=parseFloat(item.systemQty)||0;
+    const dlc=parseFloat(item.dlc)||0;
+    const mrp=parseFloat(item.mrp)||0;
+    const stockVal=sysQty*dlc;
+    totalStockVal+=stockVal;
+    const sm=(typeof S_SALES_MAP!=='undefined'&&S_SALES_MAP[pn])?Object.values(S_SALES_MAP[pn]):[];
+    const totalSales=sm.reduce((a,b)=>a+b,0);
+    const avgM=sm.length?totalSales/sm.length:0;
+    const cvDays=avgM>0?Math.round(sysQty/(avgM/30)):null;
+    if(totalSales===0&&sysQty>0){deadCount++;deadVal+=stockVal;deadParts.push({pn,desc:item.desc||'',bin:item.bin||'',sysQty,dlc,mrp,stockVal});}
+    if(avgM>0&&cvDays!==null&&cvDays<30)fastLow.push({pn,desc:item.desc||'',bin:item.bin||'',sysQty,avgM,cvDays,dlc,mrp});
+    const physQty=cMap[pn]!==undefined?cMap[pn]:null;
+    const variance=physQty!==null?physQty-sysQty:null;
+    if(variance!==null){
+      if(variance<0){shortCount++;shortVal+=Math.abs(variance)*dlc;shortParts.push({pn,desc:item.desc||'',bin:item.bin||'',sysQty,physQty,variance,dlc,mrp,loss:Math.round(Math.abs(variance)*dlc)});}
+      else if(variance>0){excessCount++;excessVal+=variance*dlc;excessParts.push({pn,desc:item.desc||'',bin:item.bin||'',sysQty,physQty,variance,dlc,mrp,exVal:Math.round(variance*dlc)});}
+      else matchCount++;
+    }
+    if(item.bin){
+      if(!binMap[item.bin])binMap[item.bin]={total:0,counted:0,short:0,excess:0};
+      binMap[item.bin].total++;
+      if(physQty!==null)binMap[item.bin].counted++;
+      if(variance!==null&&variance<0)binMap[item.bin].short++;
+      if(variance!==null&&variance>0)binMap[item.bin].excess++;
+    }
+  });
+  const uCounted=new Set(todayCounts.map(c=>c.partNo)).size;
+  const pct=S.items.length?Math.round(uCounted/S.items.length*100):0;
+  const mPct=uCounted?Math.round(matchCount/uCounted*100):0;
+  const up=typeof getUserPerf==='function'?getUserPerf():{};
+  const users=Object.entries(up).map(([u,d])=>({u,total:d.totalCounts||0,errors:d.errorCounts||0,acc:d.totalCounts?Math.round(((d.totalCounts-(d.errorCounts||0))/d.totalCounts)*100):100})).sort((a,b)=>b.total-a.total);
+  const teamAvgAcc=users.length?Math.round(users.reduce((s,u)=>s+u.acc,0)/users.length):0;
+  const activeToday=[...new Set(todayCounts.map(c=>c.auditorName||c.auditor))];
+  return{
+    today_s,totalStockVal,shortVal,excessVal,deadVal,
+    shortCount,excessCount,matchCount,deadCount,
+    shortParts:shortParts.sort((a,b)=>b.loss-a.loss),
+    excessParts:excessParts.sort((a,b)=>b.exVal-a.exVal),
+    deadParts:deadParts.sort((a,b)=>b.stockVal-a.stockVal),
+    fastLow:fastLow.sort((a,b)=>a.cvDays-b.cvDays),
+    binMap,uCounted,pct,mPct,users,teamAvgAcc,activeToday,
+    totalItems:S.items.length
+  };
+}
+
+function imReply(q,snap){
+  const r=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+  const n=n=>(parseFloat(n)||0).toLocaleString('en-IN');
+  const ql=q.toLowerCase();
+
+  // ── STAT ROW BUILDER ─────────────────────
+  const SR=items=>`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:8px 0">
+    ${items.map(s=>`<div style="background:${s.bg||'#f8fafc'};border:1px solid ${s.bd||'#e2e8f0'};border-radius:10px;padding:11px;text-align:center">
+      <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${s.c||'#0f172a'}">${s.val}</div>
+      <div style="font-size:10px;font-weight:700;color:${s.lc||'#64748b'};margin-top:3px;text-transform:uppercase;letter-spacing:.4px">${s.lbl}</div>
+    </div>`).join('')}
+  </div>`;
+
+  // ── TABLE BUILDER ──────────────────────
+  const TB=(hds,rows,max=12)=>{
+    if(!rows.length)return`<div style="color:#94a3b8;font-size:12px;padding:6px 0">No data found.</div>`;
+    return`<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:11px;min-width:400px">
+      <thead><tr>${hds.map(h=>`<th style="background:#f8fafc;padding:6px 10px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700;color:#475569;white-space:nowrap">${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.slice(0,max).map((row,i)=>`<tr style="border-bottom:1px solid #f1f5f9;background:${i%2?'#fafbfc':'#fff'}">${row.map(c=>`<td style="padding:6px 10px">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      ${rows.length>max?`<tfoot><tr><td colspan="${hds.length}" style="padding:5px 10px;font-size:10px;color:#94a3b8;text-align:center">+${rows.length-max} more rows</td></tr></tfoot>`:''}
+    </table></div>`;
+  };
+
+  const PN=p=>`<span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${p}</span>`;
+  const BIN=b=>`<span style="background:#eff6ff;color:#2563eb;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700">${b||'—'}</span>`;
+
+  // ── 1. AUDIT PROGRESS ─────────────────
+  if(/progress|audit.*status|kitna|hua|complete|count|counted|aaj ka|today|kya ban/i.test(ql)){
+    const rem=snap.totalItems-snap.uCounted;
+    const statusMsg=snap.pct>=80?'🟢 Audit is on track — excellent progress!':snap.pct>=50?'🟡 Good progress, keep going.':'🔴 Audit is behind schedule. Push the team!';
+    return SR([
+      {val:snap.pct+'%',lbl:'Audit Complete',c:'#2563eb',bg:'#eff6ff',bd:'#bfdbfe',lc:'#1e40af'},
+      {val:n(snap.uCounted),lbl:'Parts Counted',c:'#059669',bg:'#ecfdf5',bd:'#a7f3d0',lc:'#065f46'},
+      {val:n(rem),lbl:'Remaining',c:'#d97706',bg:'#fffbeb',bd:'#fde68a',lc:'#92400e'},
+      {val:snap.mPct+'%',lbl:'Accuracy',c:'#7c3aed',bg:'#f5f3ff',bd:'#c4b5fd',lc:'#5b21b6'}
+    ])+`<div style="margin-top:8px;font-size:12px;color:#475569;line-height:1.7">
+      ${statusMsg}<br>
+      <strong>${snap.activeToday.length}</strong> staff active today · <strong>${snap.matchCount}</strong> matched · <strong>${snap.shortCount}</strong> short · <strong>${snap.excessCount}</strong> excess
+    </div>`;
+  }
+
+  // ── 2. FINANCIAL IMPACT ───────────────
+  if(/financial|money|rupee|loss|value|paisa|nuks|impact|kitna.*nuksaan/i.test(ql)){
+    const net=snap.shortVal+snap.excessVal+snap.deadVal;
+    return SR([
+      {val:r(snap.totalStockVal),lbl:'Total Stock Value',c:'#c8922a',bg:'#fffbeb',bd:'#f0e0a0',lc:'#92400e'},
+      {val:r(snap.shortVal),lbl:'Shortage Loss',c:'#dc2626',bg:'#fef2f2',bd:'#fecaca',lc:'#991b1b'},
+      {val:r(snap.excessVal),lbl:'Excess Blocked',c:'#d97706',bg:'#fffbeb',bd:'#fde68a',lc:'#92400e'},
+      {val:r(snap.deadVal),lbl:'Dead Stock',c:'#7c3aed',bg:'#f5f3ff',bd:'#c4b5fd',lc:'#5b21b6'}
+    ])+`<div style="font-size:12px;color:#475569;margin-top:8px;line-height:1.7">
+      Total financial exposure: <strong>${r(net)}</strong><br>
+      ${snap.shortVal>50000?'🚨 Shortage value is HIGH — immediate investigation needed.':snap.shortVal>10000?'⚠️ Moderate shortage — verify high-value parts.':'✅ Shortage value is manageable.'}
+    </div>`;
+  }
+
+  // ── 3. SHORT PARTS ────────────────────
+  if(/short|kam|missing|shortage|kaunse.*short|short.*list|variance.*short/i.test(ql)){
+    return `<div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:8px">🔻 ${snap.shortCount} parts short — Total loss: ${r(snap.shortVal)}</div>`
+    +TB(['Part No','Description','Bin','DMS','Physical','Short','Loss ₹'],
+      snap.shortParts.slice(0,15).map(p=>[PN(p.pn),`<span style="font-size:10px">${(p.desc||'—').slice(0,20)}</span>`,BIN(p.bin),
+        `<b>${p.sysQty}</b>`,`<span style="color:#059669;font-weight:700">${p.physQty}</span>`,
+        `<span style="color:#dc2626;font-weight:800">${p.variance}</span>`,
+        `<span style="color:#dc2626;font-weight:700">${r(p.loss)}</span>`]));
+  }
+
+  // ── 4. EXCESS PARTS ───────────────────
+  if(/excess|zyada|extra|surplus|excess.*list/i.test(ql)){
+    return `<div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:8px">🔺 ${snap.excessCount} parts excess — Value: ${r(snap.excessVal)}</div>`
+    +TB(['Part No','Description','Bin','DMS','Physical','Excess','Value ₹'],
+      snap.excessParts.slice(0,15).map(p=>[PN(p.pn),`<span style="font-size:10px">${(p.desc||'—').slice(0,20)}</span>`,BIN(p.bin),
+        `<b>${p.sysQty}</b>`,`<span style="color:#059669;font-weight:700">${p.physQty}</span>`,
+        `<span style="color:#d97706;font-weight:800">+${p.variance}</span>`,
+        `<span style="color:#d97706;font-weight:700">${r(p.exVal)}</span>`]));
+  }
+
+  // ── 5. DEAD STOCK ─────────────────────
+  if(/dead|bandh|zero.*sale|no.*movement|deadstock|dead.*stock/i.test(ql)){
+    return `<div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:8px">💀 ${snap.deadCount} dead stock parts — ${r(snap.deadVal)} capital locked</div>`
+    +TB(['Part No','Description','Bin','Qty','Value Locked'],
+      snap.deadParts.slice(0,15).map(p=>[PN(p.pn),`<span style="font-size:10px">${(p.desc||'—').slice(0,22)}</span>`,BIN(p.bin),
+        `<b>${n(p.sysQty)}</b>`,`<span style="color:#7c3aed;font-weight:700">${r(p.stockVal)}</span>`]))
+    +`<div style="font-size:11px;color:#64748b;margin-top:8px;padding:8px 12px;background:#f5f3ff;border-radius:8px">💡 Recommend: supplier return, promotion campaign, or write-off review for items older than 12 months.</div>`;
+  }
+
+  // ── 6. REORDER / FAST MOVING ─────────
+  if(/reorder|order karna|order.*chahiye|fast.*moving|cover|khatam|urgent.*order/i.test(ql)){
+    return `<div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:8px">⚡ ${snap.fastLow.length} parts need reorder (< 30 days stock cover)</div>`
+    +TB(['Part No','Description','Bin','Stock','Avg/Month','Cover','Reorder Qty'],
+      snap.fastLow.slice(0,15).map(p=>{
+        const rq=Math.ceil(p.avgM*2);
+        const uc=p.cvDays<7?'#dc2626':p.cvDays<15?'#d97706':'#059669';
+        return[PN(p.pn),`<span style="font-size:10px">${(p.desc||'—').slice(0,18)}</span>`,BIN(p.bin),
+          `<b>${n(p.sysQty)}</b>`,`<span style="color:#059669;font-weight:700">${p.avgM.toFixed(1)}</span>`,
+          `<span style="color:${uc};font-weight:800">${p.cvDays}d</span>`,
+          `<span style="color:#2563eb;font-weight:800">${rq}</span>`];
+      }));
+  }
+
+  // ── 7. BIN PROGRESS ──────────────────
+  if(/bin|location|rack|jagah|bins.*progress|bin.*count/i.test(ql)){
+    const bins=Object.entries(snap.binMap).map(([b,v])=>({b,pct:v.total?Math.round(v.counted/v.total*100):0,...v})).sort((a,b2)=>a.pct-b2.pct);
+    const notStarted=bins.filter(b=>b.pct===0);
+    const done=bins.filter(b=>b.pct===100);
+    const prob=bins.filter(b=>b.short>0).sort((a,b2)=>b2.short-a.short).slice(0,5);
+    return SR([
+      {val:S.bins.length,lbl:'Total Bins',c:'#0f172a'},
+      {val:done.length,lbl:'Fully Done',c:'#059669',bg:'#ecfdf5',bd:'#a7f3d0',lc:'#065f46'},
+      {val:notStarted.length,lbl:'Not Started',c:'#dc2626',bg:'#fef2f2',bd:'#fecaca',lc:'#991b1b'}
+    ])+(notStarted.length?`<div style="font-size:11px;font-weight:700;color:#dc2626;margin:8px 0 4px">⏳ Bins not started:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">${notStarted.slice(0,14).map(b=>`<span style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">${b.b}</span>`).join('')}${notStarted.length>14?`<span style="font-size:10px;color:#94a3b8">+${notStarted.length-14} more</span>`:''}</div>`:'')
+    +(prob.length?`<div style="font-size:11px;font-weight:700;color:#d97706;margin-bottom:4px">⚠️ Most shortage bins:</div>`+TB(['Bin','Total Parts','Short'],prob.map(b=>[`<b style="color:#2563eb">${b.b}</b>`,n(b.total),`<span style="color:#dc2626;font-weight:700">${b.short}</span>`])):'');
+  }
+
+  // ── 8. TEAM PERFORMANCE ──────────────
+  if(/team|user|staff|kaun.*accha|best|performance|accuracy|error|galti|worker/i.test(ql)){
+    return SR([
+      {val:snap.users.length,lbl:'Team Members',c:'#0f172a'},
+      {val:snap.activeToday.length,lbl:'Active Today',c:'#2563eb',bg:'#eff6ff',bd:'#bfdbfe',lc:'#1e40af'},
+      {val:snap.teamAvgAcc+'%',lbl:'Avg Accuracy',c:'#059669',bg:'#ecfdf5',bd:'#a7f3d0',lc:'#065f46'}
+    ])+TB(['User','Entries','Errors','Accuracy'],
+      snap.users.slice(0,8).map(u=>{
+        const ac=u.acc>=90?'#059669':u.acc>=75?'#d97706':'#dc2626';
+        return[`<b>${u.u}</b>`,`<span style="font-family:'JetBrains Mono',monospace;font-weight:700">${u.total}</span>`,
+          `<span style="color:#dc2626;font-weight:700">${u.errors}</span>`,
+          `<span style="font-weight:800;color:${ac}">${u.acc}%</span>`];
+      }));
+  }
+
+  // ── 9. HIGH VALUE RISK ───────────────
+  if(/high.*value|expensive|costly|mahnga|mehenga|top.*value|risk.*part/i.test(ql)){
+    const hv=snap.shortParts.filter(p=>p.mrp>500);
+    return `<div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:8px">💎 ${hv.length} high-value parts (MRP > ₹500) are short</div>`
+    +TB(['Part No','Description','MRP','Short Units','Loss ₹'],
+      hv.slice(0,12).map(p=>[PN(p.pn),`<span style="font-size:10px">${(p.desc||'—').slice(0,20)}</span>`,
+        `<b>₹${n(p.mrp)}</b>`,`<span style="color:#dc2626;font-weight:800">${p.variance}</span>`,
+        `<span style="color:#dc2626;font-weight:700">${r(p.loss)}</span>`]));
+  }
+
+  // ── 10. PART LOOKUP ──────────────────
+  const pu=S.items.find(i=>(i.partNo||'').toUpperCase().includes(q.toUpperCase().replace(/[^A-Z0-9]/gi,'')))||(q.length>3?S.items.find(i=>(i.desc||'').toLowerCase().includes(ql)):null);
+  if(pu){
+    const counts2=S.allCounts||S.counts||[];
+    const partCounts=counts2.filter(c=>c.partNo===pu.partNo&&c.date===today());
+    const counted=partCounts.length?Math.max(...partCounts.map(c=>parseInt(c.qty)||0)):null;
+    const variance=counted!==null?counted-(parseFloat(pu.systemQty)||0):null;
+    const dlc=parseFloat(pu.dlc)||0;
+    return SR([
+      {val:n(parseFloat(pu.systemQty)||0),lbl:'DMS Stock',c:'#2563eb',bg:'#eff6ff',bd:'#bfdbfe',lc:'#1e40af'},
+      {val:counted!==null?n(counted):'—',lbl:'Physical',c:variance===null?'#94a3b8':variance===0?'#059669':variance<0?'#dc2626':'#d97706',bg:variance===null?'#f8fafc':variance===0?'#ecfdf5':variance<0?'#fef2f2':'#fffbeb',bd:variance===null?'#e2e8f0':variance===0?'#a7f3d0':variance<0?'#fecaca':'#fde68a'},
+      {val:'₹'+n(parseFloat(pu.mrp)||0),lbl:'MRP',c:'#c8922a'}
+    ])+`<div style="font-size:12px;color:#475569;margin-top:4px;line-height:1.8">
+      <strong>${esc(pu.partNo)}</strong> — ${esc(pu.desc||'—')}<br>
+      Bin: <strong>${pu.bin||'—'}</strong> · Category: <strong>${pu.category||'—'}</strong><br>
+      DLC: <strong>₹${n(dlc)}</strong> · Stock Value: <strong>${r((parseFloat(pu.systemQty)||0)*dlc)}</strong><br>
+      ${variance!==null?`Variance: <strong style="color:${variance===0?'#059669':variance<0?'#dc2626':'#d97706'}">${variance===0?'✅ Match':variance<0?`🔻 Short ${Math.abs(variance)}`:`🔺 Excess +${variance}`}</strong>`:'<span style="color:#94a3b8">Not counted today</span>'}
+    </div>`;
+  }
+
+  // ── 11. FULL SUMMARY ─────────────────
+  if(/summary|poora|puri.*report|full.*report|overall|sab.*kuch|bata.*de|kya.*chal|overview/i.test(ql)){
+    return imFullSummary(snap);
+  }
+
+  // ── 12. HELP / DEFAULT ───────────────
+  return `<div style="font-size:13px;color:#475569;line-height:1.8">
+    <strong>🧠 India Motors Intelligence Engine</strong><br>
+    <span style="font-size:11px;color:#94a3b8">Ask me anything about your inventory. Try these:</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
+      ${[['📊 Audit progress','progress'],['💰 Financial impact','financial'],['🔻 Short parts list','short parts'],
+        ['🔺 Excess parts','excess'],['💀 Dead stock','dead stock'],['⚡ Reorder alert','reorder'],
+        ['📍 Bin progress','bins'],['👥 Team accuracy','team'],['💎 High value risk','high value'],
+        ['📋 Full summary','summary']
+      ].map(([lbl,chip])=>`<button onclick="document.getElementById('AIC_INP').value='${chip}';aiSend()" style="padding:6px 10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;text-align:left;font-size:11px;font-weight:600;color:#475569;transition:.15s" onmouseover="this.style.borderColor='#2563eb';this.style.color='#2563eb'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#475569'">${lbl}</button>`).join('')}
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:#94a3b8">💡 Or type any part number to look it up instantly</div>
+  </div>`;
+}
+
+function imFullSummary(snap){
+  const r=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+  const n=n=>(parseFloat(n)||0).toLocaleString('en-IN');
+  return `<div style="font-size:13px;color:#0f172a;line-height:1.9">
+    <div style="font-weight:800;font-size:14px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;margin-bottom:12px">
+      📊 India Motors — Full Inventory Report<br>
+      <span style="font-size:11px;font-weight:500;color:#64748b">${snap.today_s} · Hero MotoCorp Dealer · Alwar, Rajasthan</span>
+    </div>
+    <b>1. Audit Progress</b><br>
+    ${n(snap.uCounted)} of ${n(snap.totalItems)} parts (${snap.pct}%) counted.
+    ${snap.matchCount} matched · ${snap.shortCount} short · ${snap.excessCount} excess.
+    ${snap.pct>=80?'🟢 On track.':snap.pct>=50?'🟡 Keep going.':'🔴 Behind — escalate!'}<br><br>
+    <b>2. Financial Position</b><br>
+    Total stock: <strong style="color:#c8922a">${r(snap.totalStockVal)}</strong> ·
+    Shortage loss: <strong style="color:#dc2626">${r(snap.shortVal)}</strong> ·
+    Excess: <strong style="color:#d97706">${r(snap.excessVal)}</strong> ·
+    Dead stock: <strong style="color:#7c3aed">${r(snap.deadVal)}</strong><br><br>
+    <b>3. Key Risks</b><br>
+    ${snap.shortParts.length?`🔻 Biggest shortage: <strong>${snap.shortParts[0].pn}</strong> — ${(snap.shortParts[0].desc||'').slice(0,30)} (loss: ${r(snap.shortParts[0].loss)})<br>`:'✅ No major shortages<br>'}
+    ${snap.fastLow.length?`⚡ Critical reorder: <strong>${snap.fastLow[0].pn}</strong> — only ${snap.fastLow[0].cvDays} days cover<br>`:''}
+    ${snap.deadVal>100000?`💀 ${r(snap.deadVal)} locked in dead stock<br>`:''}<br>
+    <b>4. Immediate Actions</b><br>
+    ${snap.shortParts.slice(0,3).map((p,i)=>`${i+1}. Investigate <strong>${p.pn}</strong> — ${Math.abs(p.variance)} units short, ${r(p.loss)} loss<br>`).join('')}
+    ${snap.fastLow.length?`${snap.shortParts.slice(0,3).length+1}. Reorder: ${snap.fastLow.slice(0,3).map(p=>p.pn).join(', ')}<br>`:''}<br>
+    <b>5. Recommendation</b><br>
+    ${snap.shortVal>snap.excessVal
+      ?`Shortage loss (${r(snap.shortVal)}) > excess. Audit DMS billing entries immediately. Focus on high-value parts first.`
+      :`Excess (${r(snap.excessVal)}) is higher. Return excess to supplier or run promotion. Clearing dead stock can free ${r(snap.deadVal)}.`}
+  </div>`;
+}
+
+function aiSend(){
   const inp=$('AIC_INP');const msgs=$('AIC_MSGS');const btn=$('AIC_SEND');
   if(!inp||!msgs)return;
   const text=(inp.value||'').trim();if(!text)return;
   inp.value='';inp.style.height='auto';
-
-  // Append user message
   msgs.innerHTML+=aiMsg('user',esc(text));
-  const loadId='AIL_'+Date.now();
-  msgs.innerHTML+=`<div id="${loadId}">${aiMsg('assistant','',true)}</div>`;
   msgs.scrollTop=msgs.scrollHeight;
   if(btn){btn.disabled=true;btn.textContent='…';}
-
-  // Build context snapshot
-  const counts=S.allCounts||S.counts||[];
-  const today_s=today();
-  const todayCounts=counts.filter(c=>c.date===today_s);
-  const cMap={};todayCounts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
-  const variances=S.items.filter(i=>cMap[i.partNo]!==undefined&&cMap[i.partNo]!==parseFloat(i.systemQty)).map(i=>({partNo:i.partNo,desc:i.desc,bin:i.bin,dms:i.systemQty,counted:cMap[i.partNo],variance:cMap[i.partNo]-parseFloat(i.systemQty),mrp:i.mrp})).sort((a,b)=>Math.abs(b.variance*b.mrp)-Math.abs(a.variance*a.mrp)).slice(0,30);
-  const binProgress=S.bins.map(b=>{const total=S.items.filter(i=>i.bin===b.bin).length;const done=todayCounts.filter(c=>c.bin===b.bin).length;return{bin:b.bin,total,done,pct:total?Math.round(done/total*100):0};});
-  const uniqueCounted=new Set(todayCounts.map(c=>c.partNo)).size;
-  const pct=S.items.length?Math.round(uniqueCounted/S.items.length*100):0;
-
-  const systemCtx=`You are the AI assistant embedded inside India Motors Inventory Audit System (Hero MotoCorp dealership, Alwar, Rajasthan). You have real-time access to the following data snapshot:
-
-CURRENT USER: ${S.user?.name||'Unknown'} (${S.user?.role||'unknown'})
-TODAY: ${today_s}
-ACTIVE SESSION: ${S.auditS?.sessionName||'None'}
-
-INVENTORY SUMMARY:
-- Total SKUs: ${S.items.length}
-- Total Bins: ${S.bins.length}
-- Parts counted today: ${uniqueCounted} (${pct}%)
-- Today's scan entries: ${todayCounts.length}
-
-TOP VARIANCES (by financial impact):
-${JSON.stringify(variances.slice(0,15),null,1)}
-
-BIN PROGRESS:
-${JSON.stringify(binProgress.slice(0,20),null,1)}
-
-UNCOUNTED PARTS COUNT: ${S.items.length-uniqueCounted}
-HIGH VALUE SHORT PARTS: ${variances.filter(v=>v.variance<0&&parseFloat(v.mrp||0)>500).length}
-
-Respond in simple, clear language. Use bullet points for lists. Be specific with numbers. Keep responses concise (under 200 words unless asked for detail). If data isn't available, say so honestly.`;
-
-  AI_HISTORY.push({role:'user',content:text});
-
-  try{
-    const res=await fetch(ANTHROPIC_API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:systemCtx,
-        messages:AI_HISTORY.slice(-12) // keep last 12 turns for context
-      })
-    });
-    const data=await res.json();
-    const reply=data.content?.find(b=>b.type==='text')?.text||'Sorry, I could not get a response. Please try again.';
-    AI_HISTORY.push({role:'assistant',content:reply});
-    const el=$(loadId);if(el)el.outerHTML=aiMsg('assistant',reply);
-  }catch(e){
-    const el=$(loadId);if(el)el.outerHTML=aiMsg('assistant','❌ Error: '+esc(e.message)+' — Check internet connection.');
-    AI_HISTORY.pop();
-  }
-  msgs.scrollTop=msgs.scrollHeight;
-  if(btn){btn.disabled=false;btn.textContent='Send ↑';}
-  inp.focus();
+  setTimeout(()=>{
+    try{
+      const snap=imSnap();
+      const reply=imReply(text,snap);
+      msgs.innerHTML+=aiMsg('assistant',reply);
+    }catch(e){
+      msgs.innerHTML+=aiMsg('assistant','❌ Engine error: '+esc(e.message));
+    }
+    msgs.scrollTop=msgs.scrollHeight;
+    if(btn){btn.disabled=false;btn.textContent='Send ↑';}
+    inp.focus();
+  },60);
 }
 
 // Also add a spin keyframe if not already present
@@ -8227,6 +8443,555 @@ async function rejectRequest(reqId){
   logTrail('DELETE_REJECTED',req.partNo,'',req.qty,'Rejected',`By ${req.decidedBy} — ${note}`);
   toast('❌ Request rejected','w',3000);
   renderApprovalsPage(requests);
+}
+
+
+// ─── Built-in Root Cause Analysis ──────────────────────────
+function imBuiltinRCA(parts){
+  const findings=[];
+  const r=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+  const short=parts.filter(p=>p.variance<0);
+  const excess=parts.filter(p=>p.variance>0);
+
+  // 1. Bin clustering — same bin has ≥2 shortages
+  const binSh={};
+  short.forEach(p=>{if(p.bin){if(!binSh[p.bin])binSh[p.bin]=[];binSh[p.bin].push(p);}});
+  Object.entries(binSh).filter(([,ps])=>ps.length>=2).slice(0,2).forEach(([bin,ps])=>{
+    const loss=ps.reduce((s,p)=>s+p.value,0);
+    findings.push({type:'danger',title:`Bin ${bin} — Multiple Shortages`,
+      rootCause:`${ps.length} parts in bin ${bin} are physically short. Possible: mis-placement, theft, or counting error in this section.`,
+      affectedParts:ps.slice(0,4).map(p=>p.partNo),financialImpact:r(loss),
+      action:`Re-count bin ${bin} immediately. If discrepancy persists, check CCTV and cross-verify with DMS billing.`});
+  });
+
+  // 2. High value shortage
+  const hvShort=short.filter(p=>p.mrp>500).sort((a,b)=>b.value-a.value).slice(0,3);
+  if(hvShort.length){
+    findings.push({type:'danger',title:'High-Value Parts Short',
+      rootCause:`${hvShort.length} expensive parts (MRP>₹500) have physical shortages. Most likely: unbilled issue, theft, or wrong DMS entry.`,
+      affectedParts:hvShort.map(p=>p.partNo),financialImpact:r(hvShort.reduce((s,p)=>s+p.value,0)),
+      action:`Cross-check these parts against last 7 days billing records and job cards. Lock them immediately.`});
+  }
+
+  // 3. Large single variance
+  parts.filter(p=>Math.abs(p.variance)>=10).sort((a,b)=>Math.abs(b.variance)-Math.abs(a.variance)).slice(0,2).forEach(p=>{
+    findings.push({type:p.variance<0?'danger':'warning',title:`Large Variance — ${p.partNo}`,
+      rootCause:`${p.partNo} has variance of ${p.variance} units (DMS: ${p.dms}, Physical: ${p.counted}). Large variances indicate systematic error — DMS issue, batch receipt not recorded, or counting error.`,
+      affectedParts:[p.partNo],financialImpact:r(p.value),
+      action:p.variance<0?`Check past billing/issue entries and pending GRNs for this part.`:`Check if recent stock receipt was entered in DMS. Verify physical count again.`});
+  });
+
+  // 4. Excess clustering — possible DMS not updated
+  const binEx={};
+  excess.forEach(p=>{if(p.bin){if(!binEx[p.bin])binEx[p.bin]=[];binEx[p.bin].push(p);}});
+  Object.entries(binEx).filter(([,ps])=>ps.length>=2).slice(0,1).forEach(([bin,ps])=>{
+    findings.push({type:'warning',title:`Excess Clustered in Bin ${bin}`,
+      rootCause:`Multiple excess parts in bin ${bin}. Parts may be in wrong bin, or DMS not updated after receipt.`,
+      affectedParts:ps.slice(0,4).map(p=>p.partNo),financialImpact:r(ps.reduce((s,p)=>s+p.value,0)),
+      action:`Verify bin labels. Check pending GRN entries in DMS.`});
+  });
+
+  // 5. Small systematic shortages
+  const smSh=short.filter(p=>p.variance>=-2);
+  if(smSh.length>=4){
+    findings.push({type:'warning',title:`Systematic Small Shortages (${smSh.length} parts)`,
+      rootCause:`${smSh.length} parts each short 1-2 units. Pattern suggests: counting errors, parts in service bay, or piecemeal issues not billed.`,
+      affectedParts:smSh.slice(0,4).map(p=>p.partNo),financialImpact:r(smSh.reduce((s,p)=>s+p.value,0)),
+      action:`Re-count these parts physically. Check if any are in service bay or pending billing.`});
+  }
+
+  // 6. Accuracy finding
+  const matchRate=parts.length?Math.round((parts.filter(p=>p.variance===0).length/parts.length)*100):0;
+  findings.push({type:'info',title:`Overall Accuracy: ${matchRate}%`,
+    rootCause:`${matchRate}% of audited parts match DMS exactly. Variances are concentrated in specific bins — ${Object.keys(binSh).slice(0,3).join(', ')||'multiple bins'}.`,
+    affectedParts:[],financialImpact:'—',
+    action:`Focus re-counts on flagged bins. Resolve high-value shortages first. Schedule follow-up count within 24 hours.`});
+
+  // 7. Summary recommendation
+  findings.push({type:'info',title:'Recommended Next Steps',
+    rootCause:`${parts.length} variance items: ${short.length} short, ${excess.length} excess. Total financial exposure: ${r(parts.reduce((s,p)=>s+p.value,0))}.`,
+    affectedParts:[],financialImpact:r(parts.reduce((s,p)=>s+p.value,0)),
+    action:`1) Lock high-value short parts. 2) Re-count problem bins. 3) Cross-check DMS billing last 7 days. 4) Submit report to management.`});
+
+  return findings.slice(0,8);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// FEATURE 1 — VARIANCE HEATMAP (bin-level visual analysis)
+// ═══════════════════════════════════════════════════════════
+async function rHeatmap(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Building heatmap…</div>';
+  const counts=await fetchCounts();
+  const cMap={};
+  counts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
+
+  // Build bin-level stats
+  const binStats={};
+  S.items.forEach(item=>{
+    const b=item.bin||'No Bin';
+    if(!binStats[b])binStats[b]={bin:b,total:0,counted:0,short:0,excess:0,match:0,shortVal:0,excessVal:0,parts:[]};
+    binStats[b].total++;
+    const cnt=cMap[item.partNo];
+    if(cnt!==undefined){
+      binStats[b].counted++;
+      const dms=parseFloat(item.systemQty)||0;
+      const dlc=parseFloat(item.dlc)||0;
+      const diff=cnt-dms;
+      if(diff<0){binStats[b].short++;binStats[b].shortVal+=Math.abs(diff)*dlc;}
+      else if(diff>0){binStats[b].excess++;binStats[b].excessVal+=diff*dlc;}
+      else binStats[b].match++;
+    }
+    binStats[b].parts.push(item.partNo);
+  });
+
+  const bins=Object.values(binStats).sort((a,b)=>b.shortVal+b.excessVal-(a.shortVal+a.excessVal));
+  const maxVal=Math.max(...bins.map(b=>b.shortVal+b.excessVal),1);
+
+  function heatColor(b){
+    const v=b.shortVal+b.excessVal;
+    const pct=v/maxVal;
+    if(pct>0.7)return{bg:'#fef2f2',border:'#dc2626',text:'#dc2626',badge:'#dc2626'};
+    if(pct>0.4)return{bg:'#fffbeb',border:'#d97706',text:'#d97706',badge:'#d97706'};
+    if(pct>0.1)return{bg:'#fffcf0',border:'#f59e0b',text:'#d97706',badge:'#f59e0b'};
+    if(b.counted===0)return{bg:'#f8fafc',border:'#e2e8f0',text:'#94a3b8',badge:'#94a3b8'};
+    if(b.short===0&&b.excess===0&&b.counted>0)return{bg:'#ecfdf5',border:'#059669',text:'#059669',badge:'#059669'};
+    return{bg:'#f0fdf4',border:'#a7f3d0',text:'#059669',badge:'#059669'};
+  }
+
+  const totShort=bins.reduce((s,b)=>s+b.short,0);
+  const totExcess=bins.reduce((s,b)=>s+b.excess,0);
+  const totShortVal=bins.reduce((s,b)=>s+b.shortVal,0);
+  const totNotStarted=bins.filter(b=>b.counted===0).length;
+
+  pg.innerHTML=`
+  <div class="ph"><div><div class="pt">🔥 Variance Heatmap</div><div class="ps">Bin-level variance intensity · Red = high financial risk · Green = clean</div></div>
+    <button class="btn bgh bsm" onclick="rHeatmap()">🔄 Refresh</button>
+  </div>
+
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">
+    <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">${totShort}</div>
+      <div style="font-size:10px;font-weight:700;color:#dc2626;margin-top:3px">Short Across Bins</div>
+      <div style="font-size:10px;color:#94a3b8">₹${Math.round(totShortVal).toLocaleString('en-IN')}</div>
+    </div>
+    <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#d97706">${totExcess}</div>
+      <div style="font-size:10px;font-weight:700;color:#d97706;margin-top:3px">Excess Across Bins</div>
+    </div>
+    <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#94a3b8">${totNotStarted}</div>
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-top:3px">Bins Not Started</div>
+    </div>
+    <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:12px;padding:12px;text-align:center">
+      <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#059669">${bins.filter(b=>b.short===0&&b.excess===0&&b.counted>0).length}</div>
+      <div style="font-size:10px;font-weight:700;color:#059669;margin-top:3px">Clean Bins</div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;font-size:11px;font-weight:600">
+    ${[['#dc2626','🔴 Critical Risk'],['#d97706','🟠 Moderate Risk'],['#f59e0b','🟡 Low Risk'],['#059669','🟢 Clean'],['#94a3b8','⚪ Not Started']].map(([c,l])=>`<span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:${c};display:inline-block"></span><span style="color:#475569">${l}</span></span>`).join('')}
+  </div>
+
+  <!-- Heatmap grid -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+    ${bins.map(b=>{
+      const col=heatColor(b);
+      const pct=b.total?Math.round(b.counted/b.total*100):0;
+      return`<div style="background:${col.bg};border:2px solid ${col.border};border-radius:12px;padding:12px;cursor:pointer;transition:.2s" onclick="hmShowBin('${esc(b.bin)}')">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:#0f172a;margin-bottom:6px">${esc(b.bin)}</div>
+        <div style="height:4px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:8px">
+          <div style="width:${pct}%;height:100%;background:${col.border};border-radius:4px"></div>
+        </div>
+        <div style="font-size:10px;color:#64748b;line-height:1.6">
+          <span>${b.total} parts</span> · <span>${pct}% counted</span><br>
+          ${b.short>0?`<span style="color:#dc2626;font-weight:700">🔻 ${b.short} short</span><br>`:''}
+          ${b.excess>0?`<span style="color:#d97706;font-weight:700">🔺 ${b.excess} excess</span><br>`:''}
+          ${b.short===0&&b.excess===0&&b.counted>0?`<span style="color:#059669;font-weight:700">✅ All clear</span>`:''}
+          ${b.counted===0?`<span style="color:#94a3b8">⏳ Not started</span>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  window._hmBinStats=binStats;
+  window.hmShowBin=function(binName){
+    const b=window._hmBinStats[binName];if(!b)return;
+    const parts=S.items.filter(i=>i.bin===binName).map(i=>{
+      const cnt=cMap[i.partNo];const dms=parseFloat(i.systemQty)||0;
+      const diff=cnt!==undefined?cnt-dms:null;
+      return{pn:i.partNo,desc:i.desc||'',dms,cnt:cnt??null,diff};
+    }).sort((a,b2)=>Math.abs(b2.diff||0)-Math.abs(a.diff||0));
+    modal(`<div class="md mdlg"><div class="mdh"><div class="mdt">📍 ${esc(binName)} — ${b.total} parts</div><button class="mdc" onclick="closeMd()">✕</button></div>
+    <div class="mdb" style="padding:0">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--bd)">
+        ${[['Short',b.short,'#dc2626'],['Excess',b.excess,'#d97706'],['Clean',b.match,'#059669']].map(([l,v,c])=>`<div style="padding:12px;text-align:center;border-right:1px solid var(--bd)">
+          <div style="font-size:20px;font-weight:800;color:${c}">${v}</div><div style="font-size:10px;color:#64748b">${l}</div></div>`).join('')}
+      </div>
+      <div class="tw" style="max-height:400px;overflow-y:auto"><table>
+        <thead><tr><th>Part No</th><th>Description</th><th>DMS</th><th>Counted</th><th>Variance</th></tr></thead>
+        <tbody>${parts.map(p=>`<tr>
+          <td class="tpn">${esc(p.pn)}</td>
+          <td style="font-size:11px">${esc(tr2(p.desc,24))}</td>
+          <td class="tq">${p.dms}</td>
+          <td class="tq" style="color:${p.cnt===null?'#94a3b8':'#059669'}">${p.cnt??'—'}</td>
+          <td class="tq" style="color:${p.diff===null?'#94a3b8':p.diff===0?'#059669':p.diff<0?'#dc2626':'#d97706'};font-weight:800">
+            ${p.diff===null?'—':p.diff===0?'✅':p.diff<0?p.diff:'+'+p.diff}
+          </td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+    <div class="mdf"><button class="btn bgh" onclick="closeMd()">Close</button><button class="btn bpr bsm" onclick="closeMd();go('scan')">📷 Go Scan</button></div></div>`);
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// FEATURE 2 — DAILY TARGET TRACKER (per-user counting goals)
+// ═══════════════════════════════════════════════════════════
+const DT_KEY='imDailyTarget3';
+function getDT(){try{return JSON.parse(localStorage.getItem(DT_KEY)||'{}')}catch{return{};}}
+function saveDT(d){localStorage.setItem(DT_KEY,JSON.stringify(d));}
+
+async function rDailyTarget(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Loading…</div>';
+  const todayCounts=await fetchCounts(today(),S.user.username);
+  const done=new Set(todayCounts.map(c=>c.partNo)).size;
+  const dt=getDT();
+  const myTarget=dt[S.user.username]?.target||0;
+  const pct=myTarget>0?Math.min(100,Math.round(done/myTarget*100)):0;
+  const R=60,C=2*Math.PI*R;
+  const dash=C-(pct/100*C);
+  const col=pct>=100?'#059669':pct>=60?'#2563eb':'#d97706';
+
+  pg.innerHTML=`
+  <div class="ph"><div><div class="pt">🎯 My Daily Target</div><div class="ps">Your personal counting target for ${fmtD(new Date())} · ${esc(S.user.name||S.user.username)}</div></div></div>
+
+  <!-- Progress ring -->
+  <div style="text-align:center;padding:20px 0;margin-bottom:20px">
+    <svg width="160" height="160" viewBox="0 0 160 160" style="transform:rotate(-90deg)">
+      <circle cx="80" cy="80" r="${R}" fill="none" stroke="#f1f5f9" stroke-width="10"/>
+      <circle cx="80" cy="80" r="${R}" fill="none" stroke="${col}" stroke-width="10" stroke-linecap="round"
+        stroke-dasharray="${C}" stroke-dashoffset="${dash}" style="transition:stroke-dashoffset 1s ease"/>
+    </svg>
+    <div style="margin-top:-90px;font-size:32px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${col}">${pct}%</div>
+    <div style="margin-top:70px;font-size:13px;color:#64748b"><strong>${done}</strong> counted ${myTarget>0?`of <strong>${myTarget}</strong> target`:''}</div>
+    ${pct>=100?`<div style="margin-top:8px;padding:8px 20px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:20px;display:inline-block;font-size:12px;font-weight:700;color:#059669">🎉 Target Achieved!</div>`:''}
+  </div>
+
+  <!-- Set Target -->
+  <div class="cd" style="margin-bottom:16px">
+    <div class="cdh"><div class="cdt">⚙️ Set Today's Target</div></div>
+    <div class="cdb">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px">
+          <label class="fll">Parts to count today *</label>
+          <input class="fi" id="DT_INP" type="number" min="1" max="5000" value="${myTarget||''}" placeholder="e.g. 200">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+          ${[50,100,150,200,250,300].map(v=>`<button onclick="$('DT_INP').value=${v}" style="padding:5px 12px;border:1.5px solid #e2e8f0;border-radius:8px;background:#f8fafc;cursor:pointer;font-size:11px;font-weight:700;color:#475569">${v}</button>`).join('')}
+        </div>
+      </div>
+      <button class="btn bpr" style="margin-top:12px" onclick="saveMyTarget()">Save Target</button>
+    </div>
+  </div>
+
+  <!-- Recent scans today -->
+  <div class="cd">
+    <div class="cdh"><div class="cdt">📋 Today's Scans (${todayCounts.length} entries · ${done} parts)</div></div>
+    <div class="tw" style="max-height:360px;overflow-y:auto"><table>
+      <thead><tr><th>Time</th><th>Part No</th><th>Description</th><th>Qty</th><th>Bin</th></tr></thead>
+      <tbody>${todayCounts.length?[...todayCounts].reverse().slice(0,50).map(c=>`<tr>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(c.time||'').slice(0,5)}</td>
+        <td class="tpn">${esc(c.partNo)}</td>
+        <td style="font-size:11px">${esc(tr2(c.desc||'—',24))}</td>
+        <td class="tq">${c.qty}</td>
+        <td>${c.bin?`<span class="bg bgp" style="font-size:9px">${esc(c.bin)}</span>`:'—'}</td>
+      </tr>`).join(''):`<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8">No scans yet today</td></tr>`}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+function saveMyTarget(){
+  const v=parseInt($('DT_INP')?.value)||0;
+  if(!v||v<1){toast('Enter a valid target','w');return;}
+  const dt=getDT();
+  if(!dt[S.user.username])dt[S.user.username]={};
+  dt[S.user.username].target=v;
+  dt[S.user.username].date=today();
+  saveDT(dt);
+  toast(`Target set: ${v} parts for today 🎯`,'s');
+  rDailyTarget();
+}
+
+// ═══════════════════════════════════════════════════════════
+// FEATURE 3 — PART HISTORY VIEWER (tap any part → full history)
+// Shows all audit dates, all users, trend chart
+// ═══════════════════════════════════════════════════════════
+function showPartHistory(partNo){
+  const item=S.items.find(i=>i.partNo===partNo);
+  if(!item&&!partNo)return;
+  const counts=S.allCounts||S.counts||[];
+  const partCounts=counts.filter(c=>c.partNo===partNo).sort((a,b)=>b.date.localeCompare(a.date)||b.time.localeCompare(a.time));
+  // Group by date
+  const byDate={};
+  partCounts.forEach(c=>{
+    if(!byDate[c.date])byDate[c.date]=[];
+    byDate[c.date].push(c);
+  });
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+  const dms=parseFloat(item?.systemQty)||0;
+  const dlc=parseFloat(item?.dlc)||0;
+
+  modal(`<div class="md mdlg"><div class="mdh">
+    <div><div class="mdt">📈 ${esc(partNo)}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${esc(item?.desc||'')} · Bin: ${esc(item?.bin||'—')}</div></div>
+    <button class="mdc" onclick="closeMd()">✕</button>
+  </div>
+  <div class="mdb" style="padding:0">
+    <!-- Stats bar -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--bd)">
+      <div style="padding:12px;text-align:center;border-right:1px solid var(--bd)">
+        <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace">${dms}</div>
+        <div style="font-size:10px;color:#64748b">DMS Stock</div>
+      </div>
+      <div style="padding:12px;text-align:center;border-right:1px solid var(--bd)">
+        <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#c8922a">₹${dlc.toFixed(2)}</div>
+        <div style="font-size:10px;color:#64748b">DLC Rate</div>
+      </div>
+      <div style="padding:12px;text-align:center">
+        <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb">${dates.length}</div>
+        <div style="font-size:10px;color:#64748b">Audit Days</div>
+      </div>
+    </div>
+    <!-- History by date -->
+    <div style="max-height:420px;overflow-y:auto;padding:14px 18px">
+      ${dates.length?dates.map(date=>{
+        const entries=byDate[date];
+        const vals=entries.map(e=>parseInt(e.qty)||0);
+        const mode=vals.reduce((a,b)=>vals.filter(v=>v===b).length>vals.filter(v=>v===a).length?b:a,vals[0]);
+        const diff=mode-dms;
+        const dc=diff===0?'#059669':diff<0?'#dc2626':'#d97706';
+        return`<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #f1f5f9">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+            <div style="font-size:12px;font-weight:800;color:#0f172a">${fmtD(date)}</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:${dc}">${mode}</span>
+              <span style="font-size:10px;font-weight:700;color:${dc};background:${dc}15;padding:1px 8px;border-radius:20px">${diff===0?'✅ Match':diff<0?`🔻 Short ${Math.abs(diff)}`:`🔺 Excess +${diff}`}</span>
+            </div>
+          </div>
+          ${entries.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:#f8fafc;border-radius:6px;margin-bottom:4px;font-size:11px">
+            <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${(e.auditorName||e.auditor||'?')[0].toUpperCase()}</div>
+            <span style="font-weight:700;flex:1">${esc(e.auditorName||e.auditor||'—')}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-weight:800">${e.qty}</span>
+            <span style="color:#94a3b8">${(e.time||'').slice(0,5)}</span>
+          </div>`).join('')}
+        </div>`;
+      }).join(''):`<div style="text-align:center;padding:40px;color:#94a3b8">No audit history for this part yet</div>`}
+    </div>
+  </div>
+  <div class="mdf"><button class="btn bgh" onclick="closeMd()">Close</button></div></div>`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FEATURE 4 — QUICK COUNT WIDGET (floating widget for fast scan)
+// Available from any page — tap to quickly log a count
+// ═══════════════════════════════════════════════════════════
+function openQuickCount(){
+  const bo=S.bins.map(b=>`<option value="${esc(b.bin)}">${esc(b.bin)}</option>`).join('');
+  modal(`<div class="md"><div class="mdh"><div class="mdt">⚡ Quick Count</div><button class="mdc" onclick="closeMd()">✕</button></div>
+  <div class="mdb">
+    <div class="al ali" style="margin-bottom:14px">⚡ Fast entry — type part no, set qty, and save</div>
+    <div class="fg" style="gap:10px">
+      <div class="fl"><label class="fll">Part Number *</label>
+        <div class="acw">
+          <input class="fi mn" id="QC_PN" placeholder="Scan or type…" oninput="acFn('QC_PN','QC_AL','qcFill')" autocomplete="off" autocapitalize="none" autofocus>
+          <div class="acl" id="QC_AL"></div>
+        </div>
+      </div>
+      <div class="fg f2" style="gap:10px">
+        <div class="fl"><label class="fll">Physical Qty *</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="qcAdj(-1)" style="width:34px;height:34px;border-radius:50%;background:#eff6ff;color:#2563eb;border:none;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0">−</button>
+            <input class="fi" id="QC_QTY" type="number" min="0" value="0" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800">
+            <button onclick="qcAdj(1)" style="width:34px;height:34px;border-radius:50%;background:#eff6ff;color:#2563eb;border:none;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0">+</button>
+          </div>
+        </div>
+        <div class="fl"><label class="fll">Bin</label>
+          <select class="fi" id="QC_BIN"><option value="">Select…</option>${bo}</select>
+        </div>
+      </div>
+      <div id="QC_INFO" style="padding:10px;background:#f8fafc;border-radius:var(--rs);font-size:12px;color:#64748b;display:none"></div>
+    </div>
+  </div>
+  <div class="mdf">
+    <button class="btn bgh" onclick="closeMd()">Cancel</button>
+    <button class="btn bsu" onclick="qcSave()">⚡ Save Count</button>
+  </div></div>`);
+  setTimeout(()=>$('QC_PN')?.focus(),100);
+}
+
+window.qcFill=function(pn,desc,bin){
+  const i=$('QC_PN');if(i)i.value=pn;
+  const al=$('QC_AL');if(al)al.style.display='none';
+  const b=$('QC_BIN');if(b&&bin)b.value=bin;
+  const info=$('QC_INFO');
+  const item=findItem(pn);
+  if(info&&item){
+    info.style.display='block';
+    info.innerHTML=`<strong>${esc(item.desc||pn)}</strong> · DMS: <strong>${item.systemQty||0}</strong> · MRP: ₹${item.mrp||0}`;
+  }
+};
+
+function qcAdj(d){const e=$('QC_QTY');if(e)e.value=Math.max(0,(parseInt(e.value)||0)+d);}
+
+async function qcSave(){
+  const pn=($('QC_PN')?.value||'').trim().toUpperCase();
+  const qty=parseInt($('QC_QTY')?.value)||0;
+  const bin=$('QC_BIN')?.value||'';
+  if(!pn){toast('Enter part number','w');return;}
+  const item=findItem(pn);
+  const dms=parseFloat(item?.systemQty||0);
+  const variance=qty-dms;
+  let reason='';
+  if(variance!==0){
+    reason=await promptReason(pn,variance,variance<0?'SHORT':'EXCESS');
+    if(reason===null){toast('Reason required for variance','w');return;}
+  }
+  const r=await api({action:'saveCount',count:{
+    id:uid(),partNo:pn,desc:item?.desc||'',bin:bin||item?.bin||'',
+    date:today(),qty,time:nowt(),type:'MANUAL',remarks:reason||'Quick Count',
+    auditor:S.user.username,auditorName:S.user.name,
+    sessionId:S.auditS?.sessionId||'SESS001',dmsRefDate:today()
+  }});
+  if(r.success||r.queued){
+    toast(`✅ ${pn} — Qty ${qty} saved`,'s');
+    logTrail('COUNT_SAVED',pn,item?.desc||'',dms,qty,'Quick Count');
+    closeMd();
+  } else toast(r.error||'Failed','d');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FEATURE 5 — SHIFT SUMMARY (end-of-shift report for executive)
+// Auto-generated personal report — what I did today
+// ═══════════════════════════════════════════════════════════
+async function rShiftSummary(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">⏳ Generating your shift summary…</div>';
+  const myCounts=await fetchCounts(today(),S.user.username);
+  const allCounts=await fetchCounts(today());
+
+  // My stats
+  const myDone=new Set(myCounts.map(c=>c.partNo)).size;
+  const myShort=myCounts.filter(c=>{const i=findItem(c.partNo);return i&&(parseInt(c.qty)||0)<(parseFloat(i.systemQty)||0);}).length;
+  const myExcess=myCounts.filter(c=>{const i=findItem(c.partNo);return i&&(parseInt(c.qty)||0)>(parseFloat(i.systemQty)||0);}).length;
+  const myMatch=myDone-myShort-myExcess;
+  const myAcc=myDone?Math.round(myMatch/myDone*100):100;
+  const myBins=[...new Set(myCounts.map(c=>c.bin).filter(Boolean))];
+  const myVal=myCounts.reduce((s,c)=>{const i=findItem(c.partNo);return s+(parseFloat(i?.dlc||0))*(parseInt(c.qty)||0);},0);
+  const dt=getDT();
+  const myTarget=dt[S.user.username]?.target||0;
+  const targetPct=myTarget>0?Math.min(100,Math.round(myDone/myTarget*100)):null;
+
+  // Time range
+  const sortedTimes=myCounts.map(c=>c.time||'').filter(Boolean).sort();
+  const firstScan=sortedTimes[0]?.slice(0,5)||'—';
+  const lastScan=sortedTimes[sortedTimes.length-1]?.slice(0,5)||'—';
+
+  pg.innerHTML=`
+  <div class="ph"><div><div class="pt">📋 My Shift Summary</div><div class="ps">${fmtD(new Date())} · ${esc(S.user.name||S.user.username)}</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bgh bsm" onclick="window.print()">🖨 Print</button>
+      <button class="btn bgh bsm" onclick="shiftExport()">⬇ Export</button>
+    </div>
+  </div>
+
+  <!-- Hero card -->
+  <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:18px;padding:24px;margin-bottom:18px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(37,99,235,.15)"></div>
+    <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px">Today's Achievements</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:14px;margin-bottom:16px">
+      ${[
+        {v:myDone,l:'Parts Counted',c:'#60a5fa'},
+        {v:myAcc+'%',l:'Accuracy',c:myAcc>=90?'#4ade80':myAcc>=70?'#fbbf24':'#f87171'},
+        {v:myBins.length,l:'Bins Covered',c:'#c4b5fd'},
+        {v:myCounts.length,l:'Total Entries',c:'#fde68a'}
+      ].map(s=>`<div style="text-align:center">
+        <div style="font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${s.c}">${s.v}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;text-transform:uppercase;letter-spacing:.4px">${s.l}</div>
+      </div>`).join('')}
+    </div>
+    ${targetPct!==null?`<div style="margin-top:6px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;color:rgba(255,255,255,.5)">
+        <span>Daily Target Progress</span><span>${myDone}/${myTarget} (${targetPct}%)</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden">
+        <div style="width:${targetPct}%;height:100%;background:${targetPct>=100?'#4ade80':targetPct>=70?'#60a5fa':'#fbbf24'};border-radius:6px;transition:width 1s"></div>
+      </div>
+    </div>`:''}
+    <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,.4)">
+      First scan: <strong style="color:rgba(255,255,255,.7)">${firstScan}</strong> · Last scan: <strong style="color:rgba(255,255,255,.7)">${lastScan}</strong>
+    </div>
+  </div>
+
+  <!-- Variance breakdown -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
+    <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#059669">${myMatch}</div>
+      <div style="font-size:10px;font-weight:700;color:#059669;margin-top:3px">✅ Matched</div>
+    </div>
+    <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">${myShort}</div>
+      <div style="font-size:10px;font-weight:700;color:#dc2626;margin-top:3px">🔻 Short Found</div>
+    </div>
+    <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#d97706">${myExcess}</div>
+      <div style="font-size:10px;font-weight:700;color:#d97706;margin-top:3px">🔺 Excess Found</div>
+    </div>
+  </div>
+
+  <!-- Bins covered -->
+  ${myBins.length?`<div class="cd" style="margin-bottom:14px">
+    <div class="cdh"><div class="cdt">📍 Bins Covered Today (${myBins.length})</div></div>
+    <div style="padding:14px 18px;display:flex;flex-wrap:wrap;gap:8px">
+      ${myBins.map(b=>`<span class="bg bgp" style="font-size:11px">${esc(b)}</span>`).join('')}
+    </div>
+  </div>`:''}
+
+  <!-- Full scan log -->
+  <div class="cd">
+    <div class="cdh"><div class="cdt">📋 My Scan Log Today (${myCounts.length} entries)</div></div>
+    <div class="tw" style="max-height:400px;overflow-y:auto"><table>
+      <thead><tr><th>Time</th><th>Part No</th><th>Description</th><th>Qty</th><th>Bin</th><th>Status</th></tr></thead>
+      <tbody>${myCounts.length?[...myCounts].sort((a,b)=>b.time?.localeCompare(a.time||'')||0).slice(0,100).map(c=>{
+        const i=findItem(c.partNo);const dms=parseFloat(i?.systemQty||0);const diff=(parseInt(c.qty)||0)-dms;
+        const sc=diff===0?'#059669':diff<0?'#dc2626':'#d97706';
+        const sl=diff===0?'✅ Match':diff<0?`🔻 ${diff}`:`🔺 +${diff}`;
+        return`<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${(c.time||'').slice(0,5)}</td>
+          <td class="tpn">${esc(c.partNo)}</td>
+          <td style="font-size:11px">${esc(tr2(c.desc||'—',22))}</td>
+          <td class="tq">${c.qty}</td>
+          <td>${c.bin?`<span class="bg bgp" style="font-size:9px">${esc(c.bin)}</span>`:'—'}</td>
+          <td style="font-size:11px;font-weight:700;color:${sc}">${sl}</td>
+        </tr>`;
+      }).join(''):`<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8">No scans today</td></tr>`}
+      </tbody>
+    </table></div>
+  </div>`;
+
+  window._shiftData={myCounts,myDone,myMatch,myShort,myExcess,myBins,myAcc};
+}
+
+function shiftExport(){
+  const d=window._shiftData;if(!d)return;
+  const csv='Time,Part No,Description,Qty,Bin\n'
+    +d.myCounts.map(c=>`"${(c.time||'').slice(0,5)}","${c.partNo}","${(c.desc||'').replace(/"/g,'""')}",${c.qty},"${c.bin||''}"`).join('\n');
+  dlCSV(csv,`shift_summary_${S.user.username}_${today()}.csv`);
+  toast('Shift summary exported','s');
 }
 
 // Hook logTrail into key existing functions (patch at boot)
