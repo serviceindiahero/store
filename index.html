@@ -673,238 +673,95 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .bin-qr-name{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:#0f172a}
 .bin-qr-desc{font-size:10px;color:#64748b}
 .bin-qr-zone{font-size:9px;font-weight:700;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:1px 7px}
-/* ══════════════════════════════════════════════════════════
-   MOBILE RESPONSIVENESS — Full overhaul for all screens
-   Breakpoints: 480px (small phone), 600px (large phone), 768px (tablet)
-══════════════════════════════════════════════════════════ */
-
-/* --- Global mobile base --- */
+/* ── OWNER MOBILE RESPONSIVE ─────────────────────────────── */
 @media(max-width:768px){
-  /* Page padding */
-  .pg{padding:10px;padding-bottom:90px}
+  /* Owner KPI grid — force 2 cols on mobile */
+  .okpi{padding:12px 14px;border-radius:12px}
+  .okpi .kv{font-size:20px;letter-spacing:-.5px}
+  .okpi .ki{font-size:20px;top:10px;right:10px}
+  .okpi .kl{font-size:9px}
+  .okpi .ks{font-size:10px}
 
-  /* Page header */
-  .ph{margin-bottom:14px;gap:8px}
-  .pt{font-size:17px;letter-spacing:-.3px}
-  .ps{font-size:11px}
-
-  /* Topbar */
-  .tb-s{display:none}
-  .tb{padding:0 12px;gap:8px}
-  .tb-lo{font-size:13px}
-
-  /* Sidebar */
-  .sb{position:fixed;left:0;top:0;bottom:0;transform:translateX(-110%);z-index:200;
-    transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:8px 0 32px rgba(0,0,0,.3);width:260px!important;min-width:0!important}
-  .sb.on{transform:translateX(0)}
-  .ov.on{display:block}
-  .tb-m{display:flex}
-  .bn{display:block!important}
-  .fab{display:flex!important}
-
-  /* Stat grids */
-  .s2,.s3,.s4{grid-template-columns:1fr 1fr}
-  .stv{font-size:clamp(16px,5vw,26px)!important}
-  .st{padding:13px}
-
-  /* Chart grid */
-  .cg{grid-template-columns:1fr}
-
-  /* Forms */
-  .f2{grid-template-columns:1fr}
-  .fg{gap:10px}
-
-  /* Tables */
-  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0}
-  .tw table{min-width:580px}
-  thead th{font-size:9px;padding:8px 10px}
-  tbody td{font-size:11px;padding:8px 10px}
-  .tpn{font-size:10px}
-
-  /* Cards */
-  .cd{border-radius:12px}
-  .cdh{padding:11px 14px}
-  .cdb{padding:14px}
-
-  /* Modals */
-  .md{max-width:100%!important;margin:0;border-radius:18px 18px 0 0;position:fixed;bottom:0;left:0;right:0;max-height:92vh;animation:mdSlide .22s ease}
-  @keyframes mdSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .mbd{align-items:flex-end;padding:0}
-  .mdlg,.mdxl{max-width:100%!important}
-
-  /* Search overlay */
-  .gs-ov{padding:8px 0 0;align-items:flex-end}
-  .gs-box{border-radius:16px 16px 0 0;max-height:88vh}
-
-  /* Filter bars */
-  .fb{padding:8px 10px;gap:6px}
-  .fin{min-width:100px;font-size:11px;padding:6px 8px}
-
-  /* Alert */
-  .al{font-size:11px;padding:8px 11px}
-
-  /* Pagination */
-  .pag{padding:10px 12px;gap:4px}
-  .pb{padding:4px 8px;font-size:10px}
-
-  /* Financial card header */
-  .fin-hdr{flex-direction:column;align-items:flex-start!important;gap:8px!important}
-
-  /* Scan cards */
-  .qc input{width:58px;font-size:14px}
-  .qb{width:26px;height:26px;font-size:15px}
-
-  /* FOC grid */
-  .foc-grid{grid-template-columns:repeat(2,1fr)}
-  .foc-slip-row{grid-template-columns:repeat(2,1fr)}
-  .foc-cell-val{font-size:16px}
-  .foc-summary-bar{grid-template-columns:1fr}
-
-  /* Summary bar */
-  .smb{padding:8px 12px;gap:8px;font-size:10px}
-
-  /* Bins grid */
-  .bgrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
-
-  /* QR grid */
-  .qr-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-
-  /* Toasts */
-  #TS{top:60px;right:10px;left:10px}
-  .t{min-width:0;max-width:100%;font-size:11px;padding:9px 12px}
-
-  /* ── Owner Portal Mobile ── */
-  .owner-welcome{padding:16px 18px;border-radius:14px}
-  .owner-welcome::after{font-size:44px;right:14px}
-  .owner-welcome-txt h2{font-size:16px}
+  /* Owner welcome banner */
+  .owner-welcome{padding:16px 18px;border-radius:14px;gap:12px}
+  .owner-welcome::after{font-size:40px;right:14px}
+  .owner-welcome-txt h2{font-size:15px}
   .owner-welcome-txt p{font-size:10px}
 
-  .okpi{padding:14px;border-radius:12px}
-  .okpi .kv{font-size:22px}
-  .okpi .ki{font-size:22px;top:12px;right:12px}
-
-  .ofin-hero{padding:18px 14px;border-radius:14px}
-  .ofin-grid{grid-template-columns:1fr 1fr}
-  .ofin-cell .fv{font-size:15px;letter-spacing:-.5px}
+  /* Owner financial hero */
+  .ofin-hero{padding:16px 14px;border-radius:14px;margin-bottom:14px}
+  .ofin-grid{grid-template-columns:1fr 1fr!important;gap:8px}
+  .ofin-cell{padding:10px}
+  .ofin-cell .fv{font-size:14px;letter-spacing:-.3px}
   .ofin-cell .fl{font-size:8px}
   .ofin-cell .fs{font-size:9px}
 
+  /* Owner chart card */
   .ochart{border-radius:12px}
-  .ochart-hd{padding:11px 14px;flex-wrap:wrap;gap:6px}
-  .ochart-title{font-size:12px}
-  .ochart-body{padding:12px}
+  .ochart-hd{padding:10px 13px;flex-wrap:wrap;gap:6px}
+  .ochart-title{font-size:11px}
+  .ochart-body{padding:10px}
 
-  .otbl th{padding:7px 10px;font-size:9px}
-  .otbl td{padding:8px 10px;font-size:11px}
+  /* Owner tables */
+  .otbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .otbl{min-width:500px}
+  .otbl th{padding:7px 9px;font-size:9px}
+  .otbl td{padding:8px 9px;font-size:11px}
 
-  .otab-bar{flex-wrap:wrap;gap:4px}
-  .otab-btn{font-size:11px;padding:7px 8px}
-
-  .ostrip{padding:12px 14px;gap:10px;border-radius:10px}
-  .ostrip-ico{font-size:18px}
-  .ostrip-title{font-size:12px}
-  .ostrip-msg{font-size:11px}
-  .ostrip-action{font-size:10px;padding:4px 9px}
-
-  .osec{margin:16px 0 10px}
+  /* Owner section header */
+  .osec{margin:14px 0 10px}
   .osec-title{font-size:13px}
 
-  /* Owner grid columns */
-  .owner-kpi-grid-3{grid-template-columns:1fr 1fr!important}
-  .owner-user-grid{grid-template-columns:1fr!important}
+  /* Owner strips */
+  .ostrip{padding:12px 13px;gap:10px;border-radius:10px}
+  .ostrip-ico{font-size:18px}
+  .ostrip-title{font-size:12px}
+  .ostrip-msg{font-size:11px;line-height:1.5}
+  .ostrip-action{font-size:10px;padding:4px 9px}
 
-  /* AI chat */
-  #AIC_MSGS{padding:10px}
-  .ai-thinking{padding:20px}
-  .ai-orb{width:48px;height:48px;font-size:22px}
-  .ai-hero-txt h2{font-size:17px}
+  /* Owner tabs */
+  .otab-bar{gap:3px;padding:3px}
+  .otab-btn{font-size:10px;padding:6px 8px}
 
-  /* Cycle plan */
-  .cyc-day-row{flex-direction:column;gap:8px}
+  /* Owner filter pills */
+  .ofilter{padding:4px 11px;font-size:10px}
 
-  /* Wedge scanner */
-  .wedge-box{padding:12px;border-radius:10px}
-  .wedge-inp{font-size:13px}
-}
+  /* Owner progress rings */
+  .oring{width:110px!important;height:110px!important}
+  .oring-val{font-size:18px}
 
-/* --- Very small phones (< 400px) --- */
-@media(max-width:400px){
-  .pg{padding:8px;padding-bottom:90px}
-  .pt{font-size:15px}
-  .s2,.s3,.s4{grid-template-columns:1fr 1fr}
-  .stv{font-size:clamp(14px,6vw,22px)!important}
-  .st{padding:10px}
-  .okpi .kv{font-size:18px}
-  .ofin-cell .fv{font-size:13px}
-  .ofin-grid{grid-template-columns:1fr 1fr}
-  .tb{height:52px;min-height:52px;padding:0 10px}
-  .av{width:30px;height:30px;font-size:11px}
-  .bni{padding:5px 8px}
-  .bni .bic{font-size:18px}
-  .bni .bit{font-size:8px}
-  .btn{padding:7px 12px;font-size:11px}
-  .bsm{padding:4px 9px;font-size:10px}
-  .okpi{padding:12px}
-  .owner-welcome{padding:14px;border-radius:12px}
-  .owner-welcome-txt h2{font-size:14px}
-  .owner-welcome::after{display:none}
-}
+  /* Section report grids — 2 cols on mobile */
+  .owner-report-grid-3{grid-template-columns:1fr 1fr!important}
+  .owner-report-grid-4{grid-template-columns:1fr 1fr!important}
 
-/* --- Tablet landscape / medium screens --- */
-@media(min-width:601px) and (max-width:768px){
-  .s3{grid-template-columns:repeat(3,1fr)}
-  .ofin-grid{grid-template-columns:repeat(3,1fr)}
-}
-
-/* --- Force desktop sidebar on large screens --- */
-@media(min-width:769px){
-  .bn,.fab{display:none!important}
-  .sb{transform:none!important;position:relative!important;box-shadow:4px 0 20px rgba(0,0,0,.15)!important}
-}
-
-/* --- Table card scroll fix for all inline styles --- */
-.otbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 12px 12px}
-.otbl-wrap table,.otbl-wrap .otbl{min-width:500px}
-
-/* --- Inline grid overrides for owner pages on mobile --- */
-@media(max-width:768px){
-  [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr 1fr!important}
-  [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr 1fr!important}
-  [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr!important}
-  [style*="display:grid"][style*="grid-template-columns:1fr 1fr;gap"]{grid-template-columns:1fr!important}
+  /* Approval cards */
+  .appr-card{padding:14px}
+  .appr-card-hd{flex-wrap:wrap;gap:8px}
 }
 @media(max-width:400px){
-  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr 1fr!important}
-  [style*="grid-template-columns:repeat(2,1fr)"]{grid-template-columns:1fr 1fr!important}
+  .ofin-grid{grid-template-columns:1fr 1fr!important}
+  .okpi .kv{font-size:17px}
+  .otab-btn{font-size:9px;padding:5px 6px}
+  .owner-welcome{padding:12px}
+  .owner-welcome-txt h2{font-size:13px}
 }
 
-/* --- Fix inline font sizes on mobile --- */
-@media(max-width:600px){
-  [style*="font-size:36px"]{font-size:24px!important}
-  [style*="font-size:30px"]{font-size:22px!important}
-  [style*="font-size:28px"]{font-size:20px!important}
-  [style*="font-size:18px"]{font-size:15px!important}
-  /* Keep smaller sizes as-is */
-}
-
-/* --- Report table horizontal scroll with sticky col --- */
-@media(max-width:768px){
-  .tw table td:first-child,
-  .tw table th:first-child{
-    position:sticky;left:0;background:#f8fafc;z-index:1;border-right:1px solid #e2e8f0
-  }
-  .tw table tbody td:first-child{background:#fff}
-  .tw table tbody tr:hover td:first-child{background:#fafbfc}
-}
-
-/* --- Owner portrait cards grid --- */
-@media(max-width:768px){
-  .owner-portrait-grid{
-    display:grid;
-    grid-template-columns:1fr!important;
-    gap:12px!important
-  }
-}
+/* Approval card styles */
+.appr-card{background:#fff;border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.2s}
+.appr-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.appr-card.pending{border-color:#fde68a;background:#fffcf0}
+.appr-card.approved{border-color:#a7f3d0;background:#f0fdf4}
+.appr-card.rejected{border-color:#fecaca;background:#fff5f5}
+.appr-card-hd{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(0,0,0,.06)}
+.appr-card-body{padding:14px 16px}
+.appr-card-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f8fafc;font-size:12px}
+.appr-card-row:last-child{border:none}
+.appr-card-lbl{color:#94a3b8;font-size:11px}
+.appr-card-val{font-weight:600;color:#0f172a;font-size:12px}
+.appr-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.appr-badge.pending{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+.appr-badge.approved{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
+.appr-badge.rejected{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
 
 </style>
 </head>
@@ -1014,7 +871,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbz38ZbAcoOjVjZcE2pO3SOIjaIWPcEwIPNWFSv0W6bDEIKTNdCHG3gb8fQZAIZSlW2pRw/exec';
+const API = 'https://script.google.com/macros/s/AKfycbw5ELKal2HM85kw5Bz8SKonAZMp_EcX_dUQgoVc_Xgv7X6P06hv7slnJcIRLCTJQW65Yg/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -1174,38 +1031,103 @@ async function api(data) {
   return await callAPI(data);
 }
 
-// ── Gemini AI Proxy — routes through Apps Script so key is NEVER in frontend ──
-async function callGemini(prompt,opts={}){
-  // Apps Script action:'gemini' calls Gemini API with server-stored key
-  const r=await callAPI({action:'gemini',prompt,lang:opts.lang||'en',maxTokens:opts.maxTokens||1200});
-  if(r.success&&r.text)return r.text;
-  throw new Error(r.error||'Gemini proxy error — check Code.gs handleGemini()');
+// ═══════════════════════════════════════════════════════════
+// OPTIMISTIC SAVE ENGINE
+// — saveCount calls return instantly with {success:true,optimistic:true}
+// — actual API call runs in background; failures go to retry queue
+// — makes scanning feel instantaneous (no waiting for GAS round-trip)
+// ═══════════════════════════════════════════════════════════
+const OQ_KEY='imOptQ3'; // optimistic retry queue
+let _oqRunning=false;
+
+// Saves count INSTANTLY to local memory, fires API in background
+async function apiOptimistic(data){
+  if(data.action!=='saveCount') return api(data); // non-count calls go normal path
+
+  // 1. LOCAL COMMIT — instant, no waiting
+  if(data.count){
+    const c=data.count;
+    if(!S.allCounts) S.allCounts=[];
+    // Update or insert in local cache
+    const idx=S.allCounts.findIndex(x=>x.id===c.id);
+    if(idx>=0) S.allCounts[idx]={...S.allCounts[idx],...c};
+    else S.allCounts.push({...c});
+    // Keep today cache in sync
+    if(!S.counts) S.counts=[];
+    const ti=S.counts.findIndex(x=>x.id===c.id);
+    if(ti>=0) S.counts[ti]={...S.counts[ti],...c};
+    else if(c.date===today()) S.counts.push({...c});
+  }
+
+  // 2. BACKGROUND PUSH — non-blocking
+  _oqPush(data);
+  return {success:true, optimistic:true};
 }
 
-// ── Role normalizer — sheet may store 'owner', code expects 'dealer_owner' ──
-function normalizeRole(r){
-  if(!r)return'executive';
-  const v=(r+'').toLowerCase().replace(/[\s_\-]/g,'');
-  if(v==='masterauditor'||v==='admin')return'master_auditor';
-  if(v==='dealerowner'||v==='owner'||v==='proprietor'||v==='dealer')return'dealer_owner';
-  return'executive';
+function _oqPush(data){
+  // Add to persistent retry queue
+  const q=_oqLoad();
+  q.push({id:uid(),data,ts:Date.now(),retries:0});
+  _oqSave(q);
+  syncUI();
+  // Flush without awaiting
+  _oqFlush();
 }
 
-function enQ(d){const q=JSON.parse(localStorage.getItem(QK)||'[]');q.push({id:uid(),d,ts:Date.now()});localStorage.setItem(QK,JSON.stringify(q));syncUI();}
+function _oqLoad(){try{return JSON.parse(localStorage.getItem(OQ_KEY)||'[]')}catch{return[];}}
+function _oqSave(q){localStorage.setItem(OQ_KEY,JSON.stringify(q));}
 
-async function flushQ(){
-  const q=JSON.parse(localStorage.getItem(QK)||'[]');if(!q.length||!S.online)return;
-  let ok=0;const rem=[];
-  for(const item of q){const r=await callAPI(item.d);if(r.success)ok++;else rem.push(item);}
-  localStorage.setItem(QK,JSON.stringify(rem));if(ok)toast(`${ok} records synced`,'s');syncUI();
+async function _oqFlush(){
+  if(_oqRunning||!S.online) return;
+  const q=_oqLoad();
+  if(!q.length){syncUI();return;}
+  _oqRunning=true;
+  const remaining=[];
+  for(const item of q){
+    try{
+      if(S.user) item.data._u=S.user.username;
+      const r=await callAPI(item.data);
+      if(!r.success&&!r.queued){
+        item.retries=(item.retries||0)+1;
+        if(item.retries<5) remaining.push(item); // retry up to 5 times
+        // else silently drop after 5 failures
+      }
+      // success — don't re-add to queue
+    }catch{
+      item.retries=(item.retries||0)+1;
+      if(item.retries<5) remaining.push(item);
+    }
+  }
+  _oqSave(remaining);
+  _oqRunning=false;
+  syncUI();
+  // If still items pending, schedule another flush in 3s
+  if(remaining.length) setTimeout(_oqFlush,3000);
 }
 
+// Override syncUI to also show optimistic queue count
 function syncUI(){
   const d=$('SDI'),t=$('STX');if(!d||!t)return;
-  const q=JSON.parse(localStorage.getItem(QK)||'[]');
+  const offQ=JSON.parse(localStorage.getItem(QK)||'[]');
+  const optQ=_oqLoad();
+  const pending=offQ.length+optQ.length;
   if(!S.online){d.className='sd off';t.textContent='Offline';$('OFB').style.display='block';}
-  else if(q.length){d.className='sd sy';t.textContent=`${q.length} pending`;}
-  else{d.className='sd';t.textContent='Online';$('OFB').style.display='none';}
+  else if(pending>0){d.className='sd sy';t.textContent=`${pending} syncing…`;}
+  else{d.className='sd';t.textContent='Online';$('OFB')&&($('OFB').style.display='none');}
+}
+
+// Offline queue helpers (kept for offline fallback)
+function enQ(d){const q=JSON.parse(localStorage.getItem(QK)||'[]');q.push({id:uid(),d,ts:Date.now()});localStorage.setItem(QK,JSON.stringify(q));syncUI();}
+async function flushQ(){
+  // Flush both offline queue and optimistic queue on reconnect
+  const q=JSON.parse(localStorage.getItem(QK)||'[]');
+  if(q.length&&S.online){
+    let ok=0;const rem=[];
+    for(const item of q){const r=await callAPI(item.d);if(r.success)ok++;else rem.push(item);}
+    localStorage.setItem(QK,JSON.stringify(rem));if(ok)toast(`${ok} records synced`,'s');
+  }
+  _oqFlush(); // also flush optimistic queue
+  syncUI();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1241,7 +1163,7 @@ async function doLogin(){
   setErr('Connecting to server…','inf');
   const r=await callAPI({action:'login',username:u,password:p});
   if(r.success&&r.user){
-    const s={...r.user,role:normalizeRole(r.user.role),_lt:Date.now()};
+    const s={...r.user,_lt:Date.now()};
     localStorage.setItem(SK,JSON.stringify(s));
     S.user=s;
     bootApp();
@@ -1275,7 +1197,6 @@ function loadSess(){
     const r=localStorage.getItem(SK);if(!r)return null;
     const s=JSON.parse(r);
     if((Date.now()-s._lt)/3600000>10){localStorage.removeItem(SK);return null;}
-    s.role=normalizeRole(s.role); // re-normalize in case stale session has raw role
     return s;
   }catch{return null;}
 }
@@ -1298,6 +1219,7 @@ async function bootApp(){
     document.querySelector('.fab').style.display='flex';
   }
   flushQ();
+  _oqFlush(); // flush any pending optimistic saves from previous session
 }
 
 function setUserUI(){
@@ -1305,7 +1227,7 @@ function setUserUI(){
   const init=(u.name||u.username).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   ['TAV','SAV'].forEach(id=>{const el=$(id);if(el)el.textContent=init;});
   if($('SNM'))$('SNM').textContent=u.name||u.username;
-  const roleLabel=u.role==='master_auditor'?'Master Auditor':u.role==='dealer_owner'?'👑 Owner':'Executive';
+  const roleLabel=u.role==='master_auditor'?'Master Auditor':u.role==='dealer_owner'?'👑 Dealer Owner':'Executive';
   if($('SRL'))$('SRL').textContent=roleLabel;
   // Apply owner gold theme to sidebar
   if(u.role==='dealer_owner'){
@@ -1336,6 +1258,12 @@ function buildNav(){
       {l:'Movement Trends',i:'📈',p:'ownertrends'},
       {l:'Dead Stock Alert',i:'💀',p:'ownerdeadstock'},
       {l:'Team Performance',i:'👥',p:'ownerteam'},
+      {l:'ABC Analysis',i:'🔠',p:'ownerabc'},
+      {l:'FMS Report',i:'⚡',p:'ownerfms'},
+      {sec:'🧠 Intelligence'},
+      {l:'AI Assistant',i:'🤖',p:'aichat'},
+      {l:'Audit Trail',i:'🔍',p:'ownertrail'},
+      {l:'Pending Approvals',i:'⏳',p:'ownerapprovals'},
     ];
   } else {
     ls=[
@@ -1344,9 +1272,11 @@ function buildNav(){
       {l:'My Scan Log',i:'📋',p:'scanlog'},
       ...(m?[{sec:'Reports'},{l:'Variance Report',i:'📊',p:'variance'},{l:'Day-wise',i:'📅',p:'daywise'},{l:'Full Summary',i:'📄',p:'fullsummary'},{l:'Uncounted Parts',i:'⬜',p:'uncounted'},{l:'FOC Dashboard',i:'🎁',p:'foc'},
               {sec:'Analytics'},{l:'Moving Parts',i:'📈',p:'movingparts'},{l:'Bill Type Analysis',i:'🧾',p:'billtype'},{l:'Order Planning',i:'🛒',p:'orderplan'},{l:'Inventory Analysis',i:'🏭',p:'invanalysis'},
+              {sec:'Owner Reports'},{l:'Owner Dashboard',i:'👑',p:'ownerdash'},{l:'Financial Overview',i:'💰',p:'ownerfinance'},{l:'Inventory Health',i:'🏥',p:'ownerhealth'},{l:'Variance Summary',i:'📊',p:'ownervariance'},{l:'Full Stock Report',i:'📄',p:'ownerstockreport'},{l:'Top Parts Analysis',i:'🔥',p:'ownertopparts'},{l:'Movement Trends',i:'📈',p:'ownertrends'},{l:'Dead Stock Alert',i:'💀',p:'ownerdeadstock'},{l:'Team Performance',i:'👥',p:'ownerteam'},{l:'ABC Analysis',i:'🔠',p:'ownerabc'},{l:'FMS Report',i:'⚡',p:'ownerfms'},
               {sec:'Tools'},{l:'QR Generator',i:'⬡',p:'qrgen'},{l:'Bin QR Printer',i:'📍',p:'binqr'},{l:'Audit Trail',i:'🔍',p:'audittrail'},
               {l:'Cycle Count Plan',i:'📅',p:'cycleplan'},{l:'Root Cause Analysis',i:'🔬',p:'rootcause'},{l:'Photo Capture',i:'📸',p:'photocap'},
               {l:'AI Assistant',i:'🤖',p:'aichat'},
+              {l:'Pending Approvals',i:'⏳',p:'ownerapprovals'},
               {sec:'Manage'},{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'DMS Upload',i:'⬆️',p:'dms'},{l:'Settings',i:'⚙️',p:'settings'}]
             :[{l:'Item Master',i:'🗃️',p:'itemmaster'},{l:'AI Assistant',i:'🤖',p:'aichat'}])
     ];
@@ -1370,8 +1300,8 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 function go(p, fromPopState){
   if(!S.user)return;
   if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','billtype','orderplan','qrgen','binqr','audittrail','invanalysis','cycleplan','rootcause'].includes(p)&&S.user.role!=='master_auditor'&&S.user.role!=='dealer_owner'){toast('Master Auditor only','w');return;}
-  const ownerPages=['ownerdash','ownerfinance','ownerhealth','ownervariance','ownerstockreport','ownertopparts','ownertrends','ownerdeadstock','ownerteam'];
-  if(ownerPages.includes(p)&&S.user.role!=='dealer_owner'){toast('Owner access only','w');return;}
+  const ownerPages=['ownerdash','ownerfinance','ownerhealth','ownervariance','ownerstockreport','ownertopparts','ownertrends','ownerdeadstock','ownerteam','ownerabc','ownerfms','ownertrail','ownerapprovals'];
+  if(ownerPages.includes(p)&&S.user.role!=='dealer_owner'&&S.user.role!=='master_auditor'){toast('Owner / Master Auditor access only','w');return;}
   stopCam();closeSB();setNav(p);
   if(!fromPopState){history.pushState({page:p},'','#'+p);}
   $('PG').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:60px;color:#94a3b8">⏳ Loading…</div>';
@@ -1382,6 +1312,7 @@ function go(p, fromPopState){
     ownerdash:rOwnerDash,ownerfinance:rOwnerFinance,ownerhealth:rOwnerHealth,
     ownervariance:rOwnerVariance,ownerstockreport:rOwnerStockReport,ownertopparts:rOwnerTopParts,
     ownertrends:rOwnerTrends,ownerdeadstock:rOwnerDeadStock,ownerteam:rOwnerTeam,
+    ownerabc:rOwnerABC,ownerfms:rOwnerFMS,ownertrail:rOwnerTrail,ownerapprovals:rOwnerApprovals,
     cycleplan:rCyclePlan,rootcause:rRootCause,photocap:rPhotoCapture,aichat:rAIChat
   }[p]||rNF)();
 }
@@ -2150,6 +2081,7 @@ function bwsRenderList(filter){
   </table>`;
 }
 
+// ★ OPTIMISTIC: bwsSave — instant local commit, background API sync
 async function bwsSave(){
   const pn=($('BWS_INPUT')?.value||'').trim().toUpperCase();
   if(!pn){toast('Enter Part No','w');return;}
@@ -2157,15 +2089,11 @@ async function bwsSave(){
   const bin=BWS.bin;
   if(!bin){toast('Select a bin first','w');return;}
 
-  // Check if part belongs to this bin
   const item=findItem(pn);
   if(item&&item.bin&&item.bin!==bin){
-    if(!confirm(`⚠️ ${pn} is assigned to bin "${item.bin}", not "${bin}".\nSave to current bin "${bin}" anyway?`))return;
+    if(!confirm(`⚠️ ${pn} is assigned to bin "${item.bin}", not "${bin}".\nSave to "${bin}" anyway?`))return;
   }
-  if(!item){
-    toast(`Part ${pn} not found in inventory — count recorded anyway`,'w');
-  }
-
+  if(!item) toast(`Part ${pn} not in inventory — recorded anyway`,'w',2000);
   if(isLocked(pn)){toast(`🔒 ${pn} is locked`,'w');return;}
 
   const dmsQty=parseFloat(item?.systemQty||0);
@@ -2179,31 +2107,36 @@ async function bwsSave(){
   const existingEntry=(S.allCounts||[]).find(c=>
     c.partNo===pn && c.date===today() && c.auditor===S.user.username
   );
-  const r=await api({action:'saveCount',count:{
+  const countPayload={
     id:existingEntry?existingEntry.id:uid(),
     partNo:pn, desc:item?.desc||'', bin,
     date:today(), qty, time:nowt(),
-    type:'BinWise', remarks:reason||`Bin-wise scan: ${bin}`,
+    type:'BinWise', remarks:reason||`Bin-wise: ${bin}`,
     auditor:S.user.username, auditorName:S.user.name,
     sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
-  }});
+  };
 
-  if(r.success){
-    BWS.countedMap[pn]=qty;
-    toast(`✅ ${pn} → ${qty} (Bin: ${bin})`,'s',2000);
-    appendHistory({partNo:pn, user:S.user.username, userName:S.user.name, countedQty:qty, systemQty:dmsQty, variance, status, reason, date:today(), time:nowt(), type:'BinWise', action:existingEntry?'RECOUNT':'FIRST_COUNT'});
-    trackUserPerf(S.user.username, variance!==0);
-    if(existingEntry){existingEntry.qty=qty;}
-    else{(S.allCounts||(S.allCounts=[])).push({id:uid(),partNo:pn,desc:item?.desc||'',bin,date:today(),qty,time:nowt(),type:'BinWise',auditor:S.user.username});}
-    // Clear input, keep qty=1 for speed
-    if($('BWS_INPUT')){$('BWS_INPUT').value='';$('BWS_INPUT').focus();}
-    if($('BWS_QTY'))$('BWS_QTY').value='1';
-    bwsRefreshProgress();
-    // Re-render current filter
-    const activeFilter=$('BWS_FP')?.className?.includes('bpr')?'pending':$('BWS_FD')?.className?.includes('bpr')?'done':'all';
-    bwsRenderList(activeFilter);
-    reloadLog();
-  } else toast(r.error||'Failed','d');
+  // ★ INSTANT local commit
+  BWS.countedMap[pn]=qty;
+  appendHistory({partNo:pn,user:S.user.username,userName:S.user.name,countedQty:qty,systemQty:dmsQty,variance,status,reason,date:today(),time:nowt(),type:'BinWise',action:existingEntry?'RECOUNT':'FIRST_COUNT'});
+  trackUserPerf(S.user.username,variance!==0);
+  if(existingEntry){existingEntry.qty=qty;}
+  else{(S.allCounts||(S.allCounts=[])).push({...countPayload});}
+  if(!S.counts)S.counts=[];
+  const ci=S.counts.findIndex(x=>x.id===countPayload.id);
+  if(ci>=0)S.counts[ci]={...S.counts[ci],...countPayload};
+  else S.counts.push({...countPayload});
+
+  toast(`⚡ ${pn} → ${qty}`,'s',1500);
+  if($('BWS_INPUT')){$('BWS_INPUT').value='';$('BWS_INPUT').focus();}
+  if($('BWS_QTY'))$('BWS_QTY').value='1';
+  bwsRefreshProgress();
+  const activeFilter=$('BWS_FP')?.className?.includes('bpr')?'pending':$('BWS_FD')?.className?.includes('bpr')?'done':'all';
+  bwsRenderList(activeFilter);
+  reloadLog();
+
+  // ★ BACKGROUND sync
+  apiOptimistic({action:'saveCount',count:countPayload});
 }
 
 function bwsQuickCount(pn, dms){
@@ -2397,7 +2330,7 @@ function aq(i,d){
 }
 function skip(i){const c=$('SC'+i);if(c){c.style.opacity='.3';c.style.pointerEvents='none';}}
 
-// ★ UPGRADED: Multi-user save — overwrites own entry, creates new for other users
+// ★ OPTIMISTIC: saveOne — instant local commit, background API sync
 async function saveOne(i){
   const item=S.scanQ[i];if(!item)return;
   const m=findItem(item.partNo);
@@ -2405,129 +2338,119 @@ async function saveOne(i){
   const bin=$('SBN'+i)?.value||m?.bin||'';
   const pn=item.partNo;
 
-  // ★ LOCK CHECK — block save if part is locked
-  if(isLocked(pn)){
-    toast(`🔒 ${pn} is locked — no further edits allowed`,'w',4000);
-    return;
-  }
+  if(isLocked(pn)){toast(`🔒 ${pn} is locked`,'w',4000);return;}
 
-  // ★ VARIANCE CHECK — require reason if variance ≠ 0
   const dmsQty=parseFloat(m?.systemQty||0);
   const {variance,status}=calcVariance(qty,dmsQty);
   let reason='';
   if(variance!==0){
     reason=await promptReason(pn,variance,status);
-    if(reason===null){toast('Save cancelled — reason is required','w');focusWedge();return;}
+    if(reason===null){toast('Save cancelled','w');focusWedge();return;}
   }
 
-  // ★ UPSERT LOGIC: find if this user already has an entry for this part today
   const existingEntry=(S.allCounts||[]).find(c=>
     c.partNo===pn && c.date===today() && c.auditor===S.user.username
   );
+  const countPayload={
+    id:existingEntry?existingEntry.id:uid(),
+    partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
+    time:nowt(), type:'QR', remarks:reason||(existingEntry?'Recount':''),
+    auditor:S.user.username, auditorName:S.user.name,
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+  };
 
-  let r;
-  if(existingEntry){
-    // Same user recount → overwrite their own entry (delete + re-save with same id)
-    // We reuse the existing id so the server overwrites the row
-    r=await api({action:'saveCount',count:{
-      id:existingEntry.id, // ★ reuse existing id → server will UPDATE the row
-      partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
-      time:nowt(), type:'QR', remarks:reason||'Recount by same user',
-      auditor:S.user.username, auditorName:S.user.name,
-      sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
-    }});
-  } else {
-    // New entry (first count OR different user)
-    r=await api({action:'saveCount',count:{
-      id:uid(),
-      partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
-      time:nowt(), type:'QR', remarks:reason||'',
-      auditor:S.user.username, auditorName:S.user.name,
-      sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
-    }});
-  }
-
-  if(r.success){
-    // ★ APPEND HISTORY (never overwrites, append-only)
-    appendHistory({
-      partNo:pn, user:S.user.username, userName:S.user.name,
-      countedQty:qty, systemQty:dmsQty, variance, status:status,
-      reason:reason||'', date:today(), time:nowt(), type:'QR',
-      action:existingEntry?'RECOUNT':'FIRST_COUNT'
-    });
-    // ★ TRACK USER PERFORMANCE
-    trackUserPerf(S.user.username, variance!==0);
-
-    toast(`✅ Saved: ${pn} × ${qty}${variance!==0?' ('+status+': '+Math.abs(variance)+')':''}`, 's');
-    S.scanQ.splice(i,1);
-    const area=$('SCK')||$('SCAM');if(area)renderCardsInto(area);
-    reloadLog();
-  } else toast(r.error||'Failed','d');
+  // ★ INSTANT — remove from queue and show success immediately
+  appendHistory({partNo:pn,user:S.user.username,userName:S.user.name,countedQty:qty,systemQty:dmsQty,variance,status,reason:reason||'',date:today(),time:nowt(),type:'QR',action:existingEntry?'RECOUNT':'FIRST_COUNT'});
+  trackUserPerf(S.user.username,variance!==0);
+  toast(`⚡ ${pn} × ${qty}${variance!==0?' ('+status+': '+Math.abs(variance)+')':''}`, 's', 1800);
+  S.scanQ.splice(i,1);
+  const area=$('SCK')||$('SCAM');if(area)renderCardsInto(area);
+  reloadLog();
   focusWedge();
+
+  // ★ BACKGROUND — push to API without blocking UI
+  apiOptimistic({action:'saveCount',count:countPayload});
 }
 
-// ★ UPGRADED: Batch save — same upsert + lock + variance reason per item
+// ★ OPTIMISTIC: saveAllQR — instant batch, background sync
 async function saveAllQR(){
   if(!S.scanQ.length){toast('Queue is empty','w');return;}
   const btn=document.querySelector('[onclick="saveAllQR()"]');
   if(btn){btn.disabled=true;btn.textContent='Saving…';}
-  let n=0,failed=0,skipped=0;
+  let n=0,skipped=0;
 
+  // Collect variance items that need reason prompts FIRST (sequential)
   for(let i=0;i<S.scanQ.length;i++){
-    const item=S.scanQ[i];
-    if(!item)continue;
+    const item=S.scanQ[i];if(!item)continue;
     const pn=item.partNo;
+    if(isLocked(pn)){item._skip=true;skipped++;continue;}
     const m=findItem(pn);
     const qty=parseInt($('SQ'+i)?.value)||item.qty;
-    const bin=$('SBN'+i)?.value||m?.bin||'';
     const dmsQty=parseFloat(m?.systemQty||0);
-
-    // ★ LOCK CHECK
-    if(isLocked(pn)){
-      toast(`🔒 ${pn} skipped — locked`,'w',2000);
-      skipped++;continue;
-    }
-
-    // ★ VARIANCE + REASON
     const {variance,status}=calcVariance(qty,dmsQty);
-    let reason='';
     if(variance!==0){
-      if(btn){btn.disabled=false;btn.textContent=`Save All (${S.scanQ.length})`;}
-      reason=await promptReason(pn,variance,status);
-      if(reason===null){toast(`⏭ Skipped ${pn} — no reason given`,'w');skipped++;continue;}
+      if(btn){btn.disabled=false;btn.textContent=`Reason needed…`;}
+      const reason=await promptReason(pn,variance,status);
+      if(reason===null){item._skip=true;skipped++;if(btn){btn.disabled=true;btn.textContent='Saving…';}continue;}
+      item._reason=reason;item._status=status;item._variance=variance;item._dms=dmsQty;item._qty=qty;item._bin=m?.bin||'';
       if(btn){btn.disabled=true;btn.textContent='Saving…';}
+    } else {
+      item._reason='';item._status=status;item._variance=variance;item._dms=dmsQty;item._qty=qty;item._bin=m?.bin||'';
     }
+  }
 
-    // ★ UPSERT: overwrite own entry, new for different user
+  // ★ NOW: commit ALL to local instantly, fire all API calls concurrently
+  const apiCalls=[];
+  for(let i=0;i<S.scanQ.length;i++){
+    const item=S.scanQ[i];if(!item||item._skip)continue;
+    const pn=item.partNo;
+    const m=findItem(pn);
+    const qty=item._qty??item.qty;
+    const bin=$('SBN'+i)?.value||item._bin||m?.bin||'';
+    const dmsQty=item._dms??parseFloat(m?.systemQty||0);
+    const reason=item._reason||'';
+    const variance=item._variance??0;
+    const status=item._status||'OK';
+
     const existingEntry=(S.allCounts||[]).find(c=>
       c.partNo===pn && c.date===today() && c.auditor===S.user.username
     );
     const countPayload={
       id:existingEntry?existingEntry.id:uid(),
       partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
-      time:nowt(), type:'QR', remarks:reason||(existingEntry?'Recount by same user':''),
+      time:nowt(), type:'QR', remarks:reason||(existingEntry?'Recount':''),
       auditor:S.user.username, auditorName:S.user.name,
       sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
     };
-    const r=await api({action:'saveCount',count:countPayload});
-    if(r.success){
-      n++;
-      appendHistory({
-        partNo:pn, user:S.user.username, userName:S.user.name,
-        countedQty:qty, systemQty:dmsQty, variance, status,
-        reason:reason||'', date:today(), time:nowt(), type:'QR',
-        action:existingEntry?'RECOUNT':'FIRST_COUNT'
-      });
-      trackUserPerf(S.user.username, variance!==0);
-    } else failed++;
+
+    appendHistory({partNo:pn,user:S.user.username,userName:S.user.name,countedQty:qty,systemQty:dmsQty,variance,status,reason,date:today(),time:nowt(),type:'QR',action:existingEntry?'RECOUNT':'FIRST_COUNT'});
+    trackUserPerf(S.user.username,variance!==0);
+    // Update local cache
+    if(!S.allCounts)S.allCounts=[];
+    const idx=S.allCounts.findIndex(x=>x.id===countPayload.id);
+    if(idx>=0)S.allCounts[idx]={...S.allCounts[idx],...countPayload};
+    else S.allCounts.push({...countPayload});
+    if(!S.counts)S.counts=[];
+    const ti=S.counts.findIndex(x=>x.id===countPayload.id);
+    if(ti>=0)S.counts[ti]={...S.counts[ti],...countPayload};
+    else S.counts.push({...countPayload});
+
+    n++;
+    // Queue background API call
+    apiCalls.push({action:'saveCount',count:countPayload});
   }
 
+  // ★ INSTANT UI UPDATE
   S.scanQ=[];
   const area=$('SCK')||$('SCAM');if(area)area.innerHTML='';
   setWSt('wait');
-  toast(`✅ ${n} saved${skipped?`, ${skipped} skipped`:''}${failed?`, ${failed} failed`:''}. Queue cleared!`,'s',4000);
+  toast(`⚡ ${n} saved instantly!${skipped?` (${skipped} skipped)`:''}  Syncing in background…`,'s',3000);
   reloadLog();
   focusWedge();
+  if(btn){btn.disabled=false;btn.textContent=`Save All`;}
+
+  // ★ BACKGROUND: push all to optimistic queue (non-blocking)
+  for(const call of apiCalls) _oqPush(call);
 }
 
 async function addSave(i){
@@ -2568,9 +2491,51 @@ async function reloadLog(){
 }
 
 async function delRow(id,rowId){
+  const isExec=S.user?.role==='executive'||(!S.user?.role.includes('master')&&!S.user?.role.includes('owner'));
+  if(isExec){
+    // Executives cannot delete directly — send approval request
+    const row=$(rowId);
+    const cells=row?row.querySelectorAll('td'):[];
+    const partNo=cells[1]?.textContent||'Unknown';
+    const qty=cells[3]?.textContent||'0';
+    const reason=prompt(`⚠️ Delete request for ${partNo}\n\nYou cannot delete directly. This will send an approval request to Master Auditor.\n\nReason for deletion (required):`);
+    if(!reason){toast('Deletion cancelled — reason required','w');return;}
+    const req={
+      id:uid(),
+      type:'DELETE_COUNT',
+      recordId:id,
+      rowId,
+      partNo,
+      qty,
+      requestedBy:S.user?.username||'',
+      requestedByName:S.user?.name||'',
+      requestedAt:new Date().toISOString(),
+      date:today(),
+      time:nowt(),
+      reason,
+      status:'pending'
+    };
+    // Save approval request to localStorage + Google Sheets
+    const pending=JSON.parse(localStorage.getItem('imPendingApprovals3')||'[]');
+    pending.unshift(req);
+    localStorage.setItem('imPendingApprovals3',JSON.stringify(pending.slice(0,200)));
+    // Send to sheets (visible to master + owner)
+    if(S.online) api({action:'saveApprovalRequest',request:req}).catch(()=>{});
+    logTrail('DELETE_REQUESTED',partNo,'',qty,'Pending Approval',`Reason: ${reason}`);
+    toast('✅ Approval request sent to Master Auditor','i',4000);
+    // Visually flag the row
+    if(row){row.style.background='#fffbeb';row.style.opacity='.7';}
+    return;
+  }
+  // Master auditor / owner — can delete directly
   const row=$(rowId);if(row){row.style.opacity='.4';row.style.background='#fef2f2';}
   const r=await api({action:'deleteCount',id});
-  if(r.success){toast('Deleted','s');row?.remove();const lc=$('LC');if(lc)lc.textContent=Math.max(0,parseInt(lc.textContent||'0')-1);}
+  if(r.success){
+    toast('Deleted','s');
+    row?.remove();
+    const lc=$('LC');if(lc)lc.textContent=Math.max(0,parseInt(lc.textContent||'0')-1);
+    logTrail('COUNT_DELETED_DIRECT','','','','','Deleted by '+S.user?.name);
+  }
   else{toast(r.error||'Failed','d');if(row){row.style.opacity='1';row.style.background='';}}
 }
 
@@ -2621,7 +2586,7 @@ function acFn(inp,lst,fn){
 function mfl_MS(pn,d,b,q){$('MPMS')&&($('MPMS').value=pn);$('MDMS')&&($('MDMS').value=d);$('MBMS')&&($('MBMS').value=b||'');$('MQMS')&&($('MQMS').value=q||0);}
 function mfl_M(pn,d,b,q){$('MPM')&&($('MPM').value=pn);$('MDM')&&($('MDM').value=d);$('MBM')&&($('MBM').value=b||'');$('MQM')&&($('MQM').value=q||0);}
 
-// ★ UPGRADED: Manual save — upsert own entry, lock check, variance reason, history
+// ★ OPTIMISTIC: Manual save — instant local commit, background API sync
 async function subMan(sfx){
   const pn=($(`MP${sfx}`)?.value||'').trim().toUpperCase();
   if(!pn){toast('Enter Part Number','w');return;}
@@ -2629,10 +2594,8 @@ async function subMan(sfx){
   const m=findItem(pn);
   const dmsQty=parseFloat(m?.systemQty||0);
 
-  // ★ LOCK CHECK
   if(isLocked(pn)){toast(`🔒 ${pn} is locked`,'w',4000);return;}
 
-  // ★ VARIANCE + REASON
   const {variance,status}=calcVariance(qty,dmsQty);
   let reason=$(`MR${sfx}`)?.value||'';
   if(variance!==0 && !reason){
@@ -2640,30 +2603,27 @@ async function subMan(sfx){
     if(reason===null){toast('Save cancelled — reason required','w');return;}
   }
 
-  // ★ UPSERT
   const existingEntry=(S.allCounts||[]).find(c=>
     c.partNo===pn && c.date===today() && c.auditor===S.user.username
   );
-  const r=await api({action:'saveCount',count:{
+  const countPayload={
     id:existingEntry?existingEntry.id:uid(),
     partNo:pn, desc:$(`MD${sfx}`)?.value||'', bin:$(`MB${sfx}`)?.value||'',
     date:today(), qty, time:nowt(), type:'Manual',
     remarks:reason||(existingEntry?'Recount':''),
     auditor:S.user.username, auditorName:S.user.name,
     sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
-  }});
-  if(r.success){
-    appendHistory({
-      partNo:pn, user:S.user.username, userName:S.user.name,
-      countedQty:qty, systemQty:dmsQty, variance, status,
-      reason:reason||'', date:today(), time:nowt(), type:'Manual',
-      action:existingEntry?'RECOUNT':'FIRST_COUNT'
-    });
-    trackUserPerf(S.user.username, variance!==0);
-    toast(`✅ Saved: ${pn} × ${qty}`,'s');
-    clrMan(sfx);reloadLog();
-    if($('MRECENT'))await loadManRecent();
-  } else toast(r.error||'Failed','d');
+  };
+
+  // ★ INSTANT local commit
+  appendHistory({partNo:pn,user:S.user.username,userName:S.user.name,countedQty:qty,systemQty:dmsQty,variance,status,reason:reason||'',date:today(),time:nowt(),type:'Manual',action:existingEntry?'RECOUNT':'FIRST_COUNT'});
+  trackUserPerf(S.user.username,variance!==0);
+  toast(`⚡ Saved: ${pn} × ${qty}`,'s',2000);
+  clrMan(sfx);reloadLog();
+  if($('MRECENT'))loadManRecent();
+
+  // ★ BACKGROUND sync
+  apiOptimistic({action:'saveCount',count:countPayload});
 }
 function clrMan(sfx){['MP','MD','MR'].forEach(p=>{const e=$(p+sfx);if(e)e.value='';});const q=$('MPQ'+sfx);if(q)q.value='1';const b=$('MB'+sfx);if(b)b.value='';}
 
@@ -2695,48 +2655,39 @@ function pktForm(){
 function pkfl(pn,d,b){$('PKPN').value=pn;$('PKDSC').value=d;$('PKBN').value=b||'';$('PKAL').style.display='none';}
 function cpkt(){const u=parseInt($('PKU')?.value)||0,n=parseInt($('PKN')?.value)||0,b=$('PKTOT'),v=$('PKTV'),c=$('PKTC');if(!b)return;if(u>0&&n>0){b.style.display='block';v.textContent=fmt(u*n)+' units';c.textContent=`${n} pkts × ${u} = ${u*n}`;}else b.style.display='none';}
 // ★ UPGRADED: Packet save — upsert + lock + variance + history
+// ★ OPTIMISTIC: Packet save — instant local commit, background sync
 async function subPkt(){
   const pn=($('PKPN')?.value||'').trim().toUpperCase();if(!pn){toast('Enter Part Number','w');return;}
   const u=parseInt($('PKU')?.value)||0,n=parseInt($('PKN')?.value)||0;if(!u||!n){toast('Enter units & packet count','w');return;}
   const qty=u*n;
   const m=findItem(pn);
   const dmsQty=parseFloat(m?.systemQty||0);
-
-  // ★ LOCK CHECK
   if(isLocked(pn)){toast(`🔒 ${pn} is locked`,'w',4000);return;}
-
-  // ★ VARIANCE + REASON
   const {variance,status}=calcVariance(qty,dmsQty);
   let reason='';
   if(variance!==0){
     reason=await promptReason(pn,variance,status);
     if(reason===null){toast('Save cancelled','w');return;}
   }
-
-  // ★ UPSERT
   const existingEntry=(S.allCounts||[]).find(c=>
     c.partNo===pn && c.date===today() && c.auditor===S.user.username
   );
-  const r=await api({action:'saveCount',count:{
+  const countPayload={
     id:existingEntry?existingEntry.id:uid(),
     partNo:pn, desc:$('PKDSC')?.value||'', bin:$('PKBN')?.value||'',
     date:today(), qty, time:nowt(), type:'Packet',
     remarks:reason||`${n}pkts×${u}`,
     auditor:S.user.username, auditorName:S.user.name,
     sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
-  }});
-  if(r.success){
-    appendHistory({
-      partNo:pn, user:S.user.username, userName:S.user.name,
-      countedQty:qty, systemQty:dmsQty, variance, status,
-      reason:reason||`${n}pkts×${u}`, date:today(), time:nowt(), type:'Packet',
-      action:existingEntry?'RECOUNT':'FIRST_COUNT'
-    });
-    trackUserPerf(S.user.username, variance!==0);
-    toast(`✅ Packet: ${pn} × ${qty}`,'s');
-    ['PKPN','PKDSC','PKU','PKN'].forEach(id=>{const e=$(id);if(e)e.value='';});
-    $('PKBN').value='';cpkt();reloadLog();
-  } else toast(r.error||'Failed','d');
+  };
+  // ★ INSTANT
+  appendHistory({partNo:pn,user:S.user.username,userName:S.user.name,countedQty:qty,systemQty:dmsQty,variance,status,reason:reason||`${n}pkts×${u}`,date:today(),time:nowt(),type:'Packet',action:existingEntry?'RECOUNT':'FIRST_COUNT'});
+  trackUserPerf(S.user.username,variance!==0);
+  toast(`⚡ Packet: ${pn} × ${qty}`,'s',2000);
+  ['PKPN','PKDSC','PKU','PKN'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  $('PKBN').value='';cpkt();reloadLog();
+  // ★ BACKGROUND sync
+  apiOptimistic({action:'saveCount',count:countPayload});
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -5350,27 +5301,33 @@ const TRAIL_KEY='imAuditTrail3';
 
 function logTrail(action, partNo, desc, oldVal, newVal, extra){
   try{
-    const trail=JSON.parse(localStorage.getItem(TRAIL_KEY)||'[]');
-    trail.unshift({
+    const entry={
       id: uid(),
       ts: new Date().toISOString(),
       date: today(),
       time: nowt(),
       user: S.user?.username||'',
       userName: S.user?.name||'',
+      role: S.user?.role||'',
       action,
       partNo: partNo||'',
       desc: desc||'',
-      oldVal: oldVal||'',
-      newVal: newVal||'',
+      oldVal: String(oldVal||''),
+      newVal: String(newVal||''),
       extra: extra||'',
       flagged: false,
       resolved: false,
       resolvedBy: '',
       resolvedNote: ''
-    });
-    // Keep last 500 entries
+    };
+    // Save to localStorage (local backup)
+    const trail=JSON.parse(localStorage.getItem(TRAIL_KEY)||'[]');
+    trail.unshift(entry);
     localStorage.setItem(TRAIL_KEY, JSON.stringify(trail.slice(0,500)));
+    // Save to Google Sheets (persistent, visible to master+owner)
+    if(S.online){
+      api({action:'saveTrailEntry',entry}).catch(()=>{}); // fire-and-forget
+    }
   }catch(e){}
 }
 
@@ -7263,7 +7220,7 @@ async function ccExport(){
 // ═══════════════════════════════════════════════════════════
 // ROOT CAUSE ANALYSIS — AI-powered variance investigation
 // ═══════════════════════════════════════════════════════════
-// AI calls proxied via Google Apps Script — API key is ONLY in Code.gs, never in frontend
+const ANTHROPIC_API='https://api.anthropic.com/v1/messages';
 
 async function rRootCause(){
   const pg=$('PG');
@@ -7376,11 +7333,21 @@ Rules:
 - Maximum 8 findings`;
 
   try{
-    const rawReply=await callGemini(prompt+'\n\nReturn ONLY valid JSON array. No markdown, no backticks.',{maxTokens:1000});
-    const clean=rawReply.replace(/```json|```/gi,'').trim();
+    const res=await fetch(ANTHROPIC_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content?.find(b=>b.type==='text')?.text||'[]';
+    const clean=raw.replace(/```json|```/g,'').trim();
     let findings;
     try{findings=JSON.parse(clean);}
-    catch{findings=[{type:'warning',title:'Analysis Complete',rootCause:'Could not parse Gemini response. Check Apps Script logs.',affectedParts:[],financialImpact:'—',action:'Open Apps Script > Executions and check for errors.'}];}
+    catch{findings=[{type:'warning',title:'Analysis Complete',rootCause:'Could not parse AI response — check API connection.',affectedParts:[],financialImpact:'—',action:'Check browser console for errors.'}];}
 
     const sevColor={danger:'#dc2626',warning:'#d97706',info:'#2563eb'};
     const sevBg={danger:'#fef2f2',warning:'#fffbeb',info:'#eff6ff'};
@@ -7679,130 +7646,51 @@ async function pcLoadLog(){
 // ═══════════════════════════════════════════════════════════
 // AI CHAT ASSISTANT — Full inventory context chat
 // ═══════════════════════════════════════════════════════════
-let AI_HISTORY=[];let AI_LANG="en";
+let AI_HISTORY=[];
 
 async function rAIChat(){
   const pg=$('PG');
-  AI_HISTORY=[];AI_LANG='en';
+  AI_HISTORY=[];
   pg.innerHTML=`
   <div class="ph" style="margin-bottom:12px">
     <div>
       <div class="pt">🤖 AI Assistant</div>
-      <div class="ps">Gemini AI · English & Hindi · Inventory ke baare mein kuch bhi poochho</div>
+      <div class="ps">Ask anything about your inventory, audit progress, variance — powered by Claude AI</div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <div style="display:flex;background:#f1f5f9;border-radius:8px;padding:3px;border:1px solid #e2e8f0;flex-shrink:0">
-        <button id="LANG_EN" onclick="aiSetLang('en')" style="padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;transition:.15s">🇬🇧 EN</button>
-        <button id="LANG_HI" onclick="aiSetLang('hi')" style="padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:#64748b;transition:.15s">🇮🇳 HI</button>
-      </div>
-      <button class="btn bgh bsm" onclick="AI_HISTORY=[];$('AIC_MSGS').innerHTML=renderAIWelcome();">🗑 Clear</button>
-    </div>
+    <button class="btn bgh bsm" onclick="AI_HISTORY=[];$('AIC_MSGS').innerHTML=renderAIWelcome();">🗑 Clear</button>
   </div>
 
-  <!-- On-demand Full Inventory Summary -->
-  <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:14px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <div style="flex:1;min-width:180px">
-      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:3px">📊 Full Inventory Summary</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.5">AI se puri inventory ka summary maango — shortage, dead stock, financial impact, team performance sab ek jagah</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0">
-      <button onclick="aiFullSummary('en')" style="padding:9px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 English Summary</button>
-      <button onclick="aiFullSummary('hi')" style="padding:9px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 हिंदी Summary</button>
-    </div>
-  </div>
-
-  <!-- Quick chips — mix of English & Hindi -->
-  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px" id="AIC_CHIPS">
+  <!-- Quick prompts -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="AIC_CHIPS">
     ${[
-      "Today's audit progress?","Which parts are short?","Dead stock list dikhao",
-      "Reorder kya karna chahiye?","Sabse costly parts kaunse hain?",
-      "Financial impact summary","Team performance today","Bin-wise progress"
-    ].map(q=>`<button onclick="aiChip(this)" style="padding:5px 11px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;transition:.15s;white-space:nowrap">${esc(q)}</button>`).join('')}
+      'What is today\'s audit progress?',
+      'Which parts have the most variance?',
+      'Show me dead stock summary',
+      'Who is performing best today?',
+      'Which bins are not started?',
+      'What should I reorder urgently?',
+      'Summarise financial impact of variances',
+      'Which high-value parts are short?'
+    ].map(q=>`<button onclick="aiChip(this)" style="padding:6px 12px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;transition:.15s;white-space:nowrap" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">${esc(q)}</button>`).join('')}
   </div>
 
   <!-- Chat window -->
-  <div class="cd" style="display:flex;flex-direction:column;height:calc(100vh - 400px);min-height:360px">
-    <div id="AIC_MSGS" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px">
+  <div class="cd" style="display:flex;flex-direction:column;height:calc(100vh - 320px);min-height:400px">
+    <div id="AIC_MSGS" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
       ${renderAIWelcome()}
     </div>
-    <div style="border-top:1px solid var(--bd);padding:10px 14px;display:flex;gap:8px;align-items:flex-end">
-      <textarea id="AIC_INP" rows="1" placeholder="English ya Hindi mein poochho…"
-        style="flex:1;padding:9px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;outline:none;resize:none;font-family:'Inter',sans-serif;max-height:100px;overflow-y:auto;transition:.2s"
+    <!-- Input -->
+    <div style="border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;align-items:flex-end">
+      <textarea id="AIC_INP" rows="1" placeholder="Ask about inventory, audits, stock levels, variances…"
+        style="flex:1;padding:10px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;outline:none;resize:none;font-family:'Inter',sans-serif;max-height:100px;overflow-y:auto;transition:.2s"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend();}"
-        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
-        onfocus="this.style.borderColor='#2563eb';this.style.boxShadow='0 0 0 3px rgba(37,99,235,.1)'"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';this.style.borderColor='#2563eb'"
+        onfocus="this.style.borderColor='#2563eb';this.style.boxShadow='0 0 0 3px rgba(37,99,235,.15)'"
         onblur="this.style.borderColor='var(--bd)';this.style.boxShadow='none'"></textarea>
-      <button class="btn bpr" id="AIC_SEND" onclick="aiSend()" style="padding:10px 16px;border-radius:10px;height:42px;flex-shrink:0">↑</button>
+      <button class="btn bpr" id="AIC_SEND" onclick="aiSend()" style="padding:10px 18px;border-radius:10px;height:44px">Send ↑</button>
     </div>
   </div>`;
 }
-
-function aiSetLang(lang){
-  AI_LANG=lang;
-  const en=$('LANG_EN'),hi=$('LANG_HI');
-  if(lang==='en'){
-    if(en)en.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;transition:.15s';
-    if(hi)hi.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:#64748b;transition:.15s';
-  } else {
-    if(hi)hi.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;transition:.15s';
-    if(en)en.style.cssText='padding:5px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:#64748b;transition:.15s';
-  }
-  toast(lang==='hi'?'Hindi mode 🇮🇳':'English mode 🇬🇧','i',2000);
-}
-
-async function aiFullSummary(lang){
-  const msgs=$('AIC_MSGS');if(!msgs)return;
-  const counts=S.allCounts||S.counts||[];
-  const today_s=today();
-  const todayCounts=counts.filter(c=>c.date===today_s);
-  const cMap={};todayCounts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
-  let shortCount=0,excessCount=0,matchCount=0,shortVal=0,excessVal=0,deadCount=0,deadVal=0;
-  const shortParts=[];
-  S.items.forEach(item=>{
-    const dms=parseFloat(item.systemQty)||0,dlc=parseFloat(item.dlc)||0;
-    const sm=typeof S_SALES_MAP!=='undefined'?S_SALES_MAP[item.partNo]:null;
-    if((!sm||Object.values(sm).reduce((a,b)=>a+b,0)===0)&&dms>0){deadCount++;deadVal+=dms*dlc;}
-    const cnt=cMap[item.partNo];if(cnt===undefined)return;
-    const diff=cnt-dms;
-    if(diff<0){shortCount++;shortVal+=Math.abs(diff)*dlc;shortParts.push({p:item.partNo,d:item.desc,v:diff,loss:Math.round(Math.abs(diff)*dlc)});}
-    else if(diff>0){excessCount++;excessVal+=diff*dlc;}
-    else matchCount++;
-  });
-  const uCounted=new Set(todayCounts.map(c=>c.partNo)).size;
-  const pct=S.items.length?Math.round(uCounted/S.items.length*100):0;
-  const top5=shortParts.sort((a,b)=>b.loss-a.loss).slice(0,5);
-  const isHi=lang==='hi';
-  const prompt=isHi
-    ?`Aap India Motors (Hero MotoCorp authorized dealer, Alwar, Rajasthan) ke inventory AI assistant hain. Dealer owner ke liye ek professional summary Hindi (Devanagari) mein likhein:
-
-DATA:
-- Kul parts: ${S.items.length} | Counted: ${uCounted} (${pct}%)
-- Match: ${matchCount} | Short: ${shortCount} (Loss: Rs.${Math.round(shortVal).toLocaleString('en-IN')}) | Excess: ${excessCount} (Value: Rs.${Math.round(excessVal).toLocaleString('en-IN')})
-- Dead stock: ${deadCount} parts (Rs.${Math.round(deadVal).toLocaleString('en-IN')} blocked)
-- Top 5 shortage: ${JSON.stringify(top5)}
-
-In 5 sections likhein: 1) Aaj ki progress, 2) Financial impact, 3) Badi problems, 4) Turant karne wale kaam (3-5 points), 5) Owner ke liye ek line advice. Hindi Devanagari mein.`
-    :`You are the AI for India Motors (Hero MotoCorp dealer, Alwar). Write a professional inventory summary in English for the dealer owner:
-
-DATA: Total SKUs: ${S.items.length} | Counted: ${uCounted} (${pct}%) | Match: ${matchCount} | Short: ${shortCount} (Loss: Rs.${Math.round(shortVal).toLocaleString('en-IN')}) | Excess: ${excessCount} | Dead stock: ${deadCount} parts (Rs.${Math.round(deadVal).toLocaleString('en-IN')}) | Top shortages: ${JSON.stringify(top5)}
-
-Cover: 1) Audit progress, 2) Financial impact, 3) Key risks, 4) Immediate actions (3-5 bullets), 5) Closing recommendation. Be specific with rupee figures.`;
-
-  const label=isHi?'📋 हिंदी में inventory summary दो':'📋 Give full inventory summary in English';
-  msgs.innerHTML+=aiMsg('user',label);
-  const lid='AIL_'+Date.now();
-  msgs.innerHTML+=`<div id="${lid}">${aiMsg('assistant','',true)}</div>`;
-  msgs.scrollTop=msgs.scrollHeight;
-  try{
-    const reply=await callGemini(prompt,{lang,maxTokens:1200});
-    AI_HISTORY.push({role:'user',content:label},{role:'assistant',content:reply});
-    const el=$(lid);if(el)el.outerHTML=aiMsg('assistant',reply);
-  }catch(e){
-    const el=$(lid);if(el)el.outerHTML=aiMsg('assistant','❌ '+esc(e.message)+' — Check Apps Script Code.gs handleGemini()');
-  }
-  msgs.scrollTop=msgs.scrollHeight;
-}
-
 
 function renderAIWelcome(){
   const isMaster=S.user?.role==='master_auditor'||S.user?.role==='dealer_owner';
@@ -7880,15 +7768,24 @@ HIGH VALUE SHORT PARTS: ${variances.filter(v=>v.variance<0&&parseFloat(v.mrp||0)
 Respond in simple, clear language. Use bullet points for lists. Be specific with numbers. Keep responses concise (under 200 words unless asked for detail). If data isn't available, say so honestly.`;
 
   AI_HISTORY.push({role:'user',content:text});
-  // Build full prompt: system context + last 12 turns + new user message
-  const histBlock=AI_HISTORY.slice(-13,-1).map(m=>(m.role==='user'?'User':'Assistant')+': '+m.content).join('\n');
-  const fullPrompt=systemCtx+'\n\n---\nConversation history:\n'+histBlock+'\n\nUser: '+text+'\n\nAssistant:';
+
   try{
-    const reply=await callGemini(fullPrompt,{lang:AI_LANG||'en',maxTokens:1000});
+    const res=await fetch(ANTHROPIC_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:systemCtx,
+        messages:AI_HISTORY.slice(-12) // keep last 12 turns for context
+      })
+    });
+    const data=await res.json();
+    const reply=data.content?.find(b=>b.type==='text')?.text||'Sorry, I could not get a response. Please try again.';
     AI_HISTORY.push({role:'assistant',content:reply});
     const el=$(loadId);if(el)el.outerHTML=aiMsg('assistant',reply);
   }catch(e){
-    const el=$(loadId);if(el)el.outerHTML=aiMsg('assistant','❌ '+esc(e.message)+' — Check Apps Script / internet.');
+    const el=$(loadId);if(el)el.outerHTML=aiMsg('assistant','❌ Error: '+esc(e.message)+' — Check internet connection.');
     AI_HISTORY.pop();
   }
   msgs.scrollTop=msgs.scrollHeight;
@@ -7898,6 +7795,439 @@ Respond in simple, clear language. Use bullet points for lists. Be specific with
 
 // Also add a spin keyframe if not already present
 // (needed for RCA loading spinner)
+
+
+// ═══════════════════════════════════════════════════════════
+// OWNER — ABC ANALYSIS (A=High Value, B=Medium, C=Low)
+// ═══════════════════════════════════════════════════════════
+async function rOwnerABC(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading ABC Analysis…</div>';
+  await ensureSalesLoaded();
+
+  // Calculate annual consumption value for each item
+  const rows=S.items.map(item=>{
+    const sm=typeof S_SALES_MAP!=='undefined'?S_SALES_MAP[item.partNo]:null;
+    const totalSales=sm?Object.values(sm).reduce((a,b)=>a+b,0):0;
+    const dlc=parseFloat(item.dlc)||0;
+    const annualValue=totalSales*dlc;
+    const sysQty=parseFloat(item.systemQty)||0;
+    return{...item,totalSales,annualValue,dlc,sysQty,stockVal:sysQty*dlc};
+  }).sort((a,b)=>b.annualValue-a.annualValue);
+
+  const totalAV=rows.reduce((s,r)=>s+r.annualValue,0);
+  // ABC classification: A=top 70% value, B=next 20%, C=bottom 10%
+  let cumVal=0;
+  rows.forEach(r=>{
+    cumVal+=r.annualValue;
+    const pct=totalAV?cumVal/totalAV:0;
+    r.abc=pct<=0.70?'A':pct<=0.90?'B':'C';
+  });
+  const aItems=rows.filter(r=>r.abc==='A');
+  const bItems=rows.filter(r=>r.abc==='B');
+  const cItems=rows.filter(r=>r.abc==='C');
+  const aVal=aItems.reduce((s,r)=>s+r.annualValue,0);
+  const bVal=bItems.reduce((s,r)=>s+r.annualValue,0);
+  const cVal=cItems.reduce((s,r)=>s+r.annualValue,0);
+  const fmtR=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+
+  let activeTab='A';
+  function renderABCTable(items,cls){
+    if(!items.length)return`<div style="padding:24px;text-align:center;color:#94a3b8">No items in this class</div>`;
+    const clr={A:'#dc2626',B:'#d97706',C:'#059669'}[cls]||'#64748b';
+    return`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:480px">
+      <thead><tr style="background:#f8fafc">
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0;white-space:nowrap">#</th>
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0">Part No</th>
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0">Description</th>
+        <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0">Sales Qty</th>
+        <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0">Annual Value</th>
+        <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0">Stock</th>
+        <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0">Stock Value</th>
+        <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0">Class</th>
+      </tr></thead>
+      <tbody>${items.slice(0,100).map((r,i)=>`<tr style="border-bottom:1px solid #f1f5f9">
+        <td style="padding:8px 12px;font-size:10px;color:#94a3b8">${i+1}</td>
+        <td style="padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+        <td style="padding:8px 12px;font-size:11px">${esc(tr2(r.desc||'—',22))}</td>
+        <td style="padding:8px 12px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${r.totalSales}</td>
+        <td style="padding:8px 12px;text-align:right;font-weight:700;color:${clr}">${fmtR(r.annualValue)}</td>
+        <td style="padding:8px 12px;text-align:right;font-family:'JetBrains Mono',monospace">${r.sysQty}</td>
+        <td style="padding:8px 12px;text-align:right;font-size:11px">${fmtR(r.stockVal)}</td>
+        <td style="padding:8px 12px;text-align:center"><span style="padding:2px 10px;border-radius:20px;font-size:11px;font-weight:800;background:${clr}15;color:${clr};border:1px solid ${clr}44">${cls}</span></td>
+      </tr>`).join('')}
+      ${items.length>100?`<tr><td colspan="8" style="padding:8px 12px;font-size:10px;color:#94a3b8;text-align:center">+${items.length-100} more items</td></tr>`:''}</tbody>
+    </table></div>`;
+  }
+
+  pg.innerHTML=`
+  <div class="ph"><div><div class="pt">🔠 ABC Analysis</div><div class="ps">Inventory classified by annual consumption value · A=Critical, B=Moderate, C=Low priority</div></div>
+    <button class="btn bgh bsm" onclick="abcExport(${JSON.stringify(rows).replace(/</g,'&lt;')})">⬇ Export CSV</button>
+  </div>
+
+  <!-- Summary cards -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
+    ${[
+      {cls:'A',label:'Class A — Critical',items:aItems,val:aVal,color:'#dc2626',bg:'#fef2f2',border:'#fecaca',desc:'~70% of consumption value · Tight control needed'},
+      {cls:'B',label:'Class B — Moderate',items:bItems,val:bVal,color:'#d97706',bg:'#fffbeb',border:'#fde68a',desc:'~20% of value · Regular review'},
+      {cls:'C',label:'Class C — Low',items:cItems,val:cVal,color:'#059669',bg:'#ecfdf5',border:'#a7f3d0',desc:'~10% of value · Minimal control'}
+    ].map(x=>`<div style="background:${x.bg};border:1.5px solid ${x.border};border-radius:14px;padding:16px;cursor:pointer" onclick="abcShowTab('${x.cls}')">
+      <div style="font-size:28px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${x.color}">${x.cls}</div>
+      <div style="font-size:11px;font-weight:700;color:${x.color};margin:4px 0">${x.label}</div>
+      <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#0f172a">${fmtR(x.val)}</div>
+      <div style="font-size:10px;color:#64748b;margin-top:3px">${x.items.length} parts · ${x.desc}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Tab bar -->
+  <div class="otab-bar" id="ABC_TABS">
+    <button class="otab-btn on" onclick="abcShowTab('A')">Class A (${aItems.length})</button>
+    <button class="otab-btn" onclick="abcShowTab('B')">Class B (${bItems.length})</button>
+    <button class="otab-btn" onclick="abcShowTab('C')">Class C (${cItems.length})</button>
+    <button class="otab-btn" onclick="abcShowTab('ALL')">All Items (${rows.length})</button>
+  </div>
+
+  <div class="ochart" id="ABC_TABLE">${renderABCTable(aItems,'A')}</div>`;
+
+  window._abcData={A:aItems,B:bItems,C:cItems,ALL:rows};
+  window.abcShowTab=function(cls){
+    document.querySelectorAll('#ABC_TABS .otab-btn').forEach((b,i)=>b.classList.toggle('on',['A','B','C','ALL'][i]===cls));
+    const tbl=$('ABC_TABLE');if(tbl)tbl.innerHTML=renderABCTable(window._abcData[cls],cls==='ALL'?'':cls);
+  };
+}
+
+window.abcExport=function(rows){
+  if(typeof rows==='string')try{rows=JSON.parse(rows);}catch{rows=[];}
+  const csv='Part No,Description,Category,Bin,Annual Sales Qty,Annual Value,Stock Qty,Stock Value,ABC Class\n'
+    +(rows||[]).map(r=>`"${r.partNo}","${(r.desc||'').replace(/"/g,'""')}","${r.category||''}","${r.bin||''}",${r.totalSales},${Math.round(r.annualValue)},${r.sysQty},${Math.round(r.stockVal)},"${r.abc||'C'}"`).join('\n');
+  dlCSV(csv,`abc_analysis_${today()}.csv`);
+  toast('ABC Analysis exported','s');
+};
+
+// ═══════════════════════════════════════════════════════════
+// OWNER — FMS REPORT (Fast/Medium/Slow Moving Stock)
+// ═══════════════════════════════════════════════════════════
+async function rOwnerFMS(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading FMS Report…</div>';
+  await ensureSalesLoaded();
+
+  const hasSales=typeof S_SALES_MAP!=='undefined'&&Object.keys(S_SALES_MAP).length>0;
+  const months=typeof S_SALES_META!=='undefined'&&S_SALES_META?S_SALES_META.months?.length||1:1;
+
+  const rows=S.items.map(item=>{
+    const sm=hasSales?S_SALES_MAP[item.partNo]:null;
+    const totalSales=sm?Object.values(sm).reduce((a,b)=>a+b,0):0;
+    const avgMonthly=months>0?totalSales/months:0;
+    const dlc=parseFloat(item.dlc)||0;
+    const sysQty=parseFloat(item.systemQty)||0;
+    const coverDays=avgMonthly>0?Math.round(sysQty/(avgMonthly/30)):null;
+    // FMS Classification
+    let fms,fmsColor,fmsBg;
+    if(totalSales===0){fms='Non-Moving';fmsColor='#94a3b8';fmsBg='#f8fafc';}
+    else if(avgMonthly>=5){fms='Fast';fmsColor='#059669';fmsBg='#ecfdf5';}
+    else if(avgMonthly>=1){fms='Medium';fmsColor='#d97706';fmsBg='#fffbeb';}
+    else{fms='Slow';fmsColor='#dc2626';fmsBg='#fef2f2';}
+    return{...item,totalSales,avgMonthly,dlc,sysQty,stockVal:sysQty*dlc,coverDays,fms,fmsColor,fmsBg};
+  });
+
+  const fast=rows.filter(r=>r.fms==='Fast');
+  const medium=rows.filter(r=>r.fms==='Medium');
+  const slow=rows.filter(r=>r.fms==='Slow');
+  const nonMoving=rows.filter(r=>r.fms==='Non-Moving');
+  const fmtR=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+
+  function fmsTable(items){
+    if(!items.length)return`<div style="padding:24px;text-align:center;color:#94a3b8">No items in this category</div>`;
+    return`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:480px">
+      <thead><tr style="background:#f8fafc">
+        ${['#','Part No','Description','Bin','Avg/Month','Total Sales','Stock Qty','Cover Days','Classification'].map(h=>`<th style="padding:8px 11px;text-align:left;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0;white-space:nowrap">${h}</th>`).join('')}
+      </tr></thead>
+      <tbody>${items.slice(0,100).map((r,i)=>`<tr style="border-bottom:1px solid #f1f5f9;background:${i%2?'#fafbfc':'#fff'}">
+        <td style="padding:7px 11px;font-size:10px;color:#94a3b8">${i+1}</td>
+        <td style="padding:7px 11px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(r.partNo)}</td>
+        <td style="padding:7px 11px;font-size:11px">${esc(tr2(r.desc||'—',20))}</td>
+        <td style="padding:7px 11px"><span style="background:#eff6ff;color:#2563eb;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700">${esc(r.bin||'—')}</span></td>
+        <td style="padding:7px 11px;font-weight:700;color:${r.fmsColor}">${r.avgMonthly.toFixed(1)}</td>
+        <td style="padding:7px 11px;font-family:'JetBrains Mono',monospace;font-weight:700">${r.totalSales}</td>
+        <td style="padding:7px 11px;font-family:'JetBrains Mono',monospace">${r.sysQty}</td>
+        <td style="padding:7px 11px;font-weight:700;color:${r.coverDays!==null?(r.coverDays<15?'#dc2626':r.coverDays<30?'#d97706':'#059669'):'#94a3b8'}">${r.coverDays!==null?r.coverDays+'d':'∞'}</td>
+        <td style="padding:7px 11px"><span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;background:${r.fmsBg};color:${r.fmsColor};border:1px solid ${r.fmsColor}44">${r.fms}</span></td>
+      </tr>`).join('')}
+      ${items.length>100?`<tr><td colspan="9" style="padding:8px;text-align:center;font-size:10px;color:#94a3b8">+${items.length-100} more</td></tr>`:''}</tbody>
+    </table></div>`;
+  }
+
+  pg.innerHTML=`
+  <div class="ph"><div><div class="pt">⚡ FMS Report</div><div class="ps">Fast / Medium / Slow / Non-Moving stock classification · Based on ${months} months of sales data</div></div>
+    <button class="btn bgh bsm" onclick="fmsExport()">⬇ Export CSV</button>
+  </div>
+
+  ${!hasSales?`<div class="al alw" style="margin-bottom:16px">⚠️ Sales data not loaded. Upload DMS CSV from DMS Upload page for accurate FMS classification.</div>`:''}
+
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">
+    ${[
+      {l:'Fast Moving',n:fast.length,c:'#059669',bg:'#ecfdf5',bd:'#a7f3d0',d:'Avg ≥ 5/month'},
+      {l:'Medium Moving',n:medium.length,c:'#d97706',bg:'#fffbeb',bd:'#fde68a',d:'Avg 1-5/month'},
+      {l:'Slow Moving',n:slow.length,c:'#dc2626',bg:'#fef2f2',bd:'#fecaca',d:'Avg <1/month'},
+      {l:'Non Moving',n:nonMoving.length,c:'#94a3b8',bg:'#f8fafc',bd:'#e2e8f0',d:'Zero sales'}
+    ].map(x=>`<div style="background:${x.bg};border:1.5px solid ${x.bd};border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${x.c}">${x.n}</div>
+      <div style="font-size:10px;font-weight:700;color:${x.c};margin:3px 0;text-transform:uppercase;letter-spacing:.4px">${x.l}</div>
+      <div style="font-size:9px;color:#94a3b8">${x.d}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- FMS Tabs -->
+  <div class="otab-bar" id="FMS_TABS">
+    <button class="otab-btn on" onclick="fmsTab('fast')">⚡ Fast (${fast.length})</button>
+    <button class="otab-btn" onclick="fmsTab('medium')">🟡 Medium (${medium.length})</button>
+    <button class="otab-btn" onclick="fmsTab('slow')">🔴 Slow (${slow.length})</button>
+    <button class="otab-btn" onclick="fmsTab('non')">⚫ Non-Moving (${nonMoving.length})</button>
+  </div>
+  <div class="ochart" id="FMS_TABLE">${fmsTable(fast)}</div>`;
+
+  window._fmsData={fast,medium,slow,non:nonMoving,all:rows};
+  window.fmsTab=function(t){
+    document.querySelectorAll('#FMS_TABS .otab-btn').forEach((b,i)=>b.classList.toggle('on',['fast','medium','slow','non'][i]===t));
+    const tbl=$('FMS_TABLE');if(tbl)tbl.innerHTML=fmsTable(window._fmsData[t]);
+  };
+}
+
+window.fmsExport=function(){
+  const rows=window._fmsData?.all||[];
+  const csv='Part No,Description,Category,Bin,Total Sales,Avg Monthly,Stock Qty,Cover Days,FMS Class\n'
+    +rows.map(r=>`"${r.partNo}","${(r.desc||'').replace(/"/g,'""')}","${r.category||''}","${r.bin||''}",${r.totalSales},${r.avgMonthly.toFixed(2)},${r.sysQty},${r.coverDays||''},${r.fms}`).join('\n');
+  dlCSV(csv,`fms_report_${today()}.csv`);
+  toast('FMS Report exported','s');
+};
+
+// ═══════════════════════════════════════════════════════════
+// OWNER — AUDIT TRAIL VIEW (read-only, Google Sheets based)
+// ═══════════════════════════════════════════════════════════
+async function rOwnerTrail(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading Audit Trail…</div>';
+  const r=await api({action:'getTrailEntries',limit:500});
+  const entries=(r.success&&r.entries)||[];
+  const local=JSON.parse(localStorage.getItem('imAuditTrail3')||'[]');
+  // Merge: sheets entries take priority, add any local-only ones
+  const sheetsIds=new Set(entries.map(e=>e.id));
+  const merged=[...entries,...local.filter(l=>!sheetsIds.has(l.id))].slice(0,500);
+
+  const actionIcon={'COUNT_SAVED':'🔢','COUNT_DELETED':'🗑','COUNT_DELETED_DIRECT':'🗑','COUNT_UPDATED':'✏️','DELETE_REQUESTED':'⏳','ITEM_EDITED':'✏️','ITEM_ADDED':'➕','ITEM_DELETED':'🗑','DMS_APPLIED':'⬆️','SESSION_CREATED':'🗓','LOGIN':'🔑'};
+  const actionColor={'COUNT_DELETED':'#dc2626','DELETE_REQUESTED':'#d97706','COUNT_SAVED':'#059669','ITEM_EDITED':'#2563eb','LOGIN':'#94a3b8'};
+
+  pg.innerHTML=`
+  <div class="ph"><div><div class="pt">🔍 Audit Trail</div><div class="ps">All system events · ${merged.length} records · Google Sheets synced</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bgh bsm" onclick="rOwnerTrail()">🔄 Refresh</button>
+      <button class="btn bgh bsm" onclick="ownerTrailExport()">⬇ Export</button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    ${['all','LOGIN','COUNT_SAVED','COUNT_DELETED','DELETE_REQUESTED','ITEM_EDITED'].map((f,i)=>
+      `<button onclick="ownerFilterTrail('${f}')" style="padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid ${i===0?'#2563eb':'#e2e8f0'};background:${i===0?'#2563eb':'#fff'};color:${i===0?'#fff':'#64748b'};transition:.15s" id="OTF_${f}">${f==='all'?'All Events':f.replace(/_/g,' ')}</button>`
+    ).join('')}
+  </div>
+
+  <div id="OT_TABLE" class="ochart">${ownerRenderTrail(merged,'all',actionIcon,actionColor)}</div>`;
+
+  window._ownerTrailData={entries:merged,actionIcon,actionColor};
+  window.ownerFilterTrail=function(f){
+    document.querySelectorAll('[id^="OTF_"]').forEach(b=>{b.style.background='#fff';b.style.color='#64748b';b.style.borderColor='#e2e8f0';});
+    const btn=$('OTF_'+f);if(btn){btn.style.background='#2563eb';btn.style.color='#fff';btn.style.borderColor='#2563eb';}
+    const tbl=$('OT_TABLE');if(tbl)tbl.innerHTML=ownerRenderTrail(window._ownerTrailData.entries,f,actionIcon,actionColor);
+  };
+  window.ownerTrailExport=function(){
+    const e=window._ownerTrailData?.entries||[];
+    const csv='Date,Time,User,Role,Action,Part No,Old Value,New Value,Extra\n'
+      +e.map(t=>`"${t.date||''}","${(t.time||'').slice(0,5)}","${t.userName||t.user||''}","${t.role||''}","${t.action}","${t.partNo||''}","${String(t.oldVal||'').replace(/"/g,'""')}","${String(t.newVal||'').replace(/"/g,'""')}","${String(t.extra||'').replace(/"/g,'""')}"`).join('\n');
+    dlCSV(csv,`audit_trail_owner_${today()}.csv`);
+    toast('Trail exported','s');
+  };
+}
+
+function ownerRenderTrail(entries,filter,actionIcon,actionColor){
+  let rows=entries;
+  if(filter!=='all')rows=entries.filter(e=>e.action===filter);
+  if(!rows.length)return`<div style="padding:40px;text-align:center;color:#94a3b8">No events for this filter</div>`;
+  return`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:540px">
+    <thead><tr style="background:#fffbeb">
+      ${['Date/Time','User','Role','Action','Part No','Old Value','New Value','Notes'].map(h=>`<th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:#92400e;border-bottom:1.5px solid #f0e0a0;white-space:nowrap">${h}</th>`).join('')}
+    </tr></thead>
+    <tbody>${rows.slice(0,200).map((t,i)=>{
+      const ic=actionIcon[t.action]||'📝';
+      const ac=actionColor[t.action]||'#475569';
+      return`<tr style="border-bottom:1px solid #fef9ec;background:${i%2?'#fffbeb22':'#fff'}">
+        <td style="padding:8px 12px;font-size:10px;font-family:'JetBrains Mono',monospace;white-space:nowrap">
+          <div style="font-weight:700">${esc(t.date||'')}</div>
+          <div style="color:#94a3b8">${esc((t.time||'').slice(0,5))}</div>
+        </td>
+        <td style="padding:8px 12px;font-size:12px;font-weight:700">${esc(t.userName||t.user||'—')}</td>
+        <td style="padding:8px 12px"><span style="font-size:9px;padding:1px 7px;border-radius:20px;background:#f1f5f9;color:#475569;font-weight:700">${esc(t.role||'exec')}</span></td>
+        <td style="padding:8px 12px;white-space:nowrap"><span style="font-size:11px;font-weight:700;color:${ac}">${ic} ${esc(t.action.replace(/_/g,' '))}</span></td>
+        <td style="padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#2563eb">${esc(t.partNo||'—')}</td>
+        <td style="padding:8px 12px;font-size:11px;color:#dc2626;max-width:100px;overflow:hidden;text-overflow:ellipsis">${esc(String(t.oldVal||'—').slice(0,20))}</td>
+        <td style="padding:8px 12px;font-size:11px;color:#059669;max-width:100px;overflow:hidden;text-overflow:ellipsis">${esc(String(t.newVal||'—').slice(0,20))}</td>
+        <td style="padding:8px 12px;font-size:10px;color:#64748b;max-width:160px;overflow:hidden;text-overflow:ellipsis">${esc(String(t.extra||'—').slice(0,40))}</td>
+      </tr>`;
+    }).join('')}
+    ${rows.length>200?`<tr><td colspan="8" style="padding:8px;text-align:center;font-size:10px;color:#94a3b8">Showing 200 of ${rows.length}</td></tr>`:''}</tbody>
+  </table></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// OWNER + MASTER — PENDING APPROVALS (Delete Requests)
+// ═══════════════════════════════════════════════════════════
+async function rOwnerApprovals(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Loading Approval Requests…</div>';
+  const r=await api({action:'getApprovalRequests',status:'all'});
+  const pending=(r.success&&r.requests)||JSON.parse(localStorage.getItem('imPendingApprovals3')||'[]');
+  renderApprovalsPage(pending);
+}
+
+// Also accessible from master_auditor's page
+async function rMasterApprovals(){return rOwnerApprovals();}
+
+function renderApprovalsPage(requests){
+  const pg=$('PG');
+  const pendingReqs=requests.filter(r=>r.status==='pending');
+  const approvedReqs=requests.filter(r=>r.status==='approved');
+  const rejectedReqs=requests.filter(r=>r.status==='rejected');
+  const isMaster=S.user?.role==='master_auditor';
+  const isOwner=S.user?.role==='dealer_owner';
+  const canAct=isMaster||isOwner;
+
+  function reqCard(req){
+    const statusClass={pending:'pending',approved:'approved',rejected:'rejected'}[req.status]||'pending';
+    const statusLabel={pending:'⏳ Pending',approved:'✅ Approved',rejected:'❌ Rejected'}[req.status]||'Pending';
+    const typeLabel={DELETE_COUNT:'🗑 Delete Count Record'}[req.type]||req.type;
+    return`<div class="appr-card ${statusClass}">
+      <div class="appr-card-hd">
+        <div style="width:42px;height:42px;border-radius:12px;background:${req.status==='pending'?'#fffbeb':req.status==='approved'?'#ecfdf5':'#fef2f2'};border:1.5px solid ${req.status==='pending'?'#fde68a':req.status==='approved'?'#a7f3d0':'#fecaca'};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${req.type==='DELETE_COUNT'?'🗑':'📋'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;color:#0f172a">${typeLabel}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">${esc(req.requestedByName||req.requestedBy||'Unknown')} · ${esc(req.date||'')} ${esc((req.time||'').slice(0,5))}</div>
+        </div>
+        <span class="appr-badge ${statusClass}">${statusLabel}</span>
+      </div>
+      <div class="appr-card-body">
+        <!-- Detail rows -->
+        ${[
+          ['Part Number',`<span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#2563eb">${esc(req.partNo||'—')}</span>`],
+          ['Quantity in Record',`<strong>${esc(req.qty||'—')}</strong>`],
+          ['Requested By',`<strong>${esc(req.requestedByName||req.requestedBy||'—')}</strong>`],
+          ['Reason for Deletion',`<span style="color:${req.status==='pending'?'#92400e':'#475569'};font-style:italic">"${esc(req.reason||'No reason given')}"</span>`],
+          ['Request Time',`${esc(req.date||'')} at ${esc((req.time||'').slice(0,5))}`],
+          req.decidedAt?['Decision By',`<strong>${esc(req.decidedBy||'—')}</strong> at ${esc((req.decidedAt||'').slice(0,16).replace('T',' '))} — <em>${esc(req.decisionNote||'—')}</em>`]:null
+        ].filter(Boolean).map(([lbl,val])=>`<div class="appr-card-row">
+          <span class="appr-card-lbl">${lbl}</span>
+          <span class="appr-card-val">${val}</span>
+        </div>`).join('')}
+        <!-- Action buttons for master+owner -->
+        ${canAct&&req.status==='pending'?`<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button onclick="approveRequest('${req.id}')" style="flex:1;padding:9px;border:none;border-radius:9px;background:linear-gradient(135deg,#059669,#047857);color:#fff;font-size:12px;font-weight:700;cursor:pointer;min-width:100px">✅ Approve &amp; Delete</button>
+          <button onclick="rejectRequest('${req.id}')" style="flex:1;padding:9px;border:none;border-radius:9px;background:#fff;color:#dc2626;border:1.5px solid #fecaca;font-size:12px;font-weight:700;cursor:pointer;min-width:100px">❌ Reject</button>
+        </div>`:''}
+      </div>
+    </div>`;
+  }
+
+  pg.innerHTML=`
+  <div class="ph"><div><div class="pt">⏳ Pending Approvals</div>
+    <div class="ps">Delete requests from Executives · ${pendingReqs.length} pending · Requires ${isMaster?'your':'Master Auditor'} approval</div></div>
+    <button class="btn bgh bsm" onclick="rOwnerApprovals()">🔄 Refresh</button>
+  </div>
+
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
+    <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#d97706">${pendingReqs.length}</div>
+      <div style="font-size:10px;font-weight:700;color:#d97706;margin-top:3px;text-transform:uppercase">⏳ Pending</div>
+    </div>
+    <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#059669">${approvedReqs.length}</div>
+      <div style="font-size:10px;font-weight:700;color:#059669;margin-top:3px;text-transform:uppercase">✅ Approved</div>
+    </div>
+    <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">${rejectedReqs.length}</div>
+      <div style="font-size:10px;font-weight:700;color:#dc2626;margin-top:3px;text-transform:uppercase">❌ Rejected</div>
+    </div>
+  </div>
+
+  <!-- Pending section -->
+  ${pendingReqs.length?`
+  <div class="osec"><div class="osec-title">⏳ Pending Requests (${pendingReqs.length})</div><div class="osec-line"></div></div>
+  ${pendingReqs.map(reqCard).join('')}`:`
+  <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:14px;padding:28px;text-align:center;margin-bottom:18px">
+    <div style="font-size:32px;margin-bottom:8px">✅</div>
+    <div style="font-size:15px;font-weight:800;color:#065f46">No Pending Requests</div>
+    <div style="font-size:12px;color:#059669;margin-top:4px">All deletion requests have been reviewed</div>
+  </div>`}
+
+  <!-- History -->
+  ${approvedReqs.length||rejectedReqs.length?`
+  <div class="osec"><div class="osec-title">📋 Decision History</div><div class="osec-line"></div></div>
+  ${[...approvedReqs,...rejectedReqs].sort((a,b)=>(b.decidedAt||b.requestedAt||'').localeCompare(a.decidedAt||a.requestedAt||'')).slice(0,20).map(reqCard).join('')}`:''}`;
+
+  window._approvalsData=requests;
+}
+
+async function approveRequest(reqId){
+  const note=prompt('Approval note (optional):');
+  const requests=window._approvalsData||[];
+  const req=requests.find(r=>r.id===reqId);
+  if(!req){toast('Request not found','w');return;}
+
+  // Perform the actual delete
+  const r=await api({action:'deleteCount',id:req.recordId});
+  if(!r.success){toast('Delete failed: '+(r.error||'Unknown'),'d');return;}
+
+  // Update request status
+  req.status='approved';
+  req.decidedBy=S.user?.name||S.user?.username||'';
+  req.decidedAt=new Date().toISOString();
+  req.decisionNote=note||'Approved';
+
+  // Save updated status to sheets + local
+  const pending=JSON.parse(localStorage.getItem('imPendingApprovals3')||'[]');
+  const idx=pending.findIndex(p=>p.id===reqId);
+  if(idx>=0)pending[idx]=req;
+  localStorage.setItem('imPendingApprovals3',JSON.stringify(pending));
+  if(S.online)api({action:'updateApprovalRequest',request:req}).catch(()=>{});
+
+  logTrail('COUNT_DELETED',req.partNo,'',req.qty,'0',`Approved by ${req.decidedBy} — ${req.decisionNote}`);
+  toast('✅ Approved and deleted','s',3000);
+  renderApprovalsPage(requests);
+}
+
+async function rejectRequest(reqId){
+  const note=prompt('Reason for rejection (required):');
+  if(!note){toast('Rejection reason required','w');return;}
+  const requests=window._approvalsData||[];
+  const req=requests.find(r=>r.id===reqId);
+  if(!req)return;
+
+  req.status='rejected';
+  req.decidedBy=S.user?.name||S.user?.username||'';
+  req.decidedAt=new Date().toISOString();
+  req.decisionNote=note;
+
+  const pending=JSON.parse(localStorage.getItem('imPendingApprovals3')||'[]');
+  const idx=pending.findIndex(p=>p.id===reqId);
+  if(idx>=0)pending[idx]=req;
+  localStorage.setItem('imPendingApprovals3',JSON.stringify(pending));
+  if(S.online)api({action:'updateApprovalRequest',request:req}).catch(()=>{});
+
+  logTrail('DELETE_REJECTED',req.partNo,'',req.qty,'Rejected',`By ${req.decidedBy} — ${note}`);
+  toast('❌ Request rejected','w',3000);
+  renderApprovalsPage(requests);
+}
 
 // Hook logTrail into key existing functions (patch at boot)
 const _origSaveCount=window.saveCount;
@@ -7912,7 +8242,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   ['LU','LPW'].forEach(id=>{const el=$(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});});
   document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openGS();}if(e.key==='Escape')closeGS();});
   document.addEventListener('click',e=>{document.querySelectorAll('.acl').forEach(l=>{if(!l.closest('.acw')?.contains(e.target))l.style.display='none';});if(!$('GSO').contains(e.target)&&e.target!==$('GSO')){}});
-  window.addEventListener('online',()=>{S.online=true;syncUI();flushQ();});
+  window.addEventListener('online',()=>{S.online=true;syncUI();flushQ();_oqFlush();});
   window.addEventListener('offline',()=>{S.online=false;syncUI();});
 
   // Patch subMan to log trail
