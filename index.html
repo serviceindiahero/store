@@ -871,7 +871,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbw5ELKal2HM85kw5Bz8SKonAZMp_EcX_dUQgoVc_Xgv7X6P06hv7slnJcIRLCTJQW65Yg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbw11_1OFDtFP_sHJLslvkDSouJRcPBnKw7L7Udl1JEP7MPW808-op_GaXJur7UgTA32Yg/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -1257,6 +1257,8 @@ function buildNav(){
       {sec:'📊 Executive Dashboard'},
       {l:'Owner Dashboard',i:'👑',p:'ownerdash'},
       {l:'Financial Overview',i:'💰',p:'ownerfinance'},
+      {l:'💎 Financial Impact',i:'📊',p:'ownerfinancial'},
+      {l:'🚨 Profit Leakage',i:'🔍',p:'ownerprofitleak'},
       {l:'Inventory Health',i:'🏥',p:'ownerhealth'},
       {sec:'📋 Reports'},
       {l:'Variance Summary',i:'📊',p:'ownervariance'},
@@ -1308,7 +1310,7 @@ function closeSB(){$('SB').classList.remove('on');$('OV').classList.remove('on')
 function go(p, fromPopState){
   if(!S.user)return;
   if(['variance','daywise','fullsummary','uncounted','foc','dms','settings','movingparts','billtype','orderplan','qrgen','binqr','audittrail','invanalysis','cycleplan','rootcause'].includes(p)&&S.user.role!=='master_auditor'&&S.user.role!=='dealer_owner'){toast('Master Auditor only','w');return;}
-  const ownerPages=['ownerdash','ownerfinance','ownerhealth','ownervariance','ownerstockreport','ownertopparts','ownertrends','ownerdeadstock','ownerteam','ownerabc','ownerfms','ownertrail','ownerapprovals'];
+  const ownerPages=['ownerdash','ownerfinance','ownerfinancial','ownerprofitleak','ownerhealth','ownervariance','ownerstockreport','ownertopparts','ownertrends','ownerdeadstock','ownerteam','ownerabc','ownerfms','ownertrail','ownerapprovals'];
   if(ownerPages.includes(p)&&S.user.role!=='dealer_owner'&&S.user.role!=='master_auditor'){toast('Owner / Master Auditor access only','w');return;}
   stopCam();closeSB();setNav(p);
   if(!fromPopState){history.pushState({page:p},'','#'+p);}
@@ -1317,7 +1319,7 @@ function go(p, fromPopState){
     variance:rVariance,daywise:rDaywise,fullsummary:rFullSummary,uncounted:rUncounted,foc:rFOC,
     movingparts:rMovingParts,billtype:rBillType,orderplan:rOrderPlan,qrgen:rQRGen,binqr:rBinQR,audittrail:rAuditTrail,invanalysis:rInvAnalysis,
     itemmaster:rItemMaster,dms:rDMS,settings:rSettings,
-    ownerdash:rOwnerDash,ownerfinance:rOwnerFinance,ownerhealth:rOwnerHealth,
+    ownerdash:rOwnerDash,ownerfinance:rOwnerFinance,ownerfinancial:rOwnerFinancial,ownerprofitleak:rOwnerProfitLeak,ownerhealth:rOwnerHealth,
     ownervariance:rOwnerVariance,ownerstockreport:rOwnerStockReport,ownertopparts:rOwnerTopParts,
     ownertrends:rOwnerTrends,ownerdeadstock:rOwnerDeadStock,ownerteam:rOwnerTeam,
     ownerabc:rOwnerABC,ownerfms:rOwnerFMS,ownertrail:rOwnerTrail,ownerapprovals:rOwnerApprovals,
@@ -1650,9 +1652,9 @@ function onQR(raw){
   res.forEach(function(newItem){
     const existing=S.scanQ.find(function(q){return q.partNo===newItem.partNo;});
     if(existing){
-      // ★ FIX: OVERWRITE qty — no accumulation, scan = final count
-      existing.qty=newItem.qty;
-      toast("🔄 "+newItem.partNo+" qty set: "+newItem.qty,"i",1500);
+      // ★ FIX: QR re-scan of same part → ACCUMULATE qty (each scan = more pieces found)
+      existing.qty=(existing.qty||0)+newItem.qty;
+      toast("📦 "+newItem.partNo+" × "+existing.qty+" total (added "+newItem.qty+")","s",1500);
     }
     else if(S.scanQ.length<20){S.scanQ.push(newItem);toast("📷 Added: "+newItem.partNo,"s",1500);}
     else{toast("Queue full (20). Tap Save All.","w");}
@@ -2149,10 +2151,12 @@ async function bwsSave(){
 
 function bwsQuickCount(pn, dms){
   // Pre-fill the bin-wise input with this part number
+  // ★ FIX: Always set qty to 1 — NEVER auto-fill DMS qty as physical count
+  // User must physically count and enter the real qty
   const inp=$('BWS_INPUT');
   if(inp){inp.value=pn;inp.focus();}
-  if($('BWS_QTY'))$('BWS_QTY').value=dms>0?dms:1;
-  toast(`Part ${pn} loaded — verify qty and save`,'i',2500);
+  if($('BWS_QTY'))$('BWS_QTY').value=1;
+  toast(`Part ${pn} loaded — enter physical count qty and save`,'i',2500);
   // Scroll to input
   inp?.scrollIntoView({behavior:'smooth',block:'center'});
 }
@@ -2219,12 +2223,12 @@ function processWedge(v){
     res.forEach(newItem=>{
       const existing=S.scanQ.find(q=>q.partNo===newItem.partNo);
       if(existing){
-        // ★ FIX: OVERWRITE qty, do NOT add — scan = final physical count
-        existing.qty=newItem.qty;
-        toast(`🔄 ${newItem.partNo} qty set to: ${newItem.qty} (overwritten)`,'i',2000);
+        // ★ FIX: QR wedge re-scan → ACCUMULATE qty (scanning more pieces of same part)
+        existing.qty=(existing.qty||0)+newItem.qty;
+        toast(`📦 ${newItem.partNo} × ${existing.qty} total (added ${newItem.qty})`,'s',2000);
       } else if(S.scanQ.length<20){
         S.scanQ.push(newItem);
-        toast(`📷 Added: ${newItem.partNo}`,'s',1500);
+        toast(`📷 Added: ${newItem.partNo} — scan again for more pieces`,'s',1500);
       } else {
         toast('Queue full (20). Save All first.','w');
       }
@@ -2239,13 +2243,15 @@ function processWedge(v){
   if(pn.length>2){
     const existing=S.scanQ.find(q=>q.partNo===pn);
     if(existing){
-      // ★ FIX: plain barcode re-scan → set qty to 1 (final count = 1 piece confirmed)
-      // User can manually adjust qty in the card before saving
-      toast(`🔄 ${pn} already in queue — adjust qty manually if needed`,'i',2500);
+      // ★ FIX: plain barcode re-scan = scanning another physical piece of the same part
+      // Each scan of barcode gun = 1 more piece counted → ACCUMULATE qty
+      existing.qty=(existing.qty||0)+1;
+      toast(`📦 ${pn} × ${existing.qty} (scan ${existing.qty} counted)`,'s',1500);
+      if(area)renderCardsInto(area);
     } else if(S.scanQ.length<20){
       const item=findItem(pn);
       S.scanQ.push({partNo:pn,qty:1,mrp:parseFloat(item?.mrp)||0});
-      toast(`📷 Added: ${pn}`,'s',1500);
+      toast(`📷 Added: ${pn} — scan again for more pieces`,'s',1500);
     } else {
       toast('Queue full (20). Tap Save All first.','w');
     }
@@ -4403,6 +4409,9 @@ function renderMovingDashboard(){
     <div>
       <div class="pt">📈 Moving Parts Dashboard</div>
       <div class="ps">${hasSales?`${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} to ${meta.dateTo}`:'No sales data loaded'}</div>
+      ${hasSales?`<div style="display:inline-flex;align-items:center;gap:6px;margin-top:5px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:#15803d">
+        📅 Data till: <strong>${meta.dateTo}</strong> &nbsp;·&nbsp; Next upload from: <strong>${nextMonth(meta.dateTo)}</strong>
+      </div>`:''}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
       <button class="btn bgh bsm" onclick="mvUploadCSV()" id="MVUPLBTN">
@@ -4586,6 +4595,15 @@ function renderMvTable(entries,period){
   ${entries.length>300?`<div style="padding:10px 16px;font-size:11px;color:#94a3b8">Showing 300 of ${entries.length}. Use filter to narrow down.</div>`:''}`;
 }
 
+// Returns the next month string after a YYYY-MM input
+function nextMonth(ym){
+  if(!ym)return'';
+  const[y,m]=ym.split('-').map(Number);
+  if(!y||!m)return'';
+  const d=new Date(y,m,1);// JS month is 0-based, so m = next month automatically
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+
 function mvUploadCSV(){
   $('MVSFILE')?.click();
 }
@@ -4718,6 +4736,9 @@ function renderBillTypeDash(){
     <div>
       <div class="pt">🧾 Bill Type Analysis</div>
       <div class="ps">${hasSales?`${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} → ${meta.dateTo}`:'No sales data loaded'}</div>
+      ${hasSales?`<div style="display:inline-flex;align-items:center;gap:6px;margin-top:5px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:#15803d">
+        📅 Data till: <strong>${meta.dateTo}</strong> &nbsp;·&nbsp; Next upload from: <strong>${nextMonth(meta.dateTo)}</strong>
+      </div>`:''}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
       <button class="btn bgh bsm" onclick="go('movingparts')">📈 Moving Parts</button>
@@ -6156,7 +6177,75 @@ async function ownerBuildData(){
     categories,users,monthlyTotals,
     totalItems:S.items.length,
     countedItems:Object.keys(cMap).length,
-    hasSales:!!(salesMeta&&salesMeta.totalRows>0)
+    hasSales:!!(salesMeta&&salesMeta.totalRows>0),
+
+    // ── NEW: Extended Financial Metrics ──────────────────
+    // Inventory Turnover Ratio = Annual Sales Value / Average Inventory Value
+    // Carrying Cost = 25% of inventory value per year (industry standard)
+    // Monthly Carrying Cost = totalStockVal * 0.25 / 12
+    get carryingCostMonthly(){ return Math.round(this.totalStockVal*0.25/12); },
+    get carryingCostAnnual(){ return Math.round(this.totalStockVal*0.25); },
+
+    // Fast moving revenue (parts with avgMonthly >= 2)
+    get fastRevenue(){
+      let r=0;
+      S.items.forEach(i=>{
+        const s=S_SALES_MAP[i.partNo];if(!s)return;
+        const tot=Object.values(s).reduce((a,b)=>a+b,0);
+        const months=Object.keys(s).length||1;
+        const avg=tot/months;
+        if(avg>=2)r+=tot*(parseFloat(i.dlc)||0);
+      });
+      return Math.round(r);
+    },
+    // Slow moving revenue
+    get slowRevenue(){
+      let r=0;
+      S.items.forEach(i=>{
+        const s=S_SALES_MAP[i.partNo];if(!s)return;
+        const tot=Object.values(s).reduce((a,b)=>a+b,0);
+        const months=Object.keys(s).length||1;
+        const avg=tot/months;
+        if(avg>0&&avg<2)r+=tot*(parseFloat(i.dlc)||0);
+      });
+      return Math.round(r);
+    },
+    // Total sales value from history
+    get totalSalesValue(){
+      let r=0;
+      S.items.forEach(i=>{
+        const s=S_SALES_MAP[i.partNo];if(!s)return;
+        r+=Object.values(s).reduce((a,b)=>a+b,0)*(parseFloat(i.dlc)||0);
+      });
+      return Math.round(r);
+    },
+    // Inventory Turnover Ratio
+    get turnoverRatio(){
+      const sv=this.totalSalesValue;
+      return sv&&totalStockVal?(sv/totalStockVal).toFixed(2):0;
+    },
+    // Days Inventory Outstanding
+    get daysInventoryOutstanding(){
+      const tr=parseFloat(this.turnoverRatio);
+      return tr>0?Math.round(365/tr):0;
+    },
+    // Profit leakage = shortage loss + dead stock carrying cost + opportunity cost of excess
+    get profitLeakage(){ return Math.round(shortVal + (deadVal*0.25/12) + (excessVal*0.15/12)); },
+    // Monthly sales trend enriched with value
+    get monthlyRevenueTrend(){
+      const sm=S_SALES_META;
+      const months=(sm?.months||[]).slice(-12);
+      return months.map(m=>{
+        let qty=0,val=0;
+        S.items.forEach(i=>{
+          const sm2=S_SALES_MAP[i.partNo];
+          if(!sm2||!sm2[m])return;
+          qty+=sm2[m];
+          val+=sm2[m]*(parseFloat(i.dlc)||0);
+        });
+        return{month:m,qty:Math.round(qty),value:Math.round(val)};
+      });
+    }
   };
 }
 
@@ -6444,6 +6533,321 @@ async function rOwnerFinance(){
       });
     }
   },150);
+}
+
+
+// ════════════════════════════════════════════
+// 2b. FINANCIAL IMPACT ENGINE — Complete Financial Picture
+// ════════════════════════════════════════════
+async function rOwnerFinancial(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Building financial model…</div>';
+  const d=await ownerBuildData();
+  const totalSalesVal=d.totalSalesValue||0;
+  const turnover=d.turnoverRatio||0;
+  const dio=d.daysInventoryOutstanding||0;
+  const carryMonthly=d.carryingCostMonthly||0;
+  const carryAnnual=d.carryingCostAnnual||0;
+  const fastRev=d.fastRevenue||0;
+  const slowRev=d.slowRevenue||0;
+  const profLeak=d.profitLeakage||0;
+  const revTrend=d.monthlyRevenueTrend||[];
+  const last6=revTrend.slice(-6);
+  const avgMonthlyRev=last6.length?Math.round(last6.reduce((s,m)=>s+m.value,0)/last6.length):0;
+  let totalMRP=0,totalDLC=0;
+  S.items.forEach(i=>{const q=parseFloat(i.systemQty)||0;totalMRP+=q*(parseFloat(i.mrp)||0);totalDLC+=q*(parseFloat(i.dlc)||0);});
+  const marginPct=totalMRP>0?Math.round(((totalMRP-totalDLC)/totalMRP)*100):0;
+  const potentialGrossMargin=Math.round(totalMRP-totalDLC);
+
+  pg.innerHTML=`
+  <div class="ph" style="flex-wrap:wrap;gap:10px">
+    <div><div class="pt">📊 Financial Impact Engine</div><div class="ps">Complete money picture — Stock value · Turnover · Carrying cost · Revenue · Leakage · Loss report</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bgh bsm" onclick="finExport()">⬇️ Export Report</button>
+      <button class="btn bpr bsm" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+
+  <!-- HERO 6-metric band -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">
+    ${[
+      {icon:'💰',label:'Total Stock Value',val:oFmt(d.totalStockVal),sub:'At DLC rate',color:'#f0c060',bg:'linear-gradient(135deg,#0f172a,#1e3a5f)'},
+      {icon:'📈',label:'Turnover Ratio',val:turnover+'×',sub:dio+' days inventory',color:'#4ade80',bg:'linear-gradient(135deg,#064e3b,#065f46)'},
+      {icon:'🔄',label:'Avg Monthly Revenue',val:oFmt(avgMonthlyRev),sub:'6-month avg (DLC)',color:'#60a5fa',bg:'linear-gradient(135deg,#1e3a5f,#1d4ed8)'},
+      {icon:'💸',label:'Carrying Cost/Mo',val:oFmt(carryMonthly),sub:'25% p.a. standard',color:'#f87171',bg:'linear-gradient(135deg,#7f1d1d,#991b1b)'},
+      {icon:'🚰',label:'Profit Leakage/Mo',val:oFmt(profLeak),sub:'All sources combined',color:'#fbbf24',bg:'linear-gradient(135deg,#78350f,#92400e)'},
+      {icon:'📐',label:'Gross Margin Est.',val:marginPct+'%',sub:'MRP vs DLC spread',color:'#c084fc',bg:'linear-gradient(135deg,#4a1d96,#5b21b6)'}
+    ].map(m=>`
+    <div style="background:${m.bg};border-radius:16px;padding:18px 16px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-10px;right:-10px;font-size:40px;opacity:.12">${m.icon}</div>
+      <div style="font-size:20px;margin-bottom:5px">${m.icon}</div>
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${m.label}</div>
+      <div style="font-size:clamp(14px,2.5vw,22px);font-weight:900;color:${m.color};font-family:'JetBrains Mono',monospace;letter-spacing:-1px">${m.val}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">${m.sub}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Fast vs Slow vs Dead + Monthly trend -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+    <div class="ochart">
+      <div class="ochart-hd"><div class="ochart-title">⚡ Revenue Split — Fast vs Slow vs Dead</div></div>
+      <div class="ochart-body"><canvas id="OC_REV_SPLIT" style="max-height:220px"></canvas></div>
+    </div>
+    <div class="ochart">
+      <div class="ochart-hd"><div class="ochart-title">📉 Monthly Revenue Trend</div></div>
+      <div class="ochart-body"><canvas id="OC_REV_TREND" style="max-height:220px"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Carrying Cost Breakdown -->
+  <div class="ochart" style="margin-bottom:20px">
+    <div class="ochart-hd"><div class="ochart-title">💸 Carrying Cost Analysis</div></div>
+    <div style="padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+      ${[
+        {label:'Annual Carrying Cost (25% p.a.)',val:oFmt(carryAnnual),color:'#dc2626',icon:'📅',note:'Cost of holding '+oFmt(d.totalStockVal)+' in stock yearly'},
+        {label:'Monthly Carrying Cost',val:oFmt(carryMonthly),color:'#d97706',icon:'📆',note:'Includes storage, insurance, obsolescence risk'},
+        {label:'Dead Stock Monthly Cost',val:oFmt(Math.round(d.deadVal*0.25/12)),color:'#7c3aed',icon:'💀',note:d.deadCount+' parts — return or liquidate to recover'},
+        {label:'Excess Stock Monthly Cost',val:oFmt(Math.round(d.excessVal*0.25/12)),color:'#d97706',icon:'📦',note:d.excessCount+' excess parts — reduce future orders'},
+      ].map(c=>`
+      <div style="background:#f8fafc;border-radius:var(--rs);padding:14px;border-left:4px solid ${c.color}">
+        <div style="font-size:18px;margin-bottom:6px">${c.icon}</div>
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">${c.label}</div>
+        <div style="font-size:22px;font-weight:900;color:${c.color};font-family:'JetBrains Mono',monospace">${c.val}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:4px">${c.note}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- Turnover gauge + Monthly summary table -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+    <div class="ochart">
+      <div class="ochart-hd"><div class="ochart-title">🔄 Inventory Turnover Health</div></div>
+      <div style="padding:20px;text-align:center">
+        <div style="font-size:52px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${parseFloat(turnover)>=4?'#059669':parseFloat(turnover)>=2?'#d97706':'#dc2626'}">${turnover}×</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">Annual turnover ratio</div>
+        <div style="font-size:13px;font-weight:700;color:#475569;margin-top:8px">Days Inventory Outstanding: <span style="color:#0f172a">${dio}</span></div>
+        <div style="margin:14px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px">
+          <div style="padding:7px;background:${parseFloat(turnover)<2?'#fef2f2':'#f8fafc'};border-radius:7px;border:1.5px solid ${parseFloat(turnover)<2?'#fca5a5':'#e2e8f0'}"><div style="font-weight:700;color:#dc2626">Poor &lt;2×</div></div>
+          <div style="padding:7px;background:${parseFloat(turnover)>=2&&parseFloat(turnover)<4?'#fffbeb':'#f8fafc'};border-radius:7px;border:1.5px solid ${parseFloat(turnover)>=2&&parseFloat(turnover)<4?'#fde68a':'#e2e8f0'}"><div style="font-weight:700;color:#d97706">Average 2–4×</div></div>
+          <div style="padding:7px;background:${parseFloat(turnover)>=4?'#f0fdf4':'#f8fafc'};border-radius:7px;border:1.5px solid ${parseFloat(turnover)>=4?'#a7f3d0':'#e2e8f0'}"><div style="font-weight:700;color:#059669">Good ≥4×</div></div>
+        </div>
+        <div style="background:#f0f4f8;border-radius:var(--rs);padding:11px 14px;font-size:11px;color:#475569;text-align:left">
+          💡 Hero dealership benchmark: <strong>4–6 turns/year</strong>.
+          ${parseFloat(turnover)<3?'⚠️ Below benchmark — reduce dead & slow stock.':'✅ Good — keep monitoring slow categories.'}
+        </div>
+      </div>
+    </div>
+    <div class="ochart">
+      <div class="ochart-hd"><div class="ochart-title">📋 Monthly Financial Summary</div></div>
+      <div class="otbl-wrap" style="max-height:290px;overflow-y:auto">
+        <table class="otbl">
+          <thead><tr><th>Month</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th><th style="text-align:right">Carry Cost</th><th style="text-align:right">Net</th></tr></thead>
+          <tbody>${revTrend.length?revTrend.slice(-12).reverse().map(m=>{
+            const net=m.value-carryMonthly;
+            return`<tr>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700">${m.month}</td>
+              <td style="text-align:right;font-size:11px">${m.qty.toLocaleString('en-IN')}</td>
+              <td style="text-align:right;font-weight:700;color:#059669;font-size:11px">${oFmt(m.value)}</td>
+              <td style="text-align:right;font-size:11px;color:#dc2626">-${oFmt(carryMonthly)}</td>
+              <td style="text-align:right;font-weight:800;font-size:12px;color:${net>0?'#059669':'#dc2626'}">${net>=0?'+':''}${oFmt(net)}</td>
+            </tr>`;
+          }).join(''):`<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">Upload sales CSV to see monthly revenue data</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loss Report -->
+  <div class="osec"><div class="osec-title">📉 Loss Report — Where Money Is Going</div><div class="osec-line"></div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px">
+    ${[
+      {title:'Audit Shortage Loss',val:oFmt(d.shortVal),items:d.shortCount,desc:'Missing vs DMS stock — possible theft/billing error',color:'#dc2626',action:'Investigate immediately — check GRN, returns, DMS'},
+      {title:'Dead Stock Annual Cost',val:oFmt(Math.round(d.deadVal*0.25)),items:d.deadCount,desc:'Carrying cost of zero-movement inventory',color:'#7c3aed',action:'Return to HMCL under return scheme, discount or write off'},
+      {title:'Excess Over-investment',val:oFmt(d.excessVal),items:d.excessCount,desc:'Capital blocked in over-stocked parts',color:'#d97706',action:'Reduce future orders for these '+d.excessCount+' parts'},
+      {title:'Stock-out Revenue Risk',val:oFmt(Math.round(d.fastLow.reduce((s,i)=>s+(i.avgMonthly||0)*(i.dlc||0)*2,0))),items:d.fastLow.length,desc:'2-month revenue at risk from low-stock fast movers',color:'#0891b2',action:'Emergency reorder for '+d.fastLow.length+' fast-moving parts'},
+    ].map(l=>`
+    <div style="border:1.5px solid ${l.color}20;border-radius:var(--rs);overflow:hidden">
+      <div style="padding:13px 14px;background:${l.color}08">
+        <div style="font-size:12px;font-weight:800;color:${l.color};margin-bottom:4px">${l.title}</div>
+        <div style="font-size:22px;font-weight:900;color:${l.color};font-family:'JetBrains Mono',monospace">${l.val}</div>
+        <div style="font-size:10px;color:#64748b;margin-top:3px">${l.items} parts · ${l.desc}</div>
+      </div>
+      <div style="padding:9px 14px;font-size:11px;color:#374151;border-top:1px solid ${l.color}15;background:${l.color}04">⚡ ${l.action}</div>
+    </div>`).join('')}
+  </div>`;
+
+  window._finData=d;
+
+  setTimeout(()=>{
+    const ctx1=$('OC_REV_SPLIT');
+    if(ctx1&&window.Chart){
+      if(S.charts.oc_rev_split)S.charts.oc_rev_split.destroy();
+      S.charts.oc_rev_split=new Chart(ctx1,{type:'doughnut',
+        data:{labels:['Fast Moving','Slow Moving','Dead Stock'],datasets:[{data:[fastRev,slowRev,Math.round(d.deadVal)],backgroundColor:['#059669','#d97706','#7c3aed'],borderWidth:2,borderColor:'#fff'}]},
+        options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},cutout:'60%',responsive:true,maintainAspectRatio:true}
+      });
+    }
+    const ctx2=$('OC_REV_TREND');
+    if(ctx2&&window.Chart&&revTrend.length){
+      if(S.charts.oc_rev_trend)S.charts.oc_rev_trend.destroy();
+      S.charts.oc_rev_trend=new Chart(ctx2,{type:'bar',
+        data:{labels:revTrend.map(m=>m.month.slice(5)),datasets:[
+          {label:'Revenue',data:revTrend.map(m=>m.value),backgroundColor:'rgba(5,150,105,.7)',borderColor:'#059669',borderWidth:1,borderRadius:4},
+          {label:'Units',data:revTrend.map(m=>m.qty),type:'line',borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.1)',borderWidth:2,pointRadius:3,fill:true,tension:.3,yAxisID:'y1'}
+        ]},
+        options:{plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:10}}}},
+          scales:{y:{ticks:{callback:v=>'₹'+(v/1000).toFixed(0)+'K',font:{size:9}},grid:{color:'#f1f5f9'},position:'left'},
+            y1:{ticks:{font:{size:9}},grid:{display:false},position:'right'}},
+          responsive:true,maintainAspectRatio:true}
+      });
+    }
+  },150);
+}
+
+function finExport(){
+  const d=window._finData;if(!d){toast('Load Financial Impact page first','w');return;}
+  const csv=`India Motors — Financial Impact Report\n${today()}\n\n`+
+    `METRIC,VALUE\n`+
+    `Total Stock Value,${oFmt(d.totalStockVal)}\n`+
+    `Turnover Ratio,${d.turnoverRatio}x\n`+
+    `Days Inventory Outstanding,${d.daysInventoryOutstanding}\n`+
+    `Annual Carrying Cost,${oFmt(d.carryingCostAnnual)}\n`+
+    `Monthly Carrying Cost,${oFmt(d.carryingCostMonthly)}\n`+
+    `Shortage Loss,${oFmt(d.shortVal)}\n`+
+    `Excess Stock,${oFmt(d.excessVal)}\n`+
+    `Dead Stock,${oFmt(d.deadVal)}\n`+
+    `Monthly Profit Leakage,${oFmt(d.profitLeakage)}\n\n`+
+    `MONTHLY REVENUE\nMonth,Units,Revenue\n`+
+    (d.monthlyRevenueTrend||[]).map(m=>`${m.month},${m.qty},${m.value}`).join('\n');
+  dlCSV(csv,`financial_impact_${today()}.csv`);
+  toast('Report exported','s');
+}
+
+// ════════════════════════════════════════════
+// 2c. PROFIT LEAKAGE DETECTOR + OWNER DECISIONS
+// ════════════════════════════════════════════
+async function rOwnerProfitLeak(){
+  const pg=$('PG');
+  pg.innerHTML='<div style="text-align:center;padding:60px;color:#94a3b8">⏳ Detecting profit leakage…</div>';
+  const d=await ownerBuildData();
+
+  const leakSources=[];
+  d.shortItems.slice(0,10).forEach(i=>{leakSources.push({severity:'critical',type:'Audit Shortage',part:i.partNo,desc:i.desc||'',bin:i.bin||'',impact:Math.round(Math.abs(i.variance)*(i.dlc||0)),detail:`${Math.abs(i.variance)} units missing · DMS:${i.systemQty} vs Physical:${i.physQty}`,action:'Physically recount · Check last GRN · Verify billing records',icon:'🔻'});});
+  d.deadItems.slice(0,8).forEach(i=>{const m=Math.round((i.stockVal||0)*0.25/12);if(m>500)leakSources.push({severity:'warning',type:'Dead Stock',part:i.partNo,desc:i.desc||'',bin:i.bin||'',impact:m,detail:`${i.systemQty} units · ${oFmt(i.stockVal||0)} value · Zero sales`,action:'Return to HMCL · Discount · Write off',icon:'💀'});});
+  d.fastLow.slice(0,8).forEach(i=>{const m=Math.round((i.avgMonthly||0)*(i.dlc||0));if(m>500)leakSources.push({severity:'warning',type:'Stock-out Risk',part:i.partNo,desc:i.desc||'',bin:i.bin||'',impact:m,detail:`${i.coverDays} days left · ${(i.avgMonthly||0).toFixed(1)} units/mo`,action:`Order ${Math.ceil((i.avgMonthly||0)*2)} units immediately (2-month cover)`,icon:'⚡'});});
+  d.excessItems.slice(0,6).forEach(i=>{const m=Math.round((i.variance*(i.dlc||0))*0.25/12);if(m>200)leakSources.push({severity:'info',type:'Excess Stock',part:i.partNo,desc:i.desc||'',bin:i.bin||'',impact:m,detail:`+${i.variance} extra · ${oFmt(i.variance*(i.dlc||0))} blocked`,action:'Reduce future orders · Verify DMS returns updated',icon:'🔺'});});
+  leakSources.sort((a,b)=>b.impact-a.impact);
+  const totalLeakage=leakSources.reduce((s,l)=>s+l.impact,0);
+  const sevColors={critical:'#dc2626',warning:'#d97706',info:'#2563eb'};
+  const sevBg={critical:'#fef2f2',warning:'#fffbeb',info:'#eff6ff'};
+  const sevBorder={critical:'#fca5a5',warning:'#fde68a',info:'#bfdbfe'};
+
+  pg.innerHTML=`
+  <div class="ph" style="flex-wrap:wrap;gap:10px">
+    <div><div class="pt">🔍 Profit Leakage Detector</div><div class="ps">Every rupee being lost — pinpointed with AI action plan</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bpr bsm" onclick="runLeakageAI()" id="LEAK_AI_BTN">🤖 AI Action Plan</button>
+      <button class="btn bgh bsm" onclick="leakExport()">⬇️ Export</button>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#7f1d1d,#991b1b,#b91c1c);border-radius:16px;padding:20px 24px;margin-bottom:20px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:rgba(252,165,165,.7);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">🚰 ESTIMATED MONTHLY PROFIT LEAKAGE</div>
+        <div style="font-size:36px;font-weight:900;color:#fca5a5;font-family:'JetBrains Mono',monospace;letter-spacing:-2px">${oFmt(totalLeakage)}</div>
+        <div style="font-size:12px;color:rgba(252,165,165,.5);margin-top:4px">${leakSources.length} leakage sources found</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:rgba(255,255,255,.5)">Annual exposure</div>
+        <div style="font-size:24px;font-weight:800;color:#fde68a;font-family:'JetBrains Mono',monospace">${oFmt(totalLeakage*12)}</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="LEAK_AI_OUT" style="margin-bottom:20px"></div>
+
+  <div class="osec"><div class="osec-title">🔍 All Leakage Sources (by impact)</div><div class="osec-line"></div></div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+    ${leakSources.map(l=>`
+    <div style="border-radius:12px;border:1.5px solid ${sevBorder[l.severity]||'#e2e8f0'};background:${sevBg[l.severity]||'#f8fafc'};overflow:hidden">
+      <div style="padding:13px 16px;display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:22px;flex-shrink:0;margin-top:2px">${l.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:${sevColors[l.severity]};background:${sevColors[l.severity]}18;padding:2px 8px;border-radius:20px">${l.type}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#2563eb">${esc(l.part)}</span>
+            ${l.bin?`<span class="bg bgp" style="font-size:9px">${esc(l.bin)}</span>`:''}
+          </div>
+          <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:3px">${esc(l.desc)}</div>
+          <div style="font-size:11px;color:#64748b">${esc(l.detail)}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:16px;font-weight:900;color:${sevColors[l.severity]};font-family:'JetBrains Mono',monospace">${oFmt(l.impact)}</div>
+          <div style="font-size:9px;color:#94a3b8;text-transform:uppercase">per month</div>
+        </div>
+      </div>
+      <div style="padding:9px 16px;background:rgba(0,0,0,.02);border-top:1px solid ${sevBorder[l.severity]||'#e2e8f0'}60;font-size:11px;color:#374151;display:flex;align-items:center;gap:8px">
+        <span style="font-weight:700;color:${sevColors[l.severity]}">⚡</span><span>${esc(l.action)}</span>
+      </div>
+    </div>`).join('')||'<div class="emp"><div class="emp-i">🎉</div><div class="emp-t">No significant leakages!</div></div>'}
+  </div>
+
+  <div class="osec"><div class="osec-title">👑 Owner Decision Summary</div><div class="osec-line"></div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px">
+    ${[
+      {title:'Today',color:'#dc2626',icon:'🚨',items:[d.shortItems.length?`Investigate ${d.shortItems.length} shortage parts — ${oFmt(d.shortVal)} at risk`:'✅ No shortages',d.fastLow.length?`Reorder ${d.fastLow.length} fast-moving parts immediately`:'✅ Stock levels OK',`Audit: ${d.totalItems?Math.round(d.countedItems/d.totalItems*100):0}% complete`]},
+      {title:'This Week',color:'#d97706',icon:'📅',items:[`Review ${d.deadCount} dead stock parts (${oFmt(d.deadVal)} locked)`,`Excess stock: ${d.excessCount} parts need order reduction`,`Turnover ratio: ${d.turnoverRatio}× (target: 4–6×)`]},
+      {title:'This Month',color:'#2563eb',icon:'📆',items:[`Plug monthly leakage of ${oFmt(totalLeakage)}`,`Optimise carrying cost: ${oFmt(d.carryingCostMonthly)}/mo`,`Financial impact report to team`]}
+    ].map(c=>`
+    <div class="ochart" style="border-top:4px solid ${c.color}">
+      <div style="padding:14px 16px">
+        <div style="font-size:16px;margin-bottom:4px">${c.icon}</div>
+        <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:10px">${c.title}</div>
+        ${c.items.map(i=>`<div style="display:flex;gap:7px;margin-bottom:7px;font-size:12px;color:#374151;line-height:1.5"><span style="color:${c.color};font-weight:800;flex-shrink:0">→</span><span>${i}</span></div>`).join('')}
+      </div>
+    </div>`).join('')}
+  </div>`;
+
+  window._leakSources=leakSources;window._leakData=d;
+}
+
+async function runLeakageAI(){
+  const btn=$('LEAK_AI_BTN'),out=$('LEAK_AI_OUT');
+  const sources=window._leakSources||[];const d=window._leakData;
+  if(!d){toast('Load page first','w');return;}
+  if(btn){btn.disabled=true;btn.textContent='🧠 Generating plan…';}
+  if(out){out.innerHTML=`<div class="ochart" style="padding:20px;text-align:center"><div style="font-size:30px;margin-bottom:10px;display:inline-block;animation:spin 2s linear infinite">🤖</div><div style="font-weight:700;color:#0f172a">IMAS creating your action plan…</div></div>`;}
+  const prompt=`You are IMAS — India Motors AI System advisor. The owner needs an actionable decision plan.
+
+FINANCIAL SITUATION:
+- Stock Value: ${oFmt(d.totalStockVal)} | Shortage: ${oFmt(d.shortVal)} (${d.shortCount} parts) | Dead Stock: ${oFmt(d.deadVal)} (${d.deadCount} parts) | Excess: ${oFmt(d.excessVal)} (${d.excessCount} parts)
+- Monthly Carrying Cost: ${oFmt(d.carryingCostMonthly)} | Monthly Leakage: ${oFmt(d.profitLeakage)} | Turnover: ${d.turnoverRatio}×
+
+TOP LEAKAGE:
+${sources.slice(0,6).map(l=>`${l.type} — ${l.part}: ${oFmt(l.impact)}/mo`).join('\n')}
+
+Give a crisp action plan in 3 sections: TODAY | THIS WEEK | STRATEGY
+Use ₹ amounts. Be specific like a CA advisor. Under 200 words.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)throw new Error('API '+res.status);
+    const data=await res.json();
+    const reply=data.content?.find(b=>b.type==='text')?.text||'';
+    if(out&&reply){
+      const fmt2=reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^#+\s*(.+)$/gm,'<div style="font-weight:900;font-size:14px;color:#0f172a;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid #f1f5f9">$1</div>').replace(/^[\-\*] (.+)$/gm,'<div style="display:flex;gap:8px;margin:4px 0;font-size:13px;color:#374151"><span style="color:#2563eb;font-weight:800">•</span><span>$1</span></div>').replace(/₹([\d,]+)/g,'<strong style="color:#059669;font-family:\'JetBrains Mono\',monospace">₹$1</strong>').replace(/\n/g,'<br>');
+      out.innerHTML=`<div class="ochart" style="border-top:4px solid #2563eb"><div class="ochart-hd" style="background:linear-gradient(135deg,#f0f4ff,#eff6ff)"><div class="ochart-title">🤖 IMAS Action Plan — Claude AI</div><span style="font-size:10px;color:#94a3b8">${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span></div><div style="padding:18px 20px;font-size:13px;line-height:1.7;color:#0f172a">${fmt2}</div></div>`;
+    }
+  }catch(e){if(out)out.innerHTML=`<div class="al alw">❌ AI unavailable: ${esc(e.message)}</div>`;}
+  if(btn){btn.disabled=false;btn.textContent='🤖 Refresh Plan';}
+}
+
+function leakExport(){
+  const s=window._leakSources||[];
+  dlCSV(`India Motors — Profit Leakage Report\n${today()}\n\nType,Part,Description,Bin,Monthly Impact,Detail,Action\n`+s.map(l=>`"${l.type}","${l.part}","${(l.desc||'').replace(/"/g,'""')}","${l.bin||''}",${l.impact},"${(l.detail||'').replace(/"/g,'""')}","${(l.action||'').replace(/"/g,'""')}"`).join('\n'),`profit_leakage_${today()}.csv`);
+  toast('Exported','s');
 }
 
 // ════════════════════════════════════════════
