@@ -871,7 +871,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbw11_1OFDtFP_sHJLslvkDSouJRcPBnKw7L7Udl1JEP7MPW808-op_GaXJur7UgTA32Yg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzZ_KG8XhGI9kGdR62r4lfkGIlCSw-G3yf8XqzWRkMmpqy_4Wri1IP7DiHZQAQHKUeNcQ/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -1005,19 +1005,23 @@ const greet=()=>{const h=new Date().getHours();return h<12?'Good Morning':h<17?'
 async function callAPI(data) {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(), 15000); // 15 sec max
+    // Large payloads (sales data ~600KB) need more time — use 45s for saveSalesData, 15s for rest
+    const timeoutMs = (data.action==='saveSalesData') ? 45000 : 15000;
+    const timer = setTimeout(()=>controller.abort(), timeoutMs);
     const r = await fetch(API, {
       method: 'POST',
       redirect: 'follow',
       signal: controller.signal,
+      // ★ FIX: Content-Type MUST be set — without it GAS cannot read e.postData.contents
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
     clearTimeout(timer);
     const txt = await r.text();
     try { return JSON.parse(txt); }
-    catch(e) { return {success:false, error:'Bad JSON: '+txt.slice(0,120)}; }
+    catch(e) { return {success:false, error:'Bad JSON from server: '+txt.slice(0,200)}; }
   } catch(e) {
-    if(e.name==='AbortError') return {success:false, error:'Server timeout (>15s). Check API URL in Settings.'};
+    if(e.name==='AbortError') return {success:false, error:'Server timeout. For sales upload this can happen with very large files — try splitting by period.'};
     return {success:false, error:e.message};
   }
 }
@@ -1652,7 +1656,7 @@ function onQR(raw){
   res.forEach(function(newItem){
     const existing=S.scanQ.find(function(q){return q.partNo===newItem.partNo;});
     if(existing){
-      // ★ FIX: QR re-scan of same part → ACCUMULATE qty (each scan = more pieces found)
+      // ★ FIX: QR re-scan → ACCUMULATE qty
       existing.qty=(existing.qty||0)+newItem.qty;
       toast("📦 "+newItem.partNo+" × "+existing.qty+" total (added "+newItem.qty+")","s",1500);
     }
@@ -2152,7 +2156,6 @@ async function bwsSave(){
 function bwsQuickCount(pn, dms){
   // Pre-fill the bin-wise input with this part number
   // ★ FIX: Always set qty to 1 — NEVER auto-fill DMS qty as physical count
-  // User must physically count and enter the real qty
   const inp=$('BWS_INPUT');
   if(inp){inp.value=pn;inp.focus();}
   if($('BWS_QTY'))$('BWS_QTY').value=1;
@@ -2223,7 +2226,7 @@ function processWedge(v){
     res.forEach(newItem=>{
       const existing=S.scanQ.find(q=>q.partNo===newItem.partNo);
       if(existing){
-        // ★ FIX: QR wedge re-scan → ACCUMULATE qty (scanning more pieces of same part)
+        // ★ FIX: QR wedge re-scan → ACCUMULATE qty
         existing.qty=(existing.qty||0)+newItem.qty;
         toast(`📦 ${newItem.partNo} × ${existing.qty} total (added ${newItem.qty})`,'s',2000);
       } else if(S.scanQ.length<20){
@@ -2243,8 +2246,7 @@ function processWedge(v){
   if(pn.length>2){
     const existing=S.scanQ.find(q=>q.partNo===pn);
     if(existing){
-      // ★ FIX: plain barcode re-scan = scanning another physical piece of the same part
-      // Each scan of barcode gun = 1 more piece counted → ACCUMULATE qty
+      // ★ FIX: Each barcode re-scan = 1 more physical piece — ACCUMULATE
       existing.qty=(existing.qty||0)+1;
       toast(`📦 ${pn} × ${existing.qty} (scan ${existing.qty} counted)`,'s',1500);
       if(area)renderCardsInto(area);
@@ -4600,7 +4602,7 @@ function nextMonth(ym){
   if(!ym)return'';
   const[y,m]=ym.split('-').map(Number);
   if(!y||!m)return'';
-  const d=new Date(y,m,1);// JS month is 0-based, so m = next month automatically
+  const d=new Date(y,m,1);
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 }
 
