@@ -871,7 +871,7 @@ select.fin{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Your exact API URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbzZ_KG8XhGI9kGdR62r4lfkGIlCSw-G3yf8XqzWRkMmpqy_4Wri1IP7DiHZQAQHKUeNcQ/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzAFeDOfPaOPypmOwAIQ_Um73LwWjYbaBVqmuI5zbXlgF7Y1QR5QJXj-G25Y6yewuoUvw/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -1005,23 +1005,19 @@ const greet=()=>{const h=new Date().getHours();return h<12?'Good Morning':h<17?'
 async function callAPI(data) {
   try {
     const controller = new AbortController();
-    // Large payloads (sales data ~600KB) need more time — use 45s for saveSalesData, 15s for rest
-    const timeoutMs = (data.action==='saveSalesData') ? 45000 : 15000;
-    const timer = setTimeout(()=>controller.abort(), timeoutMs);
+    const timer = setTimeout(()=>controller.abort(), 15000); // 15 sec max
     const r = await fetch(API, {
       method: 'POST',
       redirect: 'follow',
       signal: controller.signal,
-      // ★ FIX: Content-Type MUST be set — without it GAS cannot read e.postData.contents
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
     clearTimeout(timer);
     const txt = await r.text();
     try { return JSON.parse(txt); }
-    catch(e) { return {success:false, error:'Bad JSON from server: '+txt.slice(0,200)}; }
+    catch(e) { return {success:false, error:'Bad JSON: '+txt.slice(0,120)}; }
   } catch(e) {
-    if(e.name==='AbortError') return {success:false, error:'Server timeout. For sales upload this can happen with very large files — try splitting by period.'};
+    if(e.name==='AbortError') return {success:false, error:'Server timeout (>15s). Check API URL in Settings.'};
     return {success:false, error:e.message};
   }
 }
@@ -1408,10 +1404,22 @@ function doGS(){
     if(!q){res.innerHTML='<div class="gs-em"><div style="font-size:36px;margin-bottom:8px">🔍</div><div style="font-weight:600;color:#64748b">Type to search</div></div>';return;}
     const items=srch(q);
     if(!items.length){res.innerHTML=`<div class="gs-em"><div style="font-size:36px;margin-bottom:8px">😕</div><div style="font-weight:600;color:#64748b">No results for "${esc(q)}"</div></div>`;return;}
-    const cMap={};S.counts.forEach(c=>{if(!cMap[c.partNo])cMap[c.partNo]=0;cMap[c.partNo]+=parseFloat(c.qty)||0;});
+    const cMap={};const dmsAtCountMap={};
+    S.counts.forEach(c=>{
+      if(!cMap[c.partNo])cMap[c.partNo]=0;
+      cMap[c.partNo]+=parseFloat(c.qty)||0;
+      // ★ FIX: store DMS qty at time of count — don't use current systemQty for variance
+      if(c.dmsQtyAtCount!==undefined && dmsAtCountMap[c.partNo]===undefined)
+        dmsAtCountMap[c.partNo]=parseFloat(c.dmsQtyAtCount)||0;
+    });
     let h=`<div class="gs-sec">📦 ${items.length} item(s) found</div>`;
     h+=items.map(item=>{
-      const dms=parseFloat(item.systemQty)||0,cnt=cMap[item.partNo]??null;
+      // ★ FIX: use DMS at time of count if available, else current systemQty
+      const _dmsNow=parseFloat(item.systemQty)||0;
+      const dms=dmsAtCountMap[item.partNo]!==undefined?dmsAtCountMap[item.partNo]:_dmsNow;
+      const cnt=cMap[item.partNo]??null;
+      // Show warning badge if DMS changed since count
+      const _dmsChanged=dmsAtCountMap[item.partNo]!==undefined&&dmsAtCountMap[item.partNo]!==_dmsNow;
       const diff=cnt!==null?cnt-dms:null;
       const sb=diff===null?'bgg':diff===0?'bgs':diff<0?'bgd':'bgw';
       const sl=diff===null?'Not Counted':diff===0?'✅ Match':diff<0?`🔻 Short ${Math.abs(diff)}`:`🔺 Excess +${diff}`;
@@ -1656,9 +1664,9 @@ function onQR(raw){
   res.forEach(function(newItem){
     const existing=S.scanQ.find(function(q){return q.partNo===newItem.partNo;});
     if(existing){
-      // ★ FIX: QR re-scan → ACCUMULATE qty
+      // ★ FIX: Rescan = more pieces found → accumulate qty
       existing.qty=(existing.qty||0)+newItem.qty;
-      toast("📦 "+newItem.partNo+" × "+existing.qty+" total (added "+newItem.qty+")","s",1500);
+      toast("📦 "+newItem.partNo+" × "+existing.qty+" total","s",1500);
     }
     else if(S.scanQ.length<20){S.scanQ.push(newItem);toast("📷 Added: "+newItem.partNo,"s",1500);}
     else{toast("Queue full (20). Tap Save All.","w");}
@@ -1728,7 +1736,8 @@ function mDash(st,counts){
   $('PG').innerHTML=`
   <div class="ph">
     <div><div class="pt">${greet()}, ${esc(nm)} 👋</div>
-    <div class="ps">${fmtD(new Date())} &nbsp;·&nbsp; <span class="bg bgs"><span style="width:5px;height:5px;border-radius:50%;background:#059669;display:inline-block;margin-right:3px"></span>${esc(S.auditS?.sessionName||'March 2026 Full Audit')}</span>${activeUsers.length>1?` &nbsp;·&nbsp; <span class="bg bgp" style="font-size:9px">👥 ${activeUsers.length} users active</span>`:''}</div></div>
+    <div class="ps">${fmtD(new Date())} &nbsp;·&nbsp; <span class="bg bgs"><span style="width:5px;height:5px;border-radius:50%;background:#059669;display:inline-block;margin-right:3px"></span>${esc(S.auditS?.sessionName||'March 2026 Full Audit')}</span>${activeUsers.length>1?` &nbsp;·&nbsp; <span class="bg bgp" style="font-size:9px">👥 ${activeUsers.length} users active</span>`:''}</div>
+    ${(()=>{const d=localStorage.getItem('imDMSLastUpdated');return d?`<div style="font-size:11px;color:#64748b;margin-top:3px">🗓️ Inventory last uploaded: <strong>${d}</strong></div>`:'';})()} </div>
     <div style="display:flex;gap:8px">
       <button class="btn bgh bsm" onclick="openGS()">🔍 Search</button>
       <button class="btn bpr bsm" onclick="go('scan')">📷 Scan</button>
@@ -2127,7 +2136,8 @@ async function bwsSave(){
     date:today(), qty, time:nowt(),
     type:'BinWise', remarks:reason||`Bin-wise: ${bin}`,
     auditor:S.user.username, auditorName:S.user.name,
-    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today(),
+    dmsQtyAtCount:dmsQty  // ★ snapshot DMS qty at time of this count
   };
 
   // ★ INSTANT local commit
@@ -2155,11 +2165,11 @@ async function bwsSave(){
 
 function bwsQuickCount(pn, dms){
   // Pre-fill the bin-wise input with this part number
-  // ★ FIX: Always set qty to 1 — NEVER auto-fill DMS qty as physical count
   const inp=$('BWS_INPUT');
   if(inp){inp.value=pn;inp.focus();}
   if($('BWS_QTY'))$('BWS_QTY').value=1;
-  toast(`Part ${pn} loaded — enter physical count qty and save`,'i',2500);
+  // ★ FIX: Always 1 — never auto-fill DMS qty as physical count
+  toast(`Part ${pn} loaded — enter physical count qty then save`,'i',2500);
   // Scroll to input
   inp?.scrollIntoView({behavior:'smooth',block:'center'});
 }
@@ -2226,12 +2236,12 @@ function processWedge(v){
     res.forEach(newItem=>{
       const existing=S.scanQ.find(q=>q.partNo===newItem.partNo);
       if(existing){
-        // ★ FIX: QR wedge re-scan → ACCUMULATE qty
+        // ★ FIX: Rescan = more pieces found → accumulate
         existing.qty=(existing.qty||0)+newItem.qty;
         toast(`📦 ${newItem.partNo} × ${existing.qty} total (added ${newItem.qty})`,'s',2000);
       } else if(S.scanQ.length<20){
         S.scanQ.push(newItem);
-        toast(`📷 Added: ${newItem.partNo} — scan again for more pieces`,'s',1500);
+        toast(`📷 Added: ${newItem.partNo}`,'s',1500);
       } else {
         toast('Queue full (20). Save All first.','w');
       }
@@ -2246,14 +2256,14 @@ function processWedge(v){
   if(pn.length>2){
     const existing=S.scanQ.find(q=>q.partNo===pn);
     if(existing){
-      // ★ FIX: Each barcode re-scan = 1 more physical piece — ACCUMULATE
+      // ★ FIX: Each barcode rescan = 1 more physical piece found → accumulate
       existing.qty=(existing.qty||0)+1;
-      toast(`📦 ${pn} × ${existing.qty} (scan ${existing.qty} counted)`,'s',1500);
+      toast(`📦 ${pn} × ${existing.qty} pcs counted`,'s',1500);
       if(area)renderCardsInto(area);
     } else if(S.scanQ.length<20){
       const item=findItem(pn);
       S.scanQ.push({partNo:pn,qty:1,mrp:parseFloat(item?.mrp)||0});
-      toast(`📷 Added: ${pn} — scan again for more pieces`,'s',1500);
+      toast(`📷 Added: ${pn}`,'s',1500);
     } else {
       toast('Queue full (20). Tap Save All first.','w');
     }
@@ -2372,7 +2382,8 @@ async function saveOne(i){
     partNo:pn, desc:m?.desc||'', bin, date:today(), qty,
     time:nowt(), type:'QR', remarks:reason||(existingEntry?'Recount':''),
     auditor:S.user.username, auditorName:S.user.name,
-    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today(),
+    dmsQtyAtCount:typeof dmsQty!=='undefined'?dmsQty:parseFloat(findItem(countPayload?.partNo||pn)?.systemQty||0)
   };
 
   // ★ INSTANT — remove from queue and show success immediately
@@ -2628,7 +2639,8 @@ async function subMan(sfx){
     date:today(), qty, time:nowt(), type:'Manual',
     remarks:reason||(existingEntry?'Recount':''),
     auditor:S.user.username, auditorName:S.user.name,
-    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today(),
+    dmsQtyAtCount:typeof dmsQty!=='undefined'?dmsQty:parseFloat(findItem(countPayload?.partNo||pn)?.systemQty||0)
   };
 
   // ★ INSTANT local commit
@@ -2694,7 +2706,8 @@ async function subPkt(){
     date:today(), qty, time:nowt(), type:'Packet',
     remarks:reason||`${n}pkts×${u}`,
     auditor:S.user.username, auditorName:S.user.name,
-    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today()
+    sessionId:S.auditS?.sessionId||'SESS001', dmsRefDate:today(),
+    dmsQtyAtCount:typeof dmsQty!=='undefined'?dmsQty:parseFloat(findItem(countPayload?.partNo||pn)?.systemQty||0)
   };
   // ★ INSTANT
   appendHistory({partNo:pn,user:S.user.username,userName:S.user.name,countedQty:qty,systemQty:dmsQty,variance,status,reason:reason||`${n}pkts×${u}`,date:today(),time:nowt(),type:'Packet',action:existingEntry?'RECOUNT':'FIRST_COUNT'});
@@ -3732,12 +3745,16 @@ async function rDMS(){
   <div class="tp on" id="TDMS">
     <div class="al alw">⚠️ After upload click "Apply to Items Sheet" to update System Qty.</div>
     <div class="snpc">
-      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Active Snapshot</div>
+      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Active DMS Snapshot</div>
       <div style="font-size:16px;font-weight:800">${esc(active.snapshotName||'DMS Stock 23-Mar-2026')}</div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:#475569">
         <span>📅 ${esc(active.uploadDate||'23-03-2026')}</span>
         <span>📦 ${fmt(parseInt(active.totalParts)||0)}</span>
         <span>👤 ${esc(active.uploadedBy||'')}</span>
+      </div>
+      <div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:#dbeafe;border:1px solid #93c5fd;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;color:#1d4ed8">
+        🗓️ Inventory last uploaded on: <strong>${esc(active.uploadDate||'—')}</strong>
+        ${active.uploadedBy?`&nbsp;by <strong>${esc(active.uploadedBy)}</strong>`:''}
       </div>
     </div>
     <div class="cd" style="margin-bottom:16px"><div class="cdh"><div class="cdt">Upload New DMS Stock</div></div><div class="cdb">
@@ -3804,6 +3821,8 @@ async function applyDailyStock(){
   }
   // Refresh items cache
   await syncItems();
+  // ★ Save DMS upload timestamp for "Inventory last uploaded" badge
+  localStorage.setItem('imDMSLastUpdated', today());
   toast(`✅ Stock updated! ${totalUpdated} parts updated in items sheet`,'s',5000);
   $('DAILYPREV').innerHTML=`<div class="al als">✅ Done! ${totalUpdated} parts updated. Items sheet System Qty is now current.</div>`;
   dailyRows=[];
@@ -3813,7 +3832,13 @@ async function applyDailyStock(){
 let dmRows=[],dmSid='';
 function prevDMS(input){const f=input.files[0];if(!f)return;const area=$('DMSPREV');const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(Boolean);dmRows=lines.slice(1).map(l=>l.split(',').map(v=>(v||'').trim().replace(/"/g,''))).filter(r=>r[0]).map(r=>({partNo:r[0].trim(),hsn:r[1]||'',desc:r[2]||'',mrp:parseFloat(r[3])||0,dlc:parseFloat(r[4])||0,moq:parseInt(r[5])||1,dmsQty:parseInt(r[6])||0,category:r[7]||'',unit:'Nos'}));area.innerHTML=`<div class="snpc"><div style="font-size:16px;font-weight:800">${dmRows.length} parts found</div><div style="font-size:12px;margin-top:4px;color:#475569">${f.name} · ${dmRows.filter(d=>S.items.find(i=>i.partNo===d.partNo)).length} matched in items sheet</div></div><div class="fl" style="margin-bottom:10px"><label class="fll">Snapshot Name</label><input class="fi" id="DSNM" value="${f.name.replace(/\.[^.]+$/,'').replace(/_/g,' ')}"></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><input type="checkbox" id="DSACT" checked style="width:14px;height:14px;accent-color:#2563eb"><label for="DSACT" style="font-size:13px;font-weight:500;cursor:pointer">Set as Active Snapshot</label></div><div style="display:flex;gap:9px"><button class="btn bpr" onclick="saveDMS()">💾 Save Snapshot</button><button class="btn bgh" onclick="$('DMSPREV').innerHTML=''">Cancel</button></div><div id="APPLYP" style="display:none;margin-top:12px"><div class="al alw">✅ Saved! Now update System Qty in items sheet?<div style="margin-top:9px;display:flex;gap:8px"><button class="btn bsu bsm" onclick="applyDMS()">✅ Yes, Apply to Items Sheet</button><button class="btn bgh bsm" onclick="$('APPLYP').style.display='none'">Skip</button></div></div></div>`;};reader.readAsText(f);}
 async function saveDMS(){if(!dmRows.length){toast('No data','w');return;}const name=$('DSNM')?.value||'DMS-'+today(),setAct=$('DSACT')?.checked;const r=await api({action:'saveDMSSnapshot',snapshot:{name,date:today(),time:nowt(),uploadedBy:S.user.username,totalParts:dmRows.length}});if(!r.success){toast('Failed: '+r.error,'d');return;}dmSid=r.snapshotId;for(let i=0;i<dmRows.length;i+=200)await api({action:'saveDMSItems',snapshotId:dmSid,items:dmRows.slice(i,i+200).map(d=>({...d,snapshotId:dmSid}))});if(setAct)await api({action:'setActiveSnapshot',snapshotId:dmSid});toast('Snapshot saved!','s');const p=$('APPLYP');if(p)p.style.display='block';}
-async function applyDMS(){if(!dmSid)return;if(!confirm('Update System Qty in items sheet from this DMS data?\nPhysical count records will NOT be affected.'))return;const r=await api({action:'applySnapshotToMaster',snapshotId:dmSid});if(r.success){toast(`Updated ${r.updated||0} items in items sheet`,'s');const p=$('APPLYP');if(p)p.style.display='none';await syncItems();}else toast(r.error||'Failed','d');}
+async function applyDMS(){if(!dmSid)return;if(!confirm('Update System Qty in items sheet from this DMS data?\nPhysical count records will NOT be affected.'))return;const r=await api({action:'applySnapshotToMaster',snapshotId:dmSid});if(r.success){
+    toast(`Updated ${r.updated||0} items in items sheet`,'s');
+    const p=$('APPLYP');if(p)p.style.display='none';
+    // ★ Save DMS upload timestamp for "Inventory last uploaded" badge
+    localStorage.setItem('imDMSLastUpdated', today());
+    await syncItems();
+  }else toast(r.error||'Failed','d');}
 async function setSnap(id){const r=await api({action:'setActiveSnapshot',snapshotId:id});if(r.success){toast('Updated','s');rDMS();}else toast(r.error||'Failed','d');}
 
 // ═══════════════════════════════════════════════════════════
@@ -4411,9 +4436,7 @@ function renderMovingDashboard(){
     <div>
       <div class="pt">📈 Moving Parts Dashboard</div>
       <div class="ps">${hasSales?`${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} to ${meta.dateTo}`:'No sales data loaded'}</div>
-      ${hasSales?`<div style="display:inline-flex;align-items:center;gap:6px;margin-top:5px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:#15803d">
-        📅 Data till: <strong>${meta.dateTo}</strong> &nbsp;·&nbsp; Next upload from: <strong>${nextMonth(meta.dateTo)}</strong>
-      </div>`:''}
+      ${hasSales?`<div style="display:inline-flex;align-items:center;gap:6px;margin-top:5px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:#15803d">📅 Data till: <strong>${meta.dateTo}</strong> &nbsp;·&nbsp; Next upload from: <strong>${nextMonth(meta.dateTo)}</strong></div>`:''}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
       <button class="btn bgh bsm" onclick="mvUploadCSV()" id="MVUPLBTN">
@@ -4597,7 +4620,6 @@ function renderMvTable(entries,period){
   ${entries.length>300?`<div style="padding:10px 16px;font-size:11px;color:#94a3b8">Showing 300 of ${entries.length}. Use filter to narrow down.</div>`:''}`;
 }
 
-// Returns the next month string after a YYYY-MM input
 function nextMonth(ym){
   if(!ym)return'';
   const[y,m]=ym.split('-').map(Number);
@@ -4650,11 +4672,20 @@ async function mvHandleFile(input){
             'Checking Google Sheets for existing data…');
     await new Promise(r=>setTimeout(r,80));
 
-    // APPEND — backend auto-skips months already in sheet
+    // APPEND in chunks of 200 — avoids GAS timeout on large files
     const batch=`${parsed.dateFrom}_to_${parsed.dateTo}`;
-    setProg('Saving new records to Google Sheets…','Data is being ADDED (not replaced)',60,'Sending to server…');
-    const r=await api({action:'saveSalesData', rows:parsed.rows, batch});
-    if(!r.success) throw new Error(r.error||'Server save failed');
+    const CHUNK_SIZE=200;
+    const totalChunks=Math.ceil(parsed.rows.length/CHUNK_SIZE);
+    let totalSaved=0,totalSkipped=0;
+    for(let ci=0;ci<totalChunks;ci++){
+      const chunkRows=parsed.rows.slice(ci*CHUNK_SIZE,(ci+1)*CHUNK_SIZE);
+      const pct=60+Math.round((ci/totalChunks)*25);
+      setProg(`Saving chunk ${ci+1}/${totalChunks}…`,`${chunkRows.length} records`,pct,'Sending to Google Sheets…');
+      await new Promise(r=>setTimeout(r,50));
+      const r=await api({action:'saveSalesData',rows:chunkRows,batch,chunkIndex:ci,totalChunks});
+      if(!r.success) throw new Error(r.error||'Server save failed at chunk '+(ci+1));
+      totalSaved+=(r.saved||0);totalSkipped+=(r.skipped||0);
+    }
 
     setProg('Reloading full history…','Building analysis from all data',85,'');
     await new Promise(r=>setTimeout(r,80));
@@ -4667,12 +4698,12 @@ async function mvHandleFile(input){
     closeMd();
 
     // Informative toast with billable type breakdown
-    if(r.saved===0){
-      toast(`ℹ️ ${r.skipped||0} records already in Google Sheets — nothing new added. Data is up to date.`,'i',6000);
+    if(totalSaved===0){
+      toast(`ℹ️ ${totalSkipped||0} records already in Google Sheets — nothing new added. Data is up to date.`,'i',6000);
     } else {
       const bs=parsed.billSummary||{};
       const btLine=Object.entries(bs).map(([k,v])=>`${k}: ${v.qty} pcs`).join(' · ');
-      toast(`✅ Added ${r.saved} records for ${parsed.uniqueParts} parts\n${btLine}`,'s',8000);
+      toast(`✅ Added ${totalSaved} records for ${parsed.uniqueParts} parts\n${btLine}`,'s',8000);
     }
     renderMovingDashboard();
   }catch(err){
@@ -4738,9 +4769,7 @@ function renderBillTypeDash(){
     <div>
       <div class="pt">🧾 Bill Type Analysis</div>
       <div class="ps">${hasSales?`${meta.totalRows.toLocaleString('en-IN')} records · ${meta.dateFrom} → ${meta.dateTo}`:'No sales data loaded'}</div>
-      ${hasSales?`<div style="display:inline-flex;align-items:center;gap:6px;margin-top:5px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:#15803d">
-        📅 Data till: <strong>${meta.dateTo}</strong> &nbsp;·&nbsp; Next upload from: <strong>${nextMonth(meta.dateTo)}</strong>
-      </div>`:''}
+      ${hasSales?`<div style="display:inline-flex;align-items:center;gap:6px;margin-top:5px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:#15803d">📅 Data till: <strong>${meta.dateTo}</strong> &nbsp;·&nbsp; Next upload from: <strong>${nextMonth(meta.dateTo)}</strong></div>`:''}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
       <button class="btn bgh bsm" onclick="go('movingparts')">📈 Moving Parts</button>
