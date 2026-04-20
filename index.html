@@ -1417,7 +1417,7 @@ tr:hover td{background:linear-gradient(90deg,#fafbff,transparent)}
 // ═══════════════════════════════════════════════════════════
 // CONFIG — Replace with your Google Apps Script URL
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbztRErzL5coySPIscCz9E8qJcAJMifYPvRDLbVlKRqbJhULpPyNXJNPG1GXhGmmI1Q8aw/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxrCOMDGNkDLghhPiFB3WU5H8PtU_b-6g8brnWWY4dG-fpTtz_E9JQX5Jm4GpjJLnlH5w/exec';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -1550,15 +1550,21 @@ const srch = q => {
 async function callAPI(data) {
   try {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 18000);
-    const r = await fetch(API, { method:'POST', redirect:'follow', signal:ctrl.signal, body:JSON.stringify(data) });
+    const timer = setTimeout(() => ctrl.abort(), 25000);
+    // GAS Web App requires text/plain (not application/json) to avoid CORS preflight
+    const r = await fetch(API, {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data)
+    });
     clearTimeout(timer);
     const txt = await r.text();
     try { return JSON.parse(txt); }
     catch(e) { return { success:false, error:'Bad JSON: '+txt.slice(0,120) }; }
   } catch(e) {
-    if(e.name==='AbortError') return { success:false, error:'Timeout. Check API URL.' };
-    return { success:false, error:e.message };
+    if(e.name==='AbortError') return { success:false, error:'Timeout — server took too long. Try again.' };
+    return { success:false, error:'Network error: ' + e.message };
   }
 }
 
